@@ -14,9 +14,9 @@ import {
   FormSection,
   SignupSection,
   SignupText,
-} from "./LoginPage.styles";
+} from "./LoginPage_m.styles";
 
-function LoginPage() {
+function LoginPage_m() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -36,6 +36,7 @@ function LoginPage() {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
+  // 유효성 검사
   useEffect(() => {
     const validateForm = () => {
       const emailValid =
@@ -86,7 +87,7 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("로그인 시도:", formData);
+    console.log("판매자 로그인 시도:", formData);
   };
 
   return (
@@ -99,7 +100,7 @@ function LoginPage() {
             <img src={squirrelIcon} alt="다람쥐" />
           </SquirrelContainer>
           <ManagerLink>
-            사장님이신가요? <Link to="/manager">사장님 전용 페이지</Link>
+            일반 유저이신가요? <Link to="/user">일반 유저 전용 페이지</Link>
           </ManagerLink>
         </PictureSection>
 
@@ -125,7 +126,6 @@ function LoginPage() {
             error={errors.password}
             required
           />
-          //버튼 비활성화 추가허기
           <Button type="submit" variant="primary" disabled={!isFormValid}>
             로그인
           </Button>
@@ -133,7 +133,7 @@ function LoginPage() {
 
         <SignupSection>
           <SignupText>
-            아직 심마니가 아니신가요?{" "}
+            아직 심봤다 회원이 아니신가요?{" "}
             <Link to="/signup">바로 회원가입하기</Link>
           </SignupText>
         </SignupSection>
@@ -142,4 +142,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default LoginPage_m;
