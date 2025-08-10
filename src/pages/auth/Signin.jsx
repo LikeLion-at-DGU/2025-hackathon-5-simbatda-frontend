@@ -14,9 +14,9 @@ import {
   FormSection,
   SignupSection,
   SignupText,
-} from "./LoginPage.styles";
+} from "./Signin.styles";
 
-function LoginPage() {
+function Signin() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,10 +32,11 @@ function LoginPage() {
   // 이메일 정규식
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // 비밀번호 정규식
+  // 비밀번호 정규식 (영문+숫자+특수문자, 8~15자)
   const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/;
 
+  // 유효성 검사
   useEffect(() => {
     const validateForm = () => {
       const emailValid =
@@ -47,7 +48,7 @@ function LoginPage() {
     };
 
     validateForm();
-  }, [formData.email, formData.password]);
+  }, [formData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -73,8 +74,7 @@ function LoginPage() {
       if (value.length === 0) {
         errorMessage = "";
       } else if (!passwordRegex.test(value)) {
-        errorMessage =
-          "대소문자, 특수문자, 숫자를 포함하여 8자 이상이어야 합니다";
+        errorMessage = "영문+숫자+특수문자를 포함하여 8~15자로 작성해주세요";
       }
     }
 
@@ -86,6 +86,12 @@ function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!isFormValid) {
+      return;
+    }
+
+    // 로그인 로직 구현
     console.log("로그인 시도:", formData);
   };
 
@@ -99,7 +105,7 @@ function LoginPage() {
             <img src={squirrelIcon} alt="다람쥐" />
           </SquirrelContainer>
           <ManagerLink>
-            사장님이신가요? <Link to="/manager">사장님 전용 페이지</Link>
+            사장님이신가요? <Link to="/signin-seller">판매자 전용 페이지</Link>
           </ManagerLink>
         </PictureSection>
 
@@ -108,7 +114,7 @@ function LoginPage() {
             label="이메일"
             name="email"
             type="email"
-            placeholder="이메일을 입력해주세요"
+            placeholder="이메일을 입력해 주세요"
             value={formData.email}
             onChange={handleInputChange}
             error={errors.email}
@@ -118,14 +124,13 @@ function LoginPage() {
             label="비밀번호"
             name="password"
             type="password"
-            placeholder="비밀번호를 입력해주세요"
+            placeholder="영문+숫자+특수만, 8~15자로 작성"
             value={formData.password}
             onChange={handleInputChange}
             isPassword
             error={errors.password}
             required
           />
-          //버튼 비활성화 추가허기
           <Button type="submit" variant="primary" disabled={!isFormValid}>
             로그인
           </Button>
@@ -133,8 +138,8 @@ function LoginPage() {
 
         <SignupSection>
           <SignupText>
-            아직 심마니가 아니신가요?{" "}
-            <Link to="/signup">바로 회원가입하기</Link>
+            아직 심봤다 회원이 아니신가요?{" "}
+            <Link to="/signup">바로회원가입하기</Link>
           </SignupText>
         </SignupSection>
       </MainContent>
@@ -142,4 +147,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default Signin;
