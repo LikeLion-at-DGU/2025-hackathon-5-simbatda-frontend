@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import Input from "../../components/common/input/Input";
+import Button from "../../components/common/button/Button";
 
 const TestContainer = styled.div`
   max-width: 600px;
@@ -17,7 +18,6 @@ const Section = styled.div`
     border-bottom: 2px solid #e5e7eb;
     padding-bottom: 10px;
   }
-  
 `;
 
 const TestPage = () => {
@@ -76,6 +76,65 @@ const TestPage = () => {
           }
           required
         />
+      </Section>
+
+      <Section>
+        <h2>Button 컴포넌트</h2>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div>
+            <h3>크기별 버튼</h3>
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <Button size="large">large</Button>
+              <Button size="small">small</Button>
+            </div>
+          </div>
+
+          <div>
+            <h3>작은 버튼 Variant별</h3>
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <Button size="small" variant="primary">
+                Primary
+              </Button>
+              <Button size="small" variant="outline">
+                Outline
+              </Button>
+              <Button size="small" variant="brown">
+                Brown
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <h3>작은 버튼 상태별</h3>
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <Button size="small">기본</Button>
+              <Button size="small" disabled>
+                비활성
+              </Button>
+              <Button size="small" loading>
+                로딩중
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <h3>Variant별 버튼</h3>
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <Button variant="primary">Primary</Button>
+              <Button variant="outline">Outline</Button>
+            </div>
+          </div>
+
+          <div>
+            <h3>상태별 버튼</h3>
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <Button>기본</Button>
+              <Button disabled>비활성</Button>
+              <Button loading>로딩 중</Button>
+            </div>
+          </div>
+        </div>
       </Section>
     </TestContainer>
   );
