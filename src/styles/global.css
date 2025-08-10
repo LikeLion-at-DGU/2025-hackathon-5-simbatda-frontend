@@ -1,3 +1,19 @@
+:root {
+  /* Primary Colors */
+  --color-primary-brown: #775c4a;
+  --color-primary-brown-hover: #5a4537;
+  --color-primary-green: #37ca79;
+  --color-primary-green-hover: #2ba066;
+
+  /* Neutral Colors */
+  --color-neutral-disabled: #e6e6e6;
+  --color-neutral-disabled-text: #999999;
+
+  /* Shadow Colors */
+  --color-shadow-brown: rgba(119, 92, 74, 0.3);
+  --color-shadow-green: rgba(55, 202, 121, 0.3);
+}
+
 * {
   box-sizing: border-box;
 }
