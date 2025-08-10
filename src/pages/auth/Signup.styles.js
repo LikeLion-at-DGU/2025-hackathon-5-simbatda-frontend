@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const SignupPageContainer = styled.div`
+export const LoginPageContainer = styled.div`
   width: 375px;
   min-height: 812px;
   background-color: #f5f5f5;
@@ -72,7 +72,7 @@ export const FormSection = styled.form`
     margin-bottom: 16px;
   }
 
-  > *:nth-child(5) {
+  > *:nth-child(2) {
     margin-bottom: 32px;
   }
 
@@ -81,11 +81,11 @@ export const FormSection = styled.form`
   }
 `;
 
-export const LoginSection = styled.div`
+export const SignupSection = styled.div`
   text-align: center;
 `;
 
-export const LoginText = styled.p`
+export const SignupText = styled.p`
   color: var(--black-black-100, #61605e);
   font-family: Pretendard;
   font-size: 12px;
