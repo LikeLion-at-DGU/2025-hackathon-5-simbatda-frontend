@@ -7,9 +7,12 @@ export const InputWrapper = styled.div`
 `;
 
 export const Label = styled.label`
+  color: var(--black-black-400, #262524);
+  font-family: Pretendard;
   font-size: 14px;
+  font-style: normal;
   font-weight: 400;
-  color: #262524;
+  line-height: 24px;
   margin-bottom: 8px;
 
   .required {
@@ -33,9 +36,11 @@ export const StyledInput = styled.input`
   transition: all 0.2s ease;
 
   ::placeholder {
-    color: #999999;
+    font-family: Pretendard;
     font-size: 16px;
+    font-style: normal;
     font-weight: 400;
+    line-height: 26px; /* 162.5% */
   }
 
   &:focus {
