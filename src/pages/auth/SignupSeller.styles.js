@@ -16,7 +16,6 @@ export const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 100%;
 `;
 
@@ -49,7 +48,6 @@ export const ManagerLink = styled.div`
   font-size: 14px;
   color: #6b7280;
   text-align: center;
-
   margin-bottom: 50px;
 
   a {
@@ -74,7 +72,7 @@ export const FormSection = styled.form`
     margin-bottom: 16px;
   }
 
-  > *:nth-child(5) {
+  > *:nth-child(6) {
     margin-bottom: 32px;
   }
 
@@ -82,7 +80,21 @@ export const FormSection = styled.form`
     margin-bottom: 0;
   }
 `;
+export const SectionGuide = styled.p`
+  width: 100%;
+  max-width: 327px;
+  align-self: flex-start;
 
+  color: #5d5752;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 500;
+  margin: 8px 0 16px;
+
+  strong {
+    font-weight: 700;
+  }
+`;
 export const SignupSection = styled.div`
   text-align: center;
 `;

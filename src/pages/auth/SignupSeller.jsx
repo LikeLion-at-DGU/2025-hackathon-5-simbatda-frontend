@@ -14,9 +14,10 @@ import {
   FormSection,
   SignupSection,
   SignupText,
-} from "./Signup.styles";
+  SectionGuide,
+} from "./SignupSeller.styles";
 
-function Signup() {
+function SignupSeller() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -69,6 +70,7 @@ function Signup() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -123,24 +125,28 @@ function Signup() {
       return;
     }
 
-    console.log("회원가입 시도:", formData);
+    console.log("판매자 회원가입 시도:", formData);
   };
 
   return (
     <LoginPageContainer>
       <MainContent>
-        <Title>회원가입</Title>
+        <Title>판매자 회원가입</Title>
 
         <PictureSection>
           <SquirrelContainer>
             <img src={squirrelIcon} alt="다람쥐" />
           </SquirrelContainer>
           <ManagerLink>
-            사장님이신가요? <Link to="/signup-seller">판매자 전용 페이지</Link>
+            일반 유저이신가요? <Link to="/signup">일반 회원가입 페이지</Link>
           </ManagerLink>
         </PictureSection>
 
         <FormSection onSubmit={handleSubmit}>
+          <SectionGuide>
+            사장님의 <strong>로그인</strong> 정보를
+            <br /> 입력해주세요.
+          </SectionGuide>
           <Input
             label="이름"
             name="name"
@@ -194,13 +200,14 @@ function Signup() {
             required
           />
           <Button type="submit" variant="primary" disabled={!isFormValid}>
-            회원가입
+            다음
           </Button>
         </FormSection>
 
         <SignupSection>
           <SignupText>
-            이미 계정이 있으신가요? <Link to="/signin">로그인하기</Link>
+            이미 판매자 계정이 있으신가요?{" "}
+            <Link to="/signin-seller">판매자 로그인</Link>
           </SignupText>
         </SignupSection>
       </MainContent>
@@ -208,4 +215,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default SignupSeller;

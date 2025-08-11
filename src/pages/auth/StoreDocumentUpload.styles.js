@@ -16,18 +16,7 @@ export const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 100%;
-`;
-
-export const Title = styled.h1`
-  color: #5d5752;
-  text-align: center;
-  font-family: Pretendard;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 15px;
 `;
 
 export const PictureSection = styled.div`
@@ -45,24 +34,6 @@ export const SquirrelContainer = styled.div`
   gap: 8px;
 `;
 
-export const ManagerLink = styled.div`
-  font-size: 14px;
-  color: #6b7280;
-  text-align: center;
-
-  margin-bottom: 50px;
-
-  a {
-    color: #8b4513;
-    text-decoration: underline;
-    font-weight: 500;
-
-    &:hover {
-      color: #654321;
-    }
-  }
-`;
-
 export const FormSection = styled.form`
   display: flex;
   flex-direction: column;
@@ -74,13 +45,90 @@ export const FormSection = styled.form`
     margin-bottom: 16px;
   }
 
-  > *:nth-child(5) {
+  > *:nth-child(4) {
     margin-bottom: 32px;
   }
 
   > *:last-child {
     margin-bottom: 0;
   }
+`;
+
+export const SectionGuide = styled.p`
+  width: 100%;
+  max-width: 327px;
+  align-self: flex-start;
+
+  color: #5d5752;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 500;
+  margin: 8px 0 16px;
+
+  strong {
+    font-weight: 700;
+  }
+`;
+
+export const UploadGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  label {
+    font-size: 14px;
+    color: #5d5752;
+  }
+`;
+
+export const UploadRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+  border: 1px solid #e6e1dc;
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+
+  &:focus {
+    outline: 2px solid #c9b5a8;
+    outline-offset: 2px;
+  }
+`;
+
+export const UploadText = styled.span`
+  color: #b0aaa6;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 40px);
+`;
+
+export const PlusButton = styled.button`
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 1px solid #d6c9bf;
+  background: #fff;
+  font-size: 20px;
+  line-height: 1;
+  color: #6b4e3d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
+`;
+
+export const HiddenFileInput = styled.input`
+  display: none;
 `;
 
 export const SignupSection = styled.div`

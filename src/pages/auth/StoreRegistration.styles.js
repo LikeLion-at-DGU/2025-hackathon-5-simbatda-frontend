@@ -16,18 +16,7 @@ export const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 100%;
-`;
-
-export const Title = styled.h1`
-  color: #5d5752;
-  text-align: center;
-  font-family: Pretendard;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 15px;
 `;
 
 export const PictureSection = styled.div`
@@ -43,24 +32,6 @@ export const SquirrelContainer = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 8px;
-`;
-
-export const ManagerLink = styled.div`
-  font-size: 14px;
-  color: #6b7280;
-  text-align: center;
-
-  margin-bottom: 50px;
-
-  a {
-    color: #8b4513;
-    text-decoration: underline;
-    font-weight: 500;
-
-    &:hover {
-      color: #654321;
-    }
-  }
 `;
 
 export const FormSection = styled.form`
@@ -80,6 +51,22 @@ export const FormSection = styled.form`
 
   > *:last-child {
     margin-bottom: 0;
+  }
+`;
+
+export const SectionGuide = styled.p`
+  width: 100%;
+  max-width: 327px;
+  align-self: flex-start;
+
+  color: #5d5752;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 500;
+  margin: 8px 0 16px;
+
+  strong {
+    font-weight: 700;
   }
 `;
 
