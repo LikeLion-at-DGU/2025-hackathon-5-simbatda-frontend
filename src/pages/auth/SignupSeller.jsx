@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
@@ -18,6 +18,7 @@ import {
 } from "./SignupSeller.styles";
 
 function SignupSeller() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -125,7 +126,9 @@ function SignupSeller() {
       return;
     }
 
-    console.log("판매자 회원가입 시도:", formData);
+    console.log("판매자 정보 입력:", formData);
+
+    navigate("/store-registration");
   };
 
   return (
