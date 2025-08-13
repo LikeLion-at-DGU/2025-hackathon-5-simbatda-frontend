@@ -1,15 +1,15 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
-import Signin from "./pages/auth/Signin";
-import SigninSeller from "./pages/auth/SigninSeller";
-import Signup from "./pages/auth/Signup";
-import SignupSeller from "./pages/auth/SignupSeller";
-import TestPage from "./pages/common/TestPage";
-import MainPage from "./pages/main/MainPage";
-import MainPageSeller from "./pages/main/MainPageSeller";
+import Signin from "./pages/auth/Signin.jsx";
+import SigninSeller from "./pages/auth/SigninSeller.jsx";
+import Signup from "./pages/auth/Signup.jsx";
+import SignupSeller from "./pages/auth/SignupSeller.jsx";
+import TestPage from "./pages/common/TestPage.jsx";
+import MainPage from "./pages/main/MainPage.jsx";
+import MainPageSeller from "./pages/main/MainPageSeller.jsx";
 
-import StoreRegistration from "./pages/auth/StoreRegistration";
-import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload";
+import StoreRegistration from "./pages/auth/StoreRegistration.jsx";
+import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
