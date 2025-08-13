@@ -6,7 +6,7 @@ import Signup from "./pages/auth/Signup";
 import SignupSeller from "./pages/auth/SignupSeller";
 import TestPage from "./pages/common/TestPage";
 import MainPage from "./pages/main/MainPage";
-import MainPageSeller from "./pages/main/MainPageSeller";
+import MainPageSeller from "./pages/main/MainpageSeller";
 
 import StoreRegistration from "./pages/auth/StoreRegistration";
 import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload";
