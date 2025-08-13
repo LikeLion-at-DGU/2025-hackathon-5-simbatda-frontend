@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { consumerSignup } from "../../api/auth";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
@@ -117,16 +118,26 @@ function Signup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid) {
       return;
     }
 
-    console.log("회원가입 시도:", formData);
-
-    navigate("/mainpage");
+    try {
+      await consumerSignup({
+        email: formData.email,
+        password: formData.password,
+        password2: formData.confirmPassword,
+        name: formData.name,
+        phone: formData.phone,
+      });
+      navigate("/mainpage");
+    } catch (err) {
+      if (err?.email && Array.isArray(err.email)) alert(err.email[0]);
+      else alert("회원가입에 실패했습니다.");
+    }
   };
 
   return (

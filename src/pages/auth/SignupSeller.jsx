@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { sellerSignup } from "../../api/auth";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
@@ -119,16 +120,26 @@ function SignupSeller() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid) {
       return;
     }
 
-    console.log("판매자 정보 입력:", formData);
-
-    navigate("/store-registration");
+    try {
+      await sellerSignup({
+        email: formData.email,
+        password: formData.password,
+        password2: formData.confirmPassword,
+        name: formData.name,
+        phone: formData.phone,
+      });
+      navigate("/store-registration");
+    } catch (err) {
+      if (err?.message) alert(err.message);
+      else alert("판매자 회원가입에 실패했습니다.");
+    }
   };
 
   return (
