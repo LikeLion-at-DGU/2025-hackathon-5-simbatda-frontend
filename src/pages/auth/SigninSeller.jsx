@@ -56,7 +56,6 @@ function SigninSeller() {
       [name]: value,
     }));
 
-    // 실시간 에러 검사
     validateField(name, value);
   };
 
@@ -94,7 +93,6 @@ function SigninSeller() {
       formData.email === mockSellerUser.email &&
       formData.password === mockSellerUser.password
     ) {
-      console.log("판매자 로그인 성공!");
       navigate("/mainpage-seller");
     } else {
       alert("이메일 또는 비밀번호가 일치하지 않습니다.");
