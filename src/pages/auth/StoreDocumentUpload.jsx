@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
 
@@ -20,6 +20,7 @@ import {
 } from "./StoreDocumentUpload.styles";
 
 function StoreDocumentUpload() {
+  const navigate = useNavigate();
   const [files, setFiles] = useState({
     bizReg: null,
     permit: null,
@@ -67,6 +68,8 @@ function StoreDocumentUpload() {
       permit: files.permit?.name,
       bankbook: files.bankbook?.name,
     });
+
+    navigate("/mainpage-seller");
   };
 
   return (

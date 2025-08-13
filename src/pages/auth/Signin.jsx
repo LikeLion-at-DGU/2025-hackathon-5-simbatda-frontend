@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { mockGeneralUser } from "../../mocks/MockData";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
@@ -17,6 +18,7 @@ import {
 } from "./Signin.styles";
 
 function Signin() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,14 +31,11 @@ function Signin() {
 
   const [isFormValid, setIsFormValid] = useState(false);
 
-  // 이메일 정규식
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // 비밀번호 정규식 (영문+숫자+특수문자, 8~15자)
   const passwordRegex =
     /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/;
 
-  // 유효성 검사
   useEffect(() => {
     const validateForm = () => {
       const emailValid =
@@ -57,7 +56,6 @@ function Signin() {
       [name]: value,
     }));
 
-    // 실시간 에러 검사
     validateField(name, value);
   };
 
@@ -91,8 +89,14 @@ function Signin() {
       return;
     }
 
-    // 로그인 로직 구현
-    console.log("로그인 시도:", formData);
+    if (
+      formData.email === mockGeneralUser.email &&
+      formData.password === mockGeneralUser.password
+    ) {
+      navigate("/main");
+    } else {
+      alert("이메일 또는 비밀번호가 일치하지 않습니다.");
+    }
   };
 
   return (
