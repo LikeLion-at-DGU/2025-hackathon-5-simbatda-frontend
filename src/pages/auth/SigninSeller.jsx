@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { mockSellerUser } from "../../mocks/MockData";
+import { sellerLogin } from "../../api/auth";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
@@ -82,20 +82,18 @@ function SigninSeller() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isFormValid) {
       return;
     }
 
-    if (
-      formData.email === mockSellerUser.email &&
-      formData.password === mockSellerUser.password
-    ) {
+    try {
+      await sellerLogin({ email: formData.email, password: formData.password });
       navigate("/mainpage-seller");
-    } else {
-      alert("이메일 또는 비밀번호가 일치하지 않습니다.");
+    } catch (err) {
+      alert(err?.error || "이메일 또는 비밀번호가 올바르지 않습니다.");
     }
   };
 
