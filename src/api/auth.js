@@ -1,4 +1,9 @@
-import { apiRequest, setStoredTokens, clearStoredTokens } from "./client";
+import {
+  apiRequest,
+  setStoredTokens,
+  clearStoredTokens,
+  getStoredTokens,
+} from "./client";
 
 const endpoints = {
   consumer: {
