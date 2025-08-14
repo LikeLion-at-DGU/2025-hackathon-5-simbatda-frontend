@@ -21,7 +21,7 @@ import {
   DrawerItem,
   ItemIcon,
 } from "./MainPage.styles";
-import squirrelIcon from "../../assets/icons/squirrel.svg";
+
 import searchIcon from "../../assets/icons/search.png";
 import menuIcon from "../../assets/icons/menu.png";
 import LocationIcon from "../../assets/icons/location.png";
