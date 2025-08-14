@@ -53,6 +53,32 @@ function StoreRegistration() {
     validateField(name, value);
   };
 
+  // 카카오
+  const openAddressSearch = () => {
+    if (!window.daum || !window.daum.postcode) {
+      alert(
+        "주소 검색 스크립트를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요."
+      );
+      return;
+    }
+
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        // 도로명 주소
+        const roadAddress = data.roadAddress || "";
+        const jibunAddress = data.jibunAddress || "";
+        const selected = roadAddress.length > 0 ? roadAddress : jibunAddress;
+
+        setFormData((prev) => ({ ...prev, address: selected }));
+        // 상세 주소
+        const detailInput = document.querySelector(
+          'input[name="addressDetail"]'
+        );
+        detailInput && detailInput.focus();
+      },
+    }).open();
+  };
+
   const validateField = (name, value) => {
     let message = "";
     const v = value.trim();
@@ -74,9 +100,6 @@ function StoreRegistration() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isFormValid) return;
-
-    console.log("매장 등록 시도:", formData);
-
     navigate("/store-document-upload");
   }; //API
 
@@ -127,6 +150,8 @@ function StoreRegistration() {
             placeholder="주소를 입력해 주세요"
             value={formData.address}
             onChange={handleInputChange}
+            onClick={openAddressSearch}
+            readOnly
             error={errors.address}
             required
           />
