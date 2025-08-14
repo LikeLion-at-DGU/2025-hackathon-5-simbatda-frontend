@@ -24,11 +24,11 @@ import {
 
 import searchIcon from "../../assets/icons/search.png";
 import menuIcon from "../../assets/icons/menu.png";
-import LocationIcon from "../../assets/icons/location.png";
-import DiscountIcon from "../../assets/icons/discount.png";
-import GoodQualityIcon from "../../assets/icons/goodquality.png";
-import BillIcon from "../../assets/icons/bill.png";
-import FavoriteIcon from "../../assets/icons/favorite.png";
+import LocationIcon from "../../assets/icons/Location.png";
+import DiscountIcon from "../../assets/icons/Discount.png";
+import GoodQualityIcon from "../../assets/icons/GoodQuality.png";
+import BillIcon from "../../assets/icons/Bill.png";
+import FavoriteIcon from "../../assets/icons/Favorite.png";
 import greenSquirrelIcon from "../../assets/icons/greensquirrel.png";
 import starsquirrelIcon from "../../assets/icons/starsquirrel.png";
 
