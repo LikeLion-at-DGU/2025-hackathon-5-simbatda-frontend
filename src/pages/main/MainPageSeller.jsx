@@ -50,7 +50,7 @@ import {
 import menuIcon from "@/assets/icons/menu.png";
 import greenSquirrelIcon from "@/assets/icons/greensquirrel.png";
 import starsquirrelIcon from "@/assets/icons/starsquirrel.png";
-import ImportantIcon from "@/assets/icons/important.png";
+import ImportantIcon from "@/assets/icons/Important.png";
 
 function MainPageSeller() {
   const navigate = useNavigate();
