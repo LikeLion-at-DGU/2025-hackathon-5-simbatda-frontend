@@ -7,8 +7,8 @@ export default defineConfig({
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
-      "@": "/src",
-      "@components": "/src/components",
+      "@": "src",
+      "@components": "src/components",
     },
   },
   server: {

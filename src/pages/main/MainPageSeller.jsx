@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSellerMe, logout } from "../../api/auth";
-import Button from "@components/common/Button/Button.jsx";
+import Button from "../../components/common/Button/Button.jsx";
 import {
   PageContainer,
   Header,
@@ -47,10 +47,10 @@ import {
   ExpiryDate,
 } from "./MainPageSeller.styles";
 
-import menuIcon from "@/assets/icons/menu.png";
-import greenSquirrelIcon from "@/assets/icons/greensquirrel.png";
-import starsquirrelIcon from "@/assets/icons/starsquirrel.png";
-import ImportantIcon from "@/assets/icons/Important.png";
+import menuIcon from "../../assets/icons/menu.png";
+import greenSquirrelIcon from "../../assets/icons/greensquirrel.png";
+import starsquirrelIcon from "../../assets/icons/starsquirrel.png";
+import ImportantIcon from "../../assets/icons/Important.png";
 
 function MainPageSeller() {
   const navigate = useNavigate();
