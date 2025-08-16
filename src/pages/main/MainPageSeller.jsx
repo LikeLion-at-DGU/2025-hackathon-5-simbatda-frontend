@@ -47,10 +47,10 @@ import {
   ExpiryDate,
 } from "./MainPageSeller.styles";
 
-import menuIcon from "../../assets/icons/menu.png";
-import greenSquirrelIcon from "../../assets/icons/greensquirrel.png";
-import starsquirrelIcon from "../../assets/icons/starsquirrel.png";
-import ImportantIcon from "../../assets/icons/important.png";
+import menuIcon from "@/assets/icons/menu.png";
+import greenSquirrelIcon from "@/assets/icons/greensquirrel.png";
+import starsquirrelIcon from "@/assets/icons/starsquirrel.png";
+import ImportantIcon from "@/assets/icons/important.png";
 
 function MainPageSeller() {
   const navigate = useNavigate();
