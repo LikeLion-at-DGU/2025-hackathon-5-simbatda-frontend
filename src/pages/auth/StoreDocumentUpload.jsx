@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "../../components/common/Button/Button";
+import Button from "../../components/common/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
 
 import {

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSellerMe, logout } from "../../api/auth";
-import Button from "../../components/common/Button/Button";
+import Button from "../../components/common/Button";
 import {
   PageContainer,
   Header,
