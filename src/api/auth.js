@@ -125,8 +125,7 @@ export async function getConsumerMe() {
 }
 
 export async function getSellerMe() {
-  const res = await apiRequest(endpoints.seller.me, { auth: true });
-  const data = await res.json();
-  if (!res.ok) throw data;
-  return data;
+  const mockApi = (await import("../mocks/mockApi.js")).default;
+  const response = await mockApi.getSellerMe();
+  return response.data;
 }

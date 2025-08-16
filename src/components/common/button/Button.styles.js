@@ -108,6 +108,119 @@ export const StyledButton = styled.button`
     }
   `}
 
+  /* 판매자 페이지  */
+ ${(props) =>
+    props.$variant === "status" &&
+    `
+  display: flex;
+  align-items: center;        
+  justify-content: center;   
+  box-sizing: border-box;     
+
+  width: 80px;
+  flex: none;
+  height: 38px;
+  padding: 0 10px;            
+  
+  border-radius: 5px;
+  border: none;
+  background:#EAE7E3;
+  color: #5D5752;
+  font-size: 14px;
+  font-weight: 600;
+  
+  margin: 0;
+
+  &.active {
+    background: #AB9C9C;
+    color: #FFF;
+  }
+
+  &:hover {
+    background: #AB9C9C;
+    color: #FFF;
+  }
+
+  &.active:hover {
+    background: #AB9C9C;
+    color: #FFF;
+  }
+`}
+
+
+  ${(props) =>
+    props.$variant === "accept" &&
+    `
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #37CA79;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    width:107px;
+    height:40px;
+
+    &:hover {
+      background:#37CA79;;
+    }
+  `}
+
+  ${(props) =>
+    props.$variant === "reject" &&
+    `
+    flex: 1;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    color: #666;
+    font-size: 16px;
+    font-weight: 600;
+    width:107px;
+    height:40px;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  `}
+
+  ${(props) =>
+    props.$variant === "close" &&
+    `
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: #999;
+    border-radius: 50%;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+  `}
+
+  ${(props) =>
+    (props.$variant === "open" || props.$variant === "close") &&
+    `
+    width: 65px;
+    height: 25px;
+    padding: 1px 6px;
+    border-radius: ${props.$variant === "open" ? "10px" : "10px"};
+    border: 1px solid ${props.$variant === "open" ? "#37CA79" : "#8A8A8A"};
+    background: transparent;
+    color: ${props.$variant === "open" ? "#37CA79" : "#8A8A8A"};
+    font-size: 14px;
+    font-weight: 500;
+
+    &:hover {
+      background: ${props.$variant === "open" ? "#37CA79" : "#8A8A8A"};
+      color: white;
+    }
+  `}
+
   /* 큰 버튼 variant 스타일 */
   ${(props) =>
     props.$size !== "small" &&
