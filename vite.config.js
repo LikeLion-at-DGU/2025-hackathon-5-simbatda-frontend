@@ -6,10 +6,6 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
-    alias: {
-      "@": "src",
-      "@components": "src/components",
-    },
   },
   server: {
     proxy: {
