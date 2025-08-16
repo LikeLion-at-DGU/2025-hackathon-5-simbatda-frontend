@@ -19,7 +19,7 @@ const Button = ({
   };
 
   return (
-    <ButtonWrapper className={className}>
+    <ButtonWrapper>
       <StyledButton
         type={type}
         $size={size}
@@ -27,6 +27,7 @@ const Button = ({
         disabled={disabled}
         $loading={loading}
         onClick={handleClick}
+        className={className}
         {...props}
       >
         {loading && (

@@ -418,6 +418,19 @@ class MockApiService {
   }
 
   // ===== 카테고리 관련 API =====
+  //사용자 정보 조회 API
+  async getSellerMe() {
+    await delay(300);
+    simulateError(0.02);
+
+    // 첫 번째 판매자 정보 (임시) 나중에바꾸기
+    const seller = mockUsers.seller[0];
+    return {
+      success: true,
+      data: { ...seller, password: undefined },
+    };
+  }
+
   async getCategories() {
     await delay(300);
     simulateError(0.02);
