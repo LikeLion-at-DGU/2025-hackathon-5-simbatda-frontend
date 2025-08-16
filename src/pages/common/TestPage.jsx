@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import Input from "../../components/common/input/Input";
-import Button from "../../components/common/Button";
+import Button from "../../components/common/Button/Button.jsx";
 
 const TestContainer = styled.div`
   max-width: 600px;

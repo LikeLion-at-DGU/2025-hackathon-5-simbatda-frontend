@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { consumerLogin } from "../../api/auth";
 import Input from "../../components/common/input/Input";
-import Button from "../../components/common/Button";
+import Button from "../../components/common/Button/Button.jsx";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
 
 import {
