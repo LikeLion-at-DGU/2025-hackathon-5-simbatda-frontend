@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import menuIcon from "../../../assets/icons/menu.png";
 import starsquirrelIcon from "../../../assets/icons/starsquirrel.png";
-import LocationIcon from "../../../assets/icons/location.png";
-import DiscountIcon from "../../../assets/icons/discount.png";
-import GoodQualityIcon from "../../../assets/icons/goodQuality.png";
-import BillIcon from "../../../assets/icons/bill.png";
-import FavoriteIcon from "../../../assets/icons/favorite.png";
+import LocationIcon from "../../../assets/icons/Location.png";
+import DiscountIcon from "../../../assets/icons/Discount.png";
+import GoodQualityIcon from "../../../assets/icons/GoodQuality.png";
+import BillIcon from "../../../assets/icons/Bill.png";
+import FavoriteIcon from "../../../assets/icons/like/brown-like.svg";
 import textLogo from "../../../assets/images/text-logo.svg";
 import {
   HeaderContainer,
