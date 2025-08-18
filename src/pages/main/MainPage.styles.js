@@ -7,7 +7,7 @@ const PageContainer = styled.div`
 
 const Content = styled.main`
   padding: 20px;
-  margin-top: 80px; 
+  margin-top: 80px;
 `;
 
 export { PageContainer, Content };
