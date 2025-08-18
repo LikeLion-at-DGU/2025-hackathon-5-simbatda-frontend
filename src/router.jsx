@@ -15,7 +15,7 @@ import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
 import ProductRegister from "./pages/main/ProductRegister.jsx";
 import Registeration from "./pages/main/Registeration.jsx";
 import Splash from "./pages/common/Splash.jsx";
-import Wishlist from "./pages/main/Wishlist.jsx";
+import WishList from "./pages/main/WishList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
       { path: "product-register", element: <ProductRegister /> },
       { path: "registeration/:productId", element: <Registeration /> },
       { path: "splash", element: <Splash /> },
-      { path: "wishlist", element: <Wishlist /> },
+      { path: "wishlist", element: <WishList /> },
     ],
   },
 ]);
