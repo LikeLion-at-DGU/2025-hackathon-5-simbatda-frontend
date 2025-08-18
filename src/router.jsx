@@ -13,6 +13,7 @@ import OrderCompleted from "./pages/main/OrderCompleted.jsx";
 import StoreRegistration from "./pages/auth/StoreRegistration.jsx";
 import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
 import ProductRegister from "./pages/main/ProductRegister.jsx";
+import Registeration from "./pages/main/Registeration.jsx";
 import Splash from "./pages/common/Splash.jsx";
 
 const router = createBrowserRouter([
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <div>대시보드</div> },
       { path: "inventory", element: <div>재고관리</div> },
       { path: "product-register", element: <ProductRegister /> },
+      { path: "registeration/:productId", element: <Registeration /> },
       { path: "splash", element: <Splash /> },
     ],
   },

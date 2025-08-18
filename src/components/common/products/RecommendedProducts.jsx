@@ -23,7 +23,7 @@ const RecommendedProducts = ({ products = [], name = "사용자" }) => {
   };
 
   const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
+    navigate(`/registeration/${productId}`);
   };
 
   const handleLikeToggle = (productId, isLiked) => {
