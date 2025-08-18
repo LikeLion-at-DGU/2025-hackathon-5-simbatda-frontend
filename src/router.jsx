@@ -7,9 +7,12 @@ import SignupSeller from "./pages/auth/SignupSeller.jsx";
 import TestPage from "./pages/common/TestPage.jsx";
 import MainPage from "./pages/main/MainPage.jsx";
 import MainPageSeller from "./pages/main/MainPageSeller.jsx";
-
+import OrderInProgress from "./pages/main/OrderInProgress.jsx";
+import OrderDetail from "./pages/main/OrderDetail.jsx";
+import OrderCompleted from "./pages/main/OrderCompleted.jsx";
 import StoreRegistration from "./pages/auth/StoreRegistration.jsx";
 import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
+import ProductRegister from "./pages/main/ProductRegister.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,8 +29,12 @@ const router = createBrowserRouter([
       { path: "store-registration", element: <StoreRegistration /> },
       { path: "store-document-upload", element: <StoreDocumentUpload /> },
       { path: "mainpage-seller", element: <MainPageSeller /> },
+      { path: "order-in-progress", element: <OrderInProgress /> },
+      { path: "order-detail", element: <OrderDetail /> },
+      { path: "order-completed", element: <OrderCompleted /> },
       { path: "dashboard", element: <div>대시보드</div> },
       { path: "inventory", element: <div>재고관리</div> },
+      { path: "product-register", element: <ProductRegister /> },
     ],
   },
 ]);
