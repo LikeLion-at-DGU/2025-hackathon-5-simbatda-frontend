@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const BottomSheetOverlay = styled.div`
+const BottomSheetOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -13,31 +13,21 @@ export const BottomSheetOverlay = styled.div`
   transition: all 0.3s ease;
 `;
 
-export const BottomSheetContainer = styled.div`
+const BottomSheetContainer = styled.div`
   position: fixed;
-  bottom: ${({ $isOpen, $currentY }) => {
-    if (!$isOpen) return "-100%";
-    return $currentY > 0 ? `-${$currentY}px` : "0";
-  }};
+  bottom: ${({ $isOpen }) => (!$isOpen ? "-100%" : "0")};
   left: 0;
   right: 0;
   background: #ffffff;
   border-radius: 20px 20px 0 0;
   z-index: 2001;
-  transition: ${({ $isDragging }) =>
-    $isDragging ? "none" : "bottom 0.3s ease"};
+  transition: bottom 0.3s ease;
   max-height: 80vh;
   overflow: hidden;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-  cursor: grab;
-  touch-action: pan-y;
-
-  &:active {
-    cursor: grabbing;
-  }
 `;
 
-export const BottomSheetHeader = styled.div`
+const BottomSheetHeader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -45,33 +35,33 @@ export const BottomSheetHeader = styled.div`
   background: #ffffff;
 `;
 
-export const HeaderTitle = styled.h3`
+const HeaderTitle = styled.h3`
   font-size: 16px;
   font-weight: 700;
   color: #775c4a;
   margin: 0;
 `;
 
-export const BottomSheetContent = styled.div`
+const BottomSheetContent = styled.div`
   padding: 20px;
   overflow-y: auto;
   max-height: calc(80vh - 80px);
 `;
 
-export const LocationTitle = styled.h4`
+const LocationTitle = styled.h4`
   font-size: 16px;
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 8px 0;
 `;
 
-export const LocationAddress = styled.p`
+const LocationAddress = styled.p`
   font-size: 14px;
   color: #6b7280;
   margin: 0;
 `;
 
-export const ProductsGrid = styled.div`
+const ProductsGrid = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -104,19 +94,45 @@ export const ProductsGrid = styled.div`
   }
 `;
 
-export const NoProductsMessage = styled.div`
+const NoProductsMessage = styled.div`
   text-align: center;
   padding: 40px 20px;
   color: #6b7280;
 `;
 
-export const NoProductsIcon = styled.div`
+const NoProductsIcon = styled.div`
   font-size: 48px;
   margin-bottom: 16px;
   opacity: 0.5;
 `;
 
-export const NoProductsText = styled.p`
+const NoProductsText = styled.p`
   font-size: 16px;
   margin: 0;
 `;
+
+const CloseButton = styled.button`
+  position: absolute;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+`;  
+
+export {
+  BottomSheetOverlay,
+  BottomSheetContainer,
+  BottomSheetHeader,
+  HeaderTitle,
+  BottomSheetContent,
+  LocationTitle,
+  LocationAddress,
+  CloseButton,
+  ProductsGrid,
+  NoProductsMessage,
+  NoProductsIcon,
+  NoProductsText,
+};
