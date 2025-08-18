@@ -99,7 +99,7 @@ export const SectionTitle = styled.h2`
 export const StatusButtons = styled.div`
   display: flex;
   gap: 10px;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   width: fit-content;
 `;
 

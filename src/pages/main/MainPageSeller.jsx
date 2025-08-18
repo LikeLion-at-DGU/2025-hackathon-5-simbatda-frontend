@@ -168,15 +168,24 @@ function MainPageSeller() {
 
         <SectionTitleWrapper>
           <SectionTitle className="active">주문 현황</SectionTitle>
-          <SectionTitle>상품 등록</SectionTitle>
+          <SectionTitle onClick={() => navigate("/product-register")}>
+            상품 등록
+          </SectionTitle>
         </SectionTitleWrapper>
 
         <StatusButtons>
           <Button variant="status" className="active">
             주문 접수
           </Button>
-          <Button variant="status">진행 중</Button>
-          <Button variant="status">진행 완료</Button>
+          <Button
+            variant="status"
+            onClick={() => navigate("/order-in-progress")}
+          >
+            진행 중
+          </Button>
+          <Button variant="status" onClick={() => navigate("/order-completed")}>
+            진행 완료
+          </Button>
         </StatusButtons>
 
         <EmptyMessage>아직 주문 접수된 건이 없어요</EmptyMessage>
@@ -195,7 +204,9 @@ function MainPageSeller() {
         </DrawerHeader>
         <DrawerList>
           <DrawerItem>주문 현황</DrawerItem>
-          <DrawerItem>상품 등록</DrawerItem>
+          <DrawerItem onClick={() => navigate("/product-register")}>
+            상품 등록
+          </DrawerItem>
         </DrawerList>
       </Drawer>
 
