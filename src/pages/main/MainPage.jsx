@@ -8,6 +8,7 @@ import RecommendedProducts from "../../components/common/products/RecommendedPro
 import SpecialPriceProducts from "../../components/common/products/SpecialPriceProducts";
 import BottomSheet from "../../components/common/bottomsheet/BottomSheet";
 import { apiRequest } from "../../api/client";
+import { unifiedMockData, mockUtils } from "../../mocks/UnifiedMockData";
 import { PageContainer, Content } from "./MainPage.styles";
 
 function MainPage() {
@@ -26,93 +27,28 @@ function MainPage() {
     // TODO: API 연결 X - mock 데이터 사용
     setUserInfo({ name: "테스트 사용자" });
 
-    // 추천상품 데이터
-    setRecommendedProducts([
-      {
-        id: 1,
-        storeName: "신선마트",
-        productName: "신선 사과 1kg",
-        originalPrice: 8000,
-        discountPrice: 6000,
-        isLiked: false,
-      },
-      {
-        id: 2,
-        storeName: "편의점24",
-        productName: "유기농 당근 500g",
-        originalPrice: 4000,
-        discountPrice: 3000,
-        isLiked: true,
-      },
-      {
-        id: 3,
-        storeName: "농장직송",
-        productName: "방울토마토 250g",
-        originalPrice: 5000,
-        discountPrice: 5000,
-        isLiked: false,
-      },
-      {
-        id: 4,
-        storeName: "직송농장",
-        productName: "신선 오이 1kg",
-        originalPrice: 6000,
-        discountPrice: 4500,
-        isLiked: false,
-      },
-      {
-        id: 5,
-        storeName: "신선마트",
-        productName: "바나나 1kg",
-        originalPrice: 3000,
-        discountPrice: 2000,
-        isLiked: true,
-      },
-    ]);
+    // 추천상품 데이터 (통합 목데이터 사용)
+    const recommended = mockUtils.getRecommendedProducts();
+    setRecommendedProducts(recommended.map(product => ({
+      id: product.id,
+      storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
+      productName: product.name,
+      originalPrice: product.originalPrice,
+      discountPrice: product.discountPrice,
+      isLiked: mockUtils.isProductLiked(1, product.id),
+    })));
 
-    // 특가상품 데이터
-    setSpecialPriceProducts([
-      {
-        id: 6,
-        storeName: "신선마트",
-        productName: "바나나 1kg",
-        originalPrice: 3000,
-        discountPrice: 2000,
-        isLiked: false,
-      },
-      {
-        id: 7,
-        storeName: "직송농장",
-        productName: "신선 오이 1kg",
-        originalPrice: 6000,
-        discountPrice: 4500,
-        isLiked: false,
-      },
-      {
-        id: 8,
-        storeName: "농장직송",
-        productName: "방울토마토 250g",
-        originalPrice: 5000,
-        discountPrice: 5000,
-        isLiked: false,
-      },
-      {
-        id: 9,
-        storeName: "편의점24",
-        productName: "유기농 당근 500g",
-        originalPrice: 4000,
-        discountPrice: 3000,
-        isLiked: true,
-      },
-      {
-        id: 10,
-        storeName: "신선마트",
-        productName: "신선 사과 1kg",
-        originalPrice: 8000,
-        discountPrice: 6000,
-        isLiked: false,
-      },
-    ]);
+    // 특가상품 데이터 (통합 목데이터 사용)
+    const specialPrice = mockUtils.getSpecialPriceProducts();
+    setSpecialPriceProducts(specialPrice.map(product => ({
+      id: product.id,
+      storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
+      productName: product.name,
+      originalPrice: product.originalPrice,
+      discountPrice: product.discountPrice,
+      isLiked: mockUtils.isProductLiked(1, product.id),
+    })));
+
   }, []);
 
   const handleLogout = () => {
@@ -318,8 +254,10 @@ function MainPage() {
   };
 
   const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
+    navigate(`/registeration/${productId}`);
   };
+
+
 
   const handleProductLikeToggle = (productId, isLiked) => {
     // TODO: 좋아요 API 연동
@@ -342,6 +280,8 @@ function MainPage() {
         />
         <SpecialPriceProducts products={specialPriceProducts} />
         
+
+        
         <BottomSheet
           isOpen={bottomSheetOpen}
           onClose={handleBottomSheetClose}
@@ -350,6 +290,7 @@ function MainPage() {
           onProductClick={handleProductClick}
           onProductLikeToggle={handleProductLikeToggle}
         />
+
       </Content>
     </PageContainer>
   );
