@@ -6,7 +6,9 @@ const pageFadeIn = keyframes`
 `;
 
 const pageFadeOut = keyframes`
-  to { opacity: 0; transform: scale(1.01); }
+  0%   { opacity: 1;  transform: scale(1);     filter: blur(0px); }
+  60%  { opacity: 0.4;transform: scale(0.995); filter: blur(1px); }
+  100% { opacity: 0;  transform: scale(0.985); filter: blur(2px); }
 `;
 
 const popIn = keyframes`
@@ -27,13 +29,6 @@ const wobble = keyframes`
   75%     { transform: rotate(-3deg); }
 `;
 
-const dropBounce = keyframes`
-  0%   { opacity: 0; transform: translate(40%, -130%) rotate(-8deg); }
-  60%  { opacity: 1; transform: translate(40%, -35%)  rotate(2deg); }  
-  80%  { transform: translate(40%, -45%) rotate(-1deg); }              
-  100% { transform: translate(40%, -40%) rotate(0); }                 
-`;
-
 const riseBounce = keyframes`
   0%   { opacity: 0; transform: translateY(24px); }
   60%  { opacity: 1; transform: translateY(-6px); }
@@ -52,92 +47,169 @@ export const PageContainer = styled.section`
   background: #775c4a;
   color: #ffffff;
   overflow: hidden;
-
-  animation: ${pageFadeIn} 360ms ease-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: ${pageFadeIn} 1000ms ease-out;
 
   &.leaving {
-    animation: ${pageFadeOut} 300ms ease forwards;
-  }
-
-  header,
-  content,
-  sectiontitle {
-    display: block;
+    animation: ${pageFadeOut} 900ms cubic-bezier(0.2, 0.5, 0.5, 0.5) forwards;
   }
 
   header {
-    max-width: 430px;
+    width: 100%;
+    max-width: 600px;
     margin: 0 auto;
-    padding: calc(env(safe-area-inset-top) + 48px) 28px 0;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    row-gap: 16px;
+    position: relative;
+    z-index: 3;
   }
 
   .top {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    flex-wrap: nowrap;
+    position: relative;
   }
 
   .logo {
-    width: 217px;
-    height: 122px;
-    flex-shrink: 0;
+    width: 300px;
+    height: auto;
     aspect-ratio: 201/113;
-    display: block;
+    flex-shrink: 0;
     animation: ${popIn} 520ms cubic-bezier(0.2, 0.8, 0.2, 1) 60ms both;
-    will-change: transform, opacity;
+  }
+  @media (max-width: 409px) {
+    .logo {
+      width: 180px;
+    }
+  }
+  @media (min-width: 500px) {
+    .logo {
+      width: 300px;
+    }
+  }
+  @media (min-width: 800px) {
+    .logo {
+      width: 500px;
+    }
   }
 
   .logo-acorn {
-    width: 80px;
-    height: 80px;
-    transform-origin: 60% 60%;
+    width: 72px;
+    height: auto;
+    transform-origin: 20% 60%;
     animation: ${popIn} 520ms cubic-bezier(0.2, 0.8, 0.2, 1) 140ms both,
       ${wobble} 2500ms ease-in-out 900ms infinite;
-    will-change: transform, opacity;
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  @media (max-width: 400px) {
+    .logo-acorn {
+      width: 56px;
+    }
+  }
+  @media (min-width: 614px) {
+    .logo-acorn {
+      width: 86px;
+    }
   }
 
   sectiontitle {
     color: #fff;
     font-family: Pretendard;
-    font-size: 25px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 140%;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    line-height: 1.3;
+    margin-top: 8px;
+    font-size: 20px;
+    max-width: 360px;
     animation: ${fadeUp} 420ms ease-out 220ms both;
+  }
+  @media (min-width: 538px) {
+    sectiontitle {
+      font-size: 28px;
+    }
   }
 
   content {
     color: #fff;
     font-family: Pretendard;
-    font-size: 18px;
-    font-style: normal;
     font-weight: 400;
-    line-height: 140%;
+    line-height: 1.5;
+    margin-top: 6px;
+    opacity: 0.92;
+    font-size: 13px;
+    max-width: 420px;
     animation: ${fadeUp} 420ms ease-out 320ms both;
+  }
+  @media (min-width: 421px) {
+    content {
+      font-size: 16px;
+    }
   }
 
   .falling-acorn {
     position: absolute;
-    left: max(-10vw, -24px);
+    left: -28px;
     bottom: -8px;
-    width: clamp(280px, 68vw, 560px);
+    width: 420px;
     height: auto;
     pointer-events: none;
     z-index: 1;
     animation: ${riseBounce} 720ms cubic-bezier(0.2, 0.8, 0.2, 1) 380ms both,
       ${floatSlow} 3800ms ease-in-out 1400ms infinite;
   }
+  @media (max-width: 412px) {
+    .falling-acorn {
+      width: 280px;
+    }
+  }
+  @media (min-width: 824px) {
+    .falling-acorn {
+      width: 560px;
+    }
+  }
 
   .squirrel {
     position: absolute;
-    right: max(-8vw, -24px);
+    right: -24px;
     bottom: -8px;
-    width: clamp(260px, 72vw, 460px);
+    width: 300px;
     height: auto;
     pointer-events: none;
+    z-index: 2;
     animation: ${riseBounce} 720ms cubic-bezier(0.2, 0.8, 0.2, 1) 480ms both,
       ${floatSlow} 3800ms ease-in-out 1400ms infinite;
-    will-change: transform, opacity;
-    z-index: 2;
+  }
+  @media (max-width: 361px) {
+    .squirrel {
+      width: 260px;
+    }
+  }
+  @media (min-width: 639px) {
+    .squirrel {
+      width: 460px;
+    }
+  }
+
+  @media (min-width: 560px) {
+    header {
+      row-gap: 20px;
+    }
+  }
+
+  @media (min-width: 800px) {
+    header {
+      row-gap: 24px;
+    }
   }
 `;

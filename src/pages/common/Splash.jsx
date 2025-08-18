@@ -5,22 +5,24 @@ import acorn1 from "../../assets/images/acorn1.svg";
 import textLogoWhite from "../../assets/images/text-logo-white.svg";
 import acorns from "../../assets/images/acorns.svg";
 import splashSquirrel from "../../assets/images/splashsquirrel.svg";
-
+const SHOW_MS = 4000;
+const FADE_MS = 900;
 const Splash = () => {
-  /*const navigate = useNavigate();
+  const navigate = useNavigate();
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setLeaving(true), 1200);
-    const navTimer = setTimeout(() => navigate("/signin"), 1500);
+    const fadeTimer = setTimeout(() => setLeaving(true), SHOW_MS);
+    const navTimer = setTimeout(() => navigate("/signin"), SHOW_MS + FADE_MS);
 
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(navTimer);
     };
-  }, [navigate]);*/
+  }, [navigate]);
+
   return (
-    <PageContainer>
+    <PageContainer className={leaving ? "leaving" : ""}>
       <header>
         <div className="top">
           <img className="logo" src={textLogoWhite} alt="심!봤다 로고" />
