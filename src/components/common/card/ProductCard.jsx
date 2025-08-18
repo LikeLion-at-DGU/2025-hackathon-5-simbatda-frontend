@@ -63,7 +63,7 @@ const ProductCard = ({
   return (
     <>
       {variant === "default" ? (
-        <CardContainer>
+        <CardContainer onClick={onClick} style={{ cursor: "pointer" }}>
           <LikeButton
             onClick={handleLikeClick}
             aria-label={liked ? "좋아요 취소" : "좋아요"}
@@ -88,7 +88,7 @@ const ProductCard = ({
           </CardContent>
         </CardContainer>
       ) : (
-        <ProductCardContainer>
+        <ProductCardContainer onClick={onClick} style={{ cursor: "pointer" }}>
           <LikeButton
             onClick={handleLikeClick}
             aria-label={liked ? "좋아요 취소" : "좋아요"}

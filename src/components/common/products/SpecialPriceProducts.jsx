@@ -23,7 +23,7 @@ const SpecialPriceProducts = ({ products = [] }) => {
   };
 
   const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
+    navigate(`/registeration/${productId}`);
   };
 
   const handleLikeToggle = (productId, isLiked) => {
@@ -36,7 +36,7 @@ const SpecialPriceProducts = ({ products = [] }) => {
       <div>
         <Header>
           <Title>특가상품</Title>
-          <MoreButton onClick={handleMoreClick}>더보기 {'>'}</MoreButton>
+          <MoreButton onClick={handleMoreClick}>더보기 {">"}</MoreButton>
         </Header>
         <Description>오늘의 특가 상품이에요!</Description>
       </div>
