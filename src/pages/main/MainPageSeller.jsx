@@ -1,13 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSellerMe, logout } from "../../api/auth";
 import Button from "../../components/common/button/Button";
 import {
   PageContainer,
-  Header,
-  Brand,
-  BrandLogo,
-  HamburgerButton,
   Content,
   OpenStatusSection,
   OpenStatusText,
@@ -15,15 +11,6 @@ import {
   SectionTitleWrapper,
   StatusButtons,
   EmptyMessage,
-  Backdrop,
-  Drawer,
-  DrawerHeader,
-  ProfileAvatar,
-  ProfileInfo,
-  Nickname,
-  LogoutButton,
-  DrawerList,
-  DrawerItem,
   OrderModal,
   ModalContent,
   ModalHeader,
@@ -47,14 +34,13 @@ import {
   ExpiryDate,
 } from "./MainPageSeller.styles";
 
-import menuIcon from "../../assets/icons/menu.png";
-import greenSquirrelIcon from "../../assets/icons/greensquirrel.png";
-import starsquirrelIcon from "../../assets/icons/starsquirrel.png";
+import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
+
 import ImportantIcon from "../../assets/icons/Important.png";
+import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 function MainPageSeller() {
   const navigate = useNavigate();
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
@@ -67,7 +53,6 @@ function MainPageSeller() {
     "가게 내부 문제 발생",
     "기타 사유",
   ];
-  const drawerRef = useRef(null);
 
   // 테스트용 주문 데이터
   const sampleOrder = {
@@ -143,17 +128,7 @@ function MainPageSeller() {
 
   return (
     <PageContainer>
-      <Header>
-        <Brand>
-          <BrandLogo src={greenSquirrelIcon} alt="심봤다" />
-        </Brand>
-        <HamburgerButton
-          aria-label="메뉴 열기"
-          onClick={() => setDrawerOpen((v) => !v)}
-        >
-          <img src={menuIcon} alt="메뉴" width={24} height={24} />
-        </HamburgerButton>
-      </Header>
+      <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
 
       <Content>
         <OpenStatusSection>
@@ -190,25 +165,6 @@ function MainPageSeller() {
 
         <EmptyMessage>아직 주문 접수된 건이 없어요</EmptyMessage>
       </Content>
-
-      <Backdrop $open={drawerOpen} onClick={() => setDrawerOpen(false)} />
-      <Drawer $open={drawerOpen} ref={drawerRef} aria-hidden={!drawerOpen}>
-        <DrawerHeader>
-          <ProfileAvatar>
-            <img src={starsquirrelIcon} alt="프로필" width={28} height={28} />
-          </ProfileAvatar>
-          <ProfileInfo>
-            <Nickname>{userInfo?.storeName || "로딩 중..."}님</Nickname>
-            <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
-          </ProfileInfo>
-        </DrawerHeader>
-        <DrawerList>
-          <DrawerItem>주문 현황</DrawerItem>
-          <DrawerItem onClick={() => navigate("/product-register")}>
-            상품 등록
-          </DrawerItem>
-        </DrawerList>
-      </Drawer>
 
       {orderModalOpen && currentOrder && (
         <>

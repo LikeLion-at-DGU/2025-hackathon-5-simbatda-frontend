@@ -1,25 +1,12 @@
 import styled from "styled-components";
 import {
   PageContainer as MainPageContainer,
-  Header as MainHeader,
-  Brand as MainBrand,
-  BrandLogo as MainBrandLogo,
-  HamburgerButton as MainHamburgerButton,
   Content as MainContent,
   OpenStatusSection as MainOpenStatusSection,
   OpenStatusText as MainOpenStatusText,
   SectionTitle as MainSectionTitle,
   SectionTitleWrapper as MainSectionTitleWrapper,
   EmptyMessage as MainEmptyMessage,
-  Backdrop as MainBackdrop,
-  Drawer as MainDrawer,
-  DrawerHeader as MainDrawerHeader,
-  ProfileAvatar as MainProfileAvatar,
-  ProfileInfo as MainProfileInfo,
-  Nickname as MainNickname,
-  LogoutButton as MainLogoutButton,
-  DrawerList as MainDrawerList,
-  DrawerItem as MainDrawerItem,
   OrderModal as MainOrderModal,
   ModalContent as MainModalContent,
   ModalHeader as MainModalHeader,
@@ -28,25 +15,12 @@ import {
 } from "./MainPageSeller.styles";
 
 export const PageContainer = MainPageContainer;
-export const Header = MainHeader;
-export const Brand = MainBrand;
-export const BrandLogo = MainBrandLogo;
-export const HamburgerButton = MainHamburgerButton;
 export const Content = MainContent;
 export const OpenStatusSection = MainOpenStatusSection;
 export const OpenStatusText = MainOpenStatusText;
 export const SectionTitle = MainSectionTitle;
 export const SectionTitleWrapper = MainSectionTitleWrapper;
 export const EmptyMessage = MainEmptyMessage;
-export const Backdrop = MainBackdrop;
-export const Drawer = MainDrawer;
-export const DrawerHeader = MainDrawerHeader;
-export const ProfileAvatar = MainProfileAvatar;
-export const ProfileInfo = MainProfileInfo;
-export const Nickname = MainNickname;
-export const LogoutButton = MainLogoutButton;
-export const DrawerList = MainDrawerList;
-export const DrawerItem = MainDrawerItem;
 
 export const OrderModal = MainOrderModal;
 export const ModalContent = MainModalContent;

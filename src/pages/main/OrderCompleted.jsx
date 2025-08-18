@@ -1,43 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSellerMe, logout } from "../../api/auth";
 import CompletedCard from "../../components/order/CompletedCard";
 import Button from "../../components/common/button/Button";
 import {
   PageContainer,
-  Header,
-  Brand,
-  BrandLogo,
-  HamburgerButton,
   Content,
   OpenStatusSection,
   OpenStatusText,
   SectionTitleWrapper,
   SectionTitle,
   StatusButtons,
-  Backdrop,
-  Drawer,
-  DrawerHeader,
-  ProfileAvatar,
-  ProfileInfo,
-  Nickname,
-  LogoutButton,
-  DrawerList,
-  DrawerItem,
   OrderList,
   DateSection,
   DateHeader,
 } from "./OrderCompleted.styles";
-import greenSquirrelIcon from "../../assets/icons/greensquirrel.png";
-import menuIcon from "../../assets/icons/menu.png";
-import starsquirrelIcon from "../../assets/icons/starsquirrel.png";
+import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 export default function OrderCompleted() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
-  const drawerRef = useRef(null);
 
   // 샘플 주문 데이터 (날짜별로 그룹화)
   const ordersGroupedByDate = {
@@ -90,17 +73,7 @@ export default function OrderCompleted() {
 
   return (
     <PageContainer>
-      <Header>
-        <Brand>
-          <BrandLogo src={greenSquirrelIcon} alt="심봤다" />
-        </Brand>
-        <HamburgerButton
-          aria-label="메뉴 열기"
-          onClick={() => setDrawerOpen((v) => !v)}
-        >
-          <img src={menuIcon} alt="메뉴" width={24} height={24} />
-        </HamburgerButton>
-      </Header>
+      <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
 
       <Content>
         <OpenStatusSection>
@@ -150,25 +123,6 @@ export default function OrderCompleted() {
             ))}
         </OrderList>
       </Content>
-
-      <Backdrop $open={drawerOpen} onClick={() => setDrawerOpen(false)} />
-      <Drawer $open={drawerOpen} ref={drawerRef} aria-hidden={!drawerOpen}>
-        <DrawerHeader>
-          <ProfileAvatar>
-            <img src={starsquirrelIcon} alt="프로필" width={28} height={28} />
-          </ProfileAvatar>
-          <ProfileInfo>
-            <Nickname>{userInfo?.storeName || "로딩 중..."}님</Nickname>
-            <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
-          </ProfileInfo>
-        </DrawerHeader>
-        <DrawerList>
-          <DrawerItem>주문 현황</DrawerItem>
-          <DrawerItem onClick={() => navigate("/product-register")}>
-            상품 등록
-          </DrawerItem>
-        </DrawerList>
-      </Drawer>
     </PageContainer>
   );
 }

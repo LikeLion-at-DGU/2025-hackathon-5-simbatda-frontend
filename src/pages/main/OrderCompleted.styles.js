@@ -1,33 +1,18 @@
 import styled from "styled-components";
 import {
   PageContainer,
-  Header,
-  Brand,
-  BrandLogo,
-  HamburgerButton,
   Content,
   OpenStatusSection,
   OpenStatusText,
   SectionTitleWrapper,
   SectionTitle,
   StatusButtons,
-  Backdrop,
-  Drawer,
-  DrawerHeader,
-  ProfileAvatar,
-  ProfileInfo,
-  Nickname,
-  LogoutButton,
-  DrawerList,
-  DrawerItem,
 } from "./MainPageSeller.styles";
+
+import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
 
 export {
   PageContainer,
-  Header,
-  Brand,
-  BrandLogo,
-  HamburgerButton,
   Content,
   OpenStatusSection,
   OpenStatusText,
@@ -35,14 +20,6 @@ export {
   SectionTitle,
   StatusButtons,
   Backdrop,
-  Drawer,
-  DrawerHeader,
-  ProfileAvatar,
-  ProfileInfo,
-  Nickname,
-  LogoutButton,
-  DrawerList,
-  DrawerItem,
 };
 
 export const OrderList = styled.div`
