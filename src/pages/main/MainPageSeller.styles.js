@@ -77,126 +77,10 @@ export const EmptyMessage = styled.div`
   text-align: center;
 `;
 
-export const OrderModal = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 40;
-  transform: translateY(${(p) => (p.$open ? "0%" : "100%")});
-  transition: transform 0.3s ease;
-  width: 100%;
-`;
-
-export const ModalContent = styled.div`
-  background: white;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 20px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-  width: 100%;
-`;
-
-export const ModalHeader = styled.div`
+export const OrdersContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-`;
-
-export const ModalTitle = styled.h3`
-  color: #37ca79;
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
-`;
-
-export const OrderInfo = styled.div`
-  margin-bottom: 20px;
-`;
-
-export const OrderNumber = styled.div`
-  color: #000;
-  font-size: 16px;
-  margin-bottom: 8px;
-  font-weight: 500;
-
-  strong {
-    font-size: 20px;
-    font-weight: 700;
-    display: block;
-    margin-top: 4px;
-  }
-`;
-
-export const OrderSummary = styled.div`
-  margin-bottom: 24px;
-
-  h4 {
-    color: #000;
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0 0 12px 0;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  th,
-  td {
-    padding: 12px;
-    text-align: center;
-    border-right: 1px solid #ddd;
-  }
-
-  th:last-child,
-  td:last-child {
-    border-right: none;
-  }
-
-  th {
-    background: #eae7e3;
-    color: #000;
-    font-size: 14px;
-    font-weight: 600;
-    border-bottom: 1px solid #ddd;
-  }
-
-  td {
-    color: #000;
-    font-size: 14px;
-    background: #f8f9fa;
-  }
-
-  .note {
-    color: #999;
-    font-size: 12px;
-    margin: 12px 0 0 0;
-    text-align: center;
-  }
-`;
-
-export const OrderItem = styled.tr`
-  &:hover {
-    background: #f8f9fa;
-  }
-`;
-
-export const ModalButtons = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
-  width: fit-content;
-  margin: 0 auto;
+  flex-direction: column;
+  gap: 16px;
 `;
 
 export const RejectModal = styled.div`
@@ -205,18 +89,18 @@ export const RejectModal = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 50;
-  opacity: ${(p) => (p.$open ? 1 : 0)};
-  pointer-events: ${(p) => (p.$open ? "auto" : "none")};
-  transition: opacity 0.3s ease;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
 `;
 
 export const RejectModalContent = styled.div`
-  background: white;
-  border-radius: 16px;
   padding: 24px;
   width: 400px;
   max-width: 90vw;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 `;
 
 export const RejectModalHeader = styled.div`
@@ -258,13 +142,6 @@ export const RejectInfo = styled.div`
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
   padding: 16px 0;
-`;
-
-export const ExpiryDate = styled.div`
-  font-size: 12px;
-  color: #999;
-  margin-top: 4px;
-  margin-left: 10px;
 `;
 
 export const RejectOrderInfo = styled.div`

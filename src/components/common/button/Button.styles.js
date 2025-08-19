@@ -72,6 +72,31 @@ export const StyledButton = styled.button`
 
   ${(props) =>
     props.$size === "small" &&
+    props.$variant === "secondary" &&
+    `
+    background-color: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+    
+    &:hover {
+      background-color: #e8e8e8;
+      color: #333;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+  `}
+
+  ${(props) =>
+    props.$size === "small" &&
     props.$variant === "outline" &&
     `
     background-color: transparent;

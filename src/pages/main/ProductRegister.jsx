@@ -39,6 +39,7 @@ import {
 } from "./ProductRegister.styles";
 
 import HeaderSeller from "../../components/common/header/HeaderSeller";
+import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
 import closeIcon from "../../assets/icons/x.png";
 import ProductCard from "../../components/product/ProductCard";
 
@@ -48,7 +49,10 @@ function ProductRegister() {
   const [userInfo, setUserInfo] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(() => {
+    const savedProducts = localStorage.getItem("sellerProducts");
+    return savedProducts ? JSON.parse(savedProducts) : [];
+  });
   const [previewUrl, setPreviewUrl] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [menuName, setMenuName] = useState("");
@@ -60,7 +64,10 @@ function ProductRegister() {
   const [discountPercent, setDiscountPercent] = useState("0");
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState("");
-  const drawerRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem("sellerProducts", JSON.stringify(products));
+  }, [products]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
