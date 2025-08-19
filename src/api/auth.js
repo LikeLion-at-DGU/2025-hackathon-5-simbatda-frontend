@@ -39,9 +39,14 @@ export async function consumerSignup(payload) {
     throw data;
   }
 
-  const { auth } = data;
+  const { auth, user } = data;
   if (auth?.accessToken && auth?.refreshToken) {
     setStoredTokens(auth.accessToken, auth.refreshToken);
+    // 사용자 정보 저장 (소비자 역할)
+    localStorage.setItem(
+      "userInfo",
+      JSON.stringify({ ...user, role: "consumer" })
+    );
   }
   return data;
 }
@@ -58,9 +63,14 @@ export async function consumerLogin(payload) {
     throw data;
   }
 
-  const { auth } = data;
+  const { auth, user } = data;
   if (auth?.accessToken && auth?.refreshToken) {
     setStoredTokens(auth.accessToken, auth.refreshToken);
+    // 사용자 정보 저장 (소비자 역할)
+    localStorage.setItem(
+      "userInfo",
+      JSON.stringify({ ...user, role: "consumer" })
+    );
   }
   return data;
 }
@@ -85,9 +95,14 @@ export async function sellerSignup(payload) {
     throw data;
   }
 
-  const { auth } = data;
+  const { auth, user } = data;
   if (auth?.accessToken && auth?.refreshToken) {
     setStoredTokens(auth.accessToken, auth.refreshToken);
+    // 사용자 정보 저장 (판매자 역할)
+    localStorage.setItem(
+      "userInfo",
+      JSON.stringify({ ...user, role: "seller" })
+    );
   }
   return data;
 }
@@ -104,9 +119,14 @@ export async function sellerLogin(payload) {
     throw data;
   }
 
-  const { auth } = data;
+  const { auth, user } = data;
   if (auth?.accessToken && auth?.refreshToken) {
     setStoredTokens(auth.accessToken, auth.refreshToken);
+    // 사용자 정보 저장 (판매자 역할)
+    localStorage.setItem(
+      "userInfo",
+      JSON.stringify({ ...user, role: "seller" })
+    );
   }
   return data;
 }
@@ -123,6 +143,8 @@ export async function logout() {
 
   if (res.status === 204 || res.ok) {
     clearStoredTokens();
+    // 사용자 정보도 제거
+    localStorage.removeItem("userInfo");
     return true;
   }
 

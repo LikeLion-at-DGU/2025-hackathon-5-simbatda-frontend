@@ -17,6 +17,17 @@ import {
 
 function StoreRegistration() {
   const navigate = useNavigate();
+
+  // 1단계 정보 확인
+  useEffect(() => {
+    const step1Data = localStorage.getItem("sellerSignupData");
+    if (!step1Data) {
+      alert("1단계 정보가 없습니다. 처음부터 다시 시작해주세요.");
+      navigate("/signup-seller");
+      return;
+    }
+  }, [navigate]);
+
   const [formData, setFormData] = useState({
     storeName: "",
     openingHours: "",
@@ -100,8 +111,23 @@ function StoreRegistration() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isFormValid) return;
+
+    // 2단계 정보를 localStorage에 저장
+    const step1Data = JSON.parse(localStorage.getItem("sellerSignupData"));
+    const sellerStep2Data = {
+      ...step1Data,
+      storeName: formData.storeName,
+      openingHours: formData.openingHours,
+      address: formData.address,
+      addressDetail: formData.addressDetail,
+      step: 2,
+    };
+
+    localStorage.setItem("sellerSignupData", JSON.stringify(sellerStep2Data));
+
+    // 다음 단계로 이동
     navigate("/store-document-upload");
-  }; //API
+  };
 
   return (
     <LoginPageContainer>
