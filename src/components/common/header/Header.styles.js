@@ -23,6 +23,15 @@ const BrandLogo = styled.img`
   height: 50px;
 `;
 
+const HeaderTitle = styled.h1`
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+`;
+
 const HamburgerButton = styled.button`
   background: none;
   border: none;
@@ -120,6 +129,7 @@ export {
   HeaderContainer,
   Brand,
   BrandLogo,
+  HeaderTitle,
   HamburgerButton,
   Backdrop,
   Drawer,

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import menuIcon from "../../../assets/icons/menu.png";
 import starsquirrelIcon from "../../../assets/icons/starsquirrel.png";
 import LocationIcon from "../../../assets/icons/Location.png";
@@ -11,6 +12,7 @@ import {
   HeaderContainer,
   Brand,
   BrandLogo,
+  HeaderTitle,
   HamburgerButton,
   Backdrop,
   Drawer,
@@ -23,9 +25,10 @@ import {
   LogoutButton,
 } from "./Header.styles";
 
-const Header = ({ userInfo, onLogout }) => {
+const Header = ({ userInfo, onLogout, title }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -48,12 +51,27 @@ const Header = ({ userInfo, onLogout }) => {
     setDrawerOpen(false);
   };
 
+  const handleReservationHistory = () => {
+    navigate("/order-history");
+    setDrawerOpen(false);
+  };
+
+  const handleLogoClick = () => {
+    navigate("/mainpage");
+  };
+
   return (
     <>
       <HeaderContainer>
         <Brand>
-          <BrandLogo src={textLogo} alt="심봤다" />
+          <BrandLogo
+            src={textLogo}
+            alt="심봤다"
+            onClick={handleLogoClick}
+            style={{ cursor: "pointer" }}
+          />
         </Brand>
+        {title && <HeaderTitle>{title}</HeaderTitle>}
         <HamburgerButton
           aria-label="메뉴 열기"
           onClick={() => setDrawerOpen((v) => !v)}
@@ -86,7 +104,7 @@ const Header = ({ userInfo, onLogout }) => {
             <img src={GoodQualityIcon} alt="추천상품" width={20} height={20} />
             추천 상품
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={handleReservationHistory}>
             <img src={BillIcon} alt="예약내역" width={20} height={20} />
             예약 내역
           </DrawerItem>
