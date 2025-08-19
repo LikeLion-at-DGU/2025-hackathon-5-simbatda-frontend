@@ -1,47 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { getStoredTokens } from "../api/client";
 
 export const useUserRole = () => {
   const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const initialized = useRef(false);
 
+  // 초기 사용자 역할 확인 (한 번만 실행)
   useEffect(() => {
+    if (initialized.current) return;
+
     const checkUserRole = () => {
       try {
-        // localStorage에서 사용자 정보 확인
         const userInfo = localStorage.getItem("userInfo");
         if (userInfo) {
           const parsedUser = JSON.parse(userInfo);
           setUserRole(parsedUser.role || "consumer");
         } else {
-          // 토큰이 있지만 사용자 정보가 없는 경우 기본값
           const { accessToken } = getStoredTokens();
           setUserRole(accessToken ? "consumer" : null);
         }
         setIsLoading(false);
+        initialized.current = true;
       } catch (error) {
         console.error("Error checking user role:", error);
         setUserRole(null);
         setIsLoading(false);
+        initialized.current = true;
       }
     };
 
     checkUserRole();
-
-    // localStorage 변경 감지
-    const handleStorageChange = () => {
-      checkUserRole();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
   }, []);
 
-  const isConsumer = userRole === "consumer";
-  const isSeller = userRole === "seller";
+  // 계산된 값들을 useMemo로 메모이제이션
+  const isConsumer = useMemo(() => userRole === "consumer", [userRole]);
+  const isSeller = useMemo(() => userRole === "seller", [userRole]);
 
-  return { userRole, isConsumer, isSeller, isLoading };
+  // 직접 객체 반환
+  return {
+    userRole,
+    isConsumer,
+    isSeller,
+    isLoading,
+  };
 };

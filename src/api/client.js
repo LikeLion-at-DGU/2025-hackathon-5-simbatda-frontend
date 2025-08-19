@@ -1,8 +1,5 @@
 // 프록시를 사용하여 CORS 문제 해결
-const API_BASE_URL =
-  import.meta.env.VITE_DEV_MODE === "true"
-    ? ""
-    : import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE_URL = "https://yeonhee.shop"; // 임시로 직접 백엔드 사용
 
 export const getStoredTokens = () => {
   try {
@@ -47,7 +44,14 @@ export async function apiRequest(
   const url = `${API_BASE_URL}${path}`;
   const tokenSet = getStoredTokens();
 
-  const baseHeaders = { "Content-Type": "application/json", ...headers };
+  // FormData인지 확인하여 Content-Type 설정
+  const isFormData = body instanceof FormData;
+  const baseHeaders = { ...headers };
+
+  if (!isFormData) {
+    baseHeaders["Content-Type"] = "application/json";
+  }
+
   if (auth && tokenSet.accessToken) {
     baseHeaders.Authorization = `Bearer ${tokenSet.accessToken}`;
   }
@@ -55,8 +59,18 @@ export async function apiRequest(
   const response = await fetch(url, {
     method,
     headers: baseHeaders,
-    body: body ? JSON.stringify(body) : undefined,
+    body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
   });
+
+  if (!response.ok) {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("text/html")) {
+      const htmlText = await response.text();
+      throw new Error(
+        `백엔드 서버 오류 (${response.status}): HTML 응답을 받았습니다. 서버 상태를 확인해주세요.`
+      );
+    }
+  }
 
   if (response.status === 401 && auth) {
     const cloned = await response

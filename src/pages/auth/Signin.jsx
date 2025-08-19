@@ -4,7 +4,6 @@ import { consumerLogin } from "../../api/auth";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
-import { useAuth } from "../../hooks/useAuth";
 
 import {
   LoginPageContainer,
@@ -20,7 +19,6 @@ import {
 
 function Signin() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -35,10 +33,12 @@ function Signin() {
 
   // 이미 로그인된 경우 메인 페이지로 리다이렉트
   useEffect(() => {
-    if (isAuthenticated) {
+    // 로컬스토리지에서 직접 토큰 확인 (useAuth 훅 사용하지 않음)
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
       navigate("/mainpage");
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

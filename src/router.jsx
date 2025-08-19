@@ -48,19 +48,11 @@ const router = createBrowserRouter([
       { path: "signup-seller", element: <SignupSeller /> },
       {
         path: "store-registration",
-        element: (
-          <SellerProtectedRoute>
-            <StoreRegistration />
-          </SellerProtectedRoute>
-        ),
+        element: <StoreRegistration />,
       },
       {
         path: "store-document-upload",
-        element: (
-          <SellerProtectedRoute>
-            <StoreDocumentUpload />
-          </SellerProtectedRoute>
-        ),
+        element: <StoreDocumentUpload />,
       },
       {
         path: "mainpage-seller",

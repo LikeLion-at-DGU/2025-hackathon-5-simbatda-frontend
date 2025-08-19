@@ -164,3 +164,64 @@ export async function getSellerMe() {
   const response = await mockApi.getSellerMe();
   return response.data;
 }
+
+// 상점 정보 저장 API - 1단계
+export async function createStore(storeData) {
+  const res = await apiRequest("/stores/signup/step1/", {
+    method: "POST",
+    auth: true,
+    body: {
+      store_name: storeData.name,
+      opening_time: storeData.opening_hours,
+      address_search: storeData.address,
+      address_detail: storeData.address_detail || "",
+      latitude: 37.5665, // 임시 위도 (실제로는 주소 검색 API에서 가져와야 함)
+      longitude: 126.978, // 임시 경도 (실제로는 주소 검색 API에서 가져와야 함)
+    },
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    console.error("Store creation failed:", data);
+    throw data;
+  }
+  return data;
+}
+
+// 서류 업로드 API - 2단계
+export async function uploadDocuments(documents, storeId) {
+  const formData = new FormData();
+  formData.append("store_id", storeId);
+
+  if (documents.bizReg) {
+    formData.append("business_license", documents.bizReg);
+  }
+  if (documents.permit) {
+    formData.append("permit_doc", documents.permit);
+  }
+  if (documents.bankbook) {
+    formData.append("bank_copy", documents.bankbook);
+  }
+
+  const res = await apiRequest("/stores/signup/step2/", {
+    method: "POST",
+    auth: true,
+    body: formData,
+  });
+
+  let data;
+  try {
+    data = await res.json();
+  } catch (parseError) {
+    console.error("Failed to parse response as JSON:", parseError);
+    throw new Error(
+      "서버에서 잘못된 응답 형식을 받았습니다. 백엔드 서버 상태를 확인해주세요."
+    );
+  }
+
+  if (!res.ok) {
+    console.error("Document upload failed:", data);
+    throw data;
+  }
+  return data;
+}
