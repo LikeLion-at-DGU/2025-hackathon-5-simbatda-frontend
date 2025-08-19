@@ -836,4 +836,16 @@ export const mockUtils = {
       pickupTime: "14:00 - 15:00", // 실제로는 예약 정보에서 가져와야 함
     };
   },
+
+  // 주문 수락 상태 체크 (테스트용)
+  checkOrderAcceptance: () => {
+    // 테스트를 위해 주문 2번을 수락된 상태로 변경
+    const order = unifiedMockData.orders.find((o) => o.id === 2);
+    if (order) {
+      order.status = "processing";
+      order.orderAccepted = true;
+      order.showAcceptanceModal = true;
+    }
+    return order;
+  },
 };
