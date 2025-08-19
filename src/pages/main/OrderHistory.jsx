@@ -4,6 +4,7 @@ import Header from "../../components/common/header/Header";
 import { mockUtils } from "../../mocks/UnifiedMockData";
 import greencheck from "../../assets/icons/check.svg";
 import graycheck from "../../assets/icons/uncheck.svg";
+import empty from "../../assets/images/crying-character.svg";
 import {
   Container,
   OrderList,
@@ -12,7 +13,6 @@ import {
   OrderInfo,
   OrderStatus,
   OrderDetails,
-  OrderProducts,
   OrderProduct,
   OrderProductImage,
   OrderProductInfo,
@@ -142,7 +142,8 @@ function OrderHistory() {
       <Container>
         <Header userInfo={userInfo} onLogout={handleLogout} title="주문 내역" />
         <EmptyState>
-          <EmptyText>주문 내역이 없습니다.</EmptyText>
+          <img src={empty} alt="empty" style={{ width: "124px", height: "124px", opacity: 0.6 }} />
+          <EmptyText>아직 주문 내역이 없습니다.</EmptyText>
         </EmptyState>
       </Container>
     );
