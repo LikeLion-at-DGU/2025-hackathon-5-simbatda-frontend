@@ -105,8 +105,8 @@ const Header = ({ userInfo, onLogout, title }) => {
             추천 상품
           </DrawerItem>
           <DrawerItem onClick={handleReservationHistory}>
-            <img src={BillIcon} alt="예약내역" width={20} height={20} />
-            예약 내역
+            <img src={BillIcon} alt="주문내역" width={20} height={20} />
+            주문 내역
           </DrawerItem>
           <DrawerItem>
             <img src={FavoriteIcon} alt="찜" width={20} height={20} />찜
