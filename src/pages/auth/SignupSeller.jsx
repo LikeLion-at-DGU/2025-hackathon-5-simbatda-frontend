@@ -127,31 +127,18 @@ function SignupSeller() {
       return;
     }
 
-    try {
-      const response = await sellerSignup({
-        email: formData.email,
-        password: formData.password,
-        password2: formData.confirmPassword,
-        name: formData.name,
-        phone: formData.phone,
-      });
+    const sellerStep1Data = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      password2: formData.confirmPassword,
+      phone: formData.phone,
+      step: 1,
+    };
 
-      if (response.user && response.auth) {
-        alert("판매자 회원가입이 완료되었습니다!");
-        navigate("/store-registration");
-      }
-    } catch (err) {
-      console.error("Seller signup error:", err);
-      if (err?.detail) {
-        alert(err.detail);
-      } else if (err?.message) {
-        alert(err.message);
-      } else if (err?.email && Array.isArray(err.email)) {
-        alert(err.email[0]);
-      } else {
-        alert("판매자 회원가입에 실패했습니다. 다시 시도해주세요.");
-      }
-    }
+    localStorage.setItem("sellerSignupData", JSON.stringify(sellerStep1Data));
+
+    navigate("/store-registration");
   };
 
   return (

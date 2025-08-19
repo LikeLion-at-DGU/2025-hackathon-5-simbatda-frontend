@@ -16,31 +16,117 @@ import ProductRegister from "./pages/main/ProductRegister.jsx";
 import Registeration from "./pages/main/Registeration.jsx";
 import Splash from "./pages/common/Splash.jsx";
 import WishList from "./pages/main/WishList.jsx";
+import ProtectedRoute from "./components/common/ProtectedRoute.jsx";
+import SellerProtectedRoute from "./components/common/SellerProtectedRoute.jsx";
+import ConsumerProtectedRoute from "./components/common/ConsumerProtectedRoute.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { path: "", element: <MainPage /> },
-      { path: "mainpage", element: <MainPage /> },
+      {
+        path: "",
+        element: (
+          <ConsumerProtectedRoute>
+            <MainPage />
+          </ConsumerProtectedRoute>
+        ),
+      },
+      {
+        path: "mainpage",
+        element: (
+          <ConsumerProtectedRoute>
+            <MainPage />
+          </ConsumerProtectedRoute>
+        ),
+      },
       { path: "test", element: <TestPage /> },
       { path: "signin", element: <Signin /> },
       { path: "signin-seller", element: <SigninSeller /> },
       { path: "signup", element: <Signup /> },
       { path: "signup-seller", element: <SignupSeller /> },
-      { path: "store-registration", element: <StoreRegistration /> },
-      { path: "store-document-upload", element: <StoreDocumentUpload /> },
-      { path: "mainpage-seller", element: <MainPageSeller /> },
-      { path: "order-in-progress", element: <OrderInProgress /> },
-      { path: "order-detail", element: <OrderDetail /> },
-      { path: "order-completed", element: <OrderCompleted /> },
-      { path: "dashboard", element: <div>대시보드</div> },
-      { path: "inventory", element: <div>재고관리</div> },
-      { path: "product-register", element: <ProductRegister /> },
-      { path: "registeration/:productId", element: <Registeration /> },
+      {
+        path: "store-registration",
+        element: <StoreRegistration />,
+      },
+      {
+        path: "store-document-upload",
+        element: <StoreDocumentUpload />,
+      },
+      {
+        path: "mainpage-seller",
+        element: (
+          <SellerProtectedRoute>
+            <MainPageSeller />
+          </SellerProtectedRoute>
+        ),
+      },
+      {
+        path: "order-in-progress",
+        element: (
+          <SellerProtectedRoute>
+            <OrderInProgress />
+          </SellerProtectedRoute>
+        ),
+      },
+      {
+        path: "order-detail",
+        element: (
+          <ProtectedRoute>
+            <OrderDetail />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "order-completed",
+        element: (
+          <SellerProtectedRoute>
+            <OrderCompleted />
+          </SellerProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard",
+        element: (
+          <SellerProtectedRoute>
+            <div>대시보드</div>
+          </SellerProtectedRoute>
+        ),
+      },
+      {
+        path: "inventory",
+        element: (
+          <SellerProtectedRoute>
+            <div>재고관리</div>
+          </SellerProtectedRoute>
+        ),
+      },
+      {
+        path: "product-register",
+        element: (
+          <SellerProtectedRoute>
+            <ProductRegister />
+          </SellerProtectedRoute>
+        ),
+      },
+      {
+        path: "registeration/:productId",
+        element: (
+          <ConsumerProtectedRoute>
+            <Registeration />
+          </ConsumerProtectedRoute>
+        ),
+      },
       { path: "splash", element: <Splash /> },
-      { path: "wishlist", element: <WishList /> },
+      {
+        path: "wishlist",
+        element: (
+          <ConsumerProtectedRoute>
+            <WishList />
+          </ConsumerProtectedRoute>
+        ),
+      },
     ],
   },
 ]);
