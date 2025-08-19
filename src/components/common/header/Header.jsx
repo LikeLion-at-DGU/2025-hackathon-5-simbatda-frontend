@@ -60,6 +60,27 @@ const Header = ({ userInfo, onLogout, title }) => {
     navigate("/mainpage");
   };
 
+  const handleInventoryMap = () => {
+    navigate("/mainpage");
+    setDrawerOpen(false);
+  };
+
+  const handleSpecialPrice = () => {
+    navigate("/special-price");
+    setDrawerOpen(false);
+  };
+
+  const handleRecommended = () => {
+    navigate("/recommended");
+    setDrawerOpen(false);
+  };
+
+  const handleFavorites = () => {
+    // TODO: 찜 페이지 구현 후 링크 연결
+    console.log("찜 페이지로 이동");
+    setDrawerOpen(false);
+  };
+
   return (
     <>
       <HeaderContainer>
@@ -92,15 +113,15 @@ const Header = ({ userInfo, onLogout, title }) => {
           </ProfileInfo>
         </DrawerHeader>
         <DrawerList>
-          <DrawerItem>
+          <DrawerItem onClick={handleInventoryMap}>
             <img src={LocationIcon} alt="재고지도" width={20} height={20} />
             재고 지도
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={handleSpecialPrice}>
             <img src={DiscountIcon} alt="특가상품" width={20} height={20} />
             특가 상품
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={handleRecommended}>
             <img src={GoodQualityIcon} alt="추천상품" width={20} height={20} />
             추천 상품
           </DrawerItem>
@@ -108,7 +129,7 @@ const Header = ({ userInfo, onLogout, title }) => {
             <img src={BillIcon} alt="주문내역" width={20} height={20} />
             주문 내역
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={handleFavorites}>
             <img src={FavoriteIcon} alt="찜" width={20} height={20} />찜
           </DrawerItem>
         </DrawerList>
