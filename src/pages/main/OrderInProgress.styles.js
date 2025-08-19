@@ -9,8 +9,6 @@ import {
   StatusButtons,
 } from "./MainPageSeller.styles";
 
-import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
-
 export {
   PageContainer,
   Content,
@@ -19,7 +17,6 @@ export {
   SectionTitleWrapper,
   SectionTitle,
   StatusButtons,
-  Backdrop,
 };
 
 export const OrderList = styled.div`
