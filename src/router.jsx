@@ -15,6 +15,8 @@ import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
 import ProductRegister from "./pages/main/ProductRegister.jsx";
 import Registeration from "./pages/main/Registeration.jsx";
 import OrderHistory from "./pages/main/OrderHistory.jsx";
+import SpecialPricePage from "./pages/products/SpecialPricePage.jsx";
+import RecommendedPage from "./pages/products/RecommendedPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +41,8 @@ const router = createBrowserRouter([
       { path: "product-register", element: <ProductRegister /> },
       { path: "registeration/:productId", element: <Registeration /> },
       { path: "order-history", element: <OrderHistory /> },
+      { path: "special-price", element: <SpecialPricePage /> },
+      { path: "recommended", element: <RecommendedPage /> },
     ],
   },
 ]);
