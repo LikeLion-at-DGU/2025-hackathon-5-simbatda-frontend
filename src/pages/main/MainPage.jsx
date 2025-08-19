@@ -11,6 +11,7 @@ import { apiRequest } from "../../api/client";
 import { unifiedMockData, mockUtils } from "../../mocks/UnifiedMockData";
 import { PageContainer, Content } from "./MainPage.styles";
 
+
 function MainPage() {
   const [userInfo, setUserInfo] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("전체");
@@ -20,7 +21,7 @@ function MainPage() {
   const [selectedLocationInfo, setSelectedLocationInfo] = useState(null);
   const [locationProducts, setLocationProducts] = useState([]);
   const navigate = useNavigate();
-
+  
 
 
   useEffect(() => {
@@ -99,101 +100,47 @@ function MainPage() {
     // 카테고리별 상품 데이터 
     const categoryProducts = [
       {
-        id: 301,
-        storeName: `${category} 전문점`,
-        productName: `${category} 상품 1`,
-        originalPrice: 7000,
-        discountPrice: 5500,
-        imageUrl: "",
-        isLiked: false
-      },
-      {
-        id: 302,
-        storeName: `${category} 전문점`,
-        productName: `${category} 상품 2`,
-        originalPrice: 9000,
-        discountPrice: 7200,
-        imageUrl: "",
-        isLiked: true
-      },
-      {
-        id: 303,
-        storeName: `${category} 전문점`,
-        productName: `${category} 상품 3`,
-        originalPrice: 6000,
-        discountPrice: 4500,
-        imageUrl: "",
-        isLiked: false
-      },
-      {
-        id: 304,
-        storeName: `${category} 전문점`,
-        productName: `${category} 상품 4`,
-        originalPrice: 11000,
-        discountPrice: 8800,
-        imageUrl: "",
-        isLiked: false
-      }
-    ];
-    
-    setLocationProducts(categoryProducts);
-    setSelectedLocationInfo({ name: "카테고리 상품", type: "category", query: category });
-    setBottomSheetOpen(true);
-  };
-
-  // 지도 플레이스홀더 클릭 시 바텀시트 열기 
-  const handleMapClick = () => {
-    // 실제로는 지도 핀 클릭 시 호출됨
-    setSelectedLocationInfo({
-      name: "주변 상품",
-      type: "nearby",
-      query: "강남역 상점가"
-    });
-    
-    // 상품 데이터
-    setLocationProducts([
-      {
         id: 101,
         storeName: "강남 베이커리",
-        productName: "크로아상",
-        originalPrice: 5000,
-        discountPrice: 3500,
+        productName: "크로아상 2개",
+        originalPrice: 6000,
+        discountPrice: 4000,
         imageUrl: "",
-        isLiked: false
+        isLiked: true
       },
       {
         id: 102,
-        storeName: "강남 카페",
-        productName: "아메리카노",
-        originalPrice: 4500,
-        discountPrice: 3000,
-        imageUrl: "",
-        isLiked: true
-      },
-      {
-        id: 103,
-        storeName: "강남 식자재점",
-        productName: "신선 채소 세트",
+        storeName: "강남 커피숍",
+        productName: "아메리카노 2잔",
         originalPrice: 8000,
         discountPrice: 6000,
         imageUrl: "",
         isLiked: false
       },
       {
+        id: 103,
+        storeName: "강남 도넛가게",
+        productName: "도넛 6개 세트",
+        originalPrice: 12000,
+        discountPrice: 9000,
+        imageUrl: "",
+        isLiked: true
+      },
+      {
         id: 104,
-        storeName: "강남 편의점",
-        productName: "삼각김밥",
-        originalPrice: 3000,
-        discountPrice: 2000,
+        storeName: "강남 샌드위치",
+        productName: "치킨 샌드위치",
+        originalPrice: 5000,
+        discountPrice: 3500,
         imageUrl: "",
         isLiked: false
       },
       {
         id: 105,
-        storeName: "강남 마트",
-        productName: "신선 우유 1L",
-        originalPrice: 4000,
-        discountPrice: 3200,
+        storeName: "강남 스무디",
+        productName: "딸기 스무디",
+        originalPrice: 7000,
+        discountPrice: 5000,
         imageUrl: "",
         isLiked: true
       },
@@ -242,8 +189,47 @@ function MainPage() {
         imageUrl: "",
         isLiked: false
       }
-    ]);
+    ];
     
+    setLocationProducts(categoryProducts);
+    setSelectedLocationInfo({ name: category, type: "category" });
+    setBottomSheetOpen(true);
+  };
+
+  const handleMapClick = () => {
+    // 지도 클릭 시 주변 상품 데이터
+    const nearbyProducts = [
+      {
+        id: 301,
+        storeName: "주변 상점 1",
+        productName: "주변 상품 1",
+        originalPrice: 10000,
+        discountPrice: 8000,
+        imageUrl: "",
+        isLiked: false
+      },
+      {
+        id: 302,
+        storeName: "주변 상점 2",
+        productName: "주변 상품 2",
+        originalPrice: 8000,
+        discountPrice: 6000,
+        imageUrl: "",
+        isLiked: true
+      },
+      {
+        id: 303,
+        storeName: "주변 상점 3",
+        productName: "주변 상품 3",
+        originalPrice: 15000,
+        discountPrice: 12000,
+        imageUrl: "",
+        isLiked: false
+      }
+    ];
+    
+    setLocationProducts(nearbyProducts);
+    setSelectedLocationInfo({ name: "주변 상품", type: "map" });
     setBottomSheetOpen(true);
   };
 
@@ -256,8 +242,6 @@ function MainPage() {
   const handleProductClick = (productId) => {
     navigate(`/registeration/${productId}`);
   };
-
-
 
   const handleProductLikeToggle = (productId, isLiked) => {
     // TODO: 좋아요 API 연동
@@ -279,8 +263,6 @@ function MainPage() {
           name={userInfo?.name || "사용자"}
         />
         <SpecialPriceProducts products={specialPriceProducts} />
-        
-
         
         <BottomSheet
           isOpen={bottomSheetOpen}
