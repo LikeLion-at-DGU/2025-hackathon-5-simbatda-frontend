@@ -115,6 +115,96 @@ const ProductCardPriceSection = styled.div`
   width: 100%;
 `;
 
+// List variant용 스타일
+const ListCardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  gap: 15px;
+  position: relative;
+  width: 100%;
+  border: 1px solid #f0f0f0;
+`;
+
+const ListCardContainer2 = styled.div`
+  display: flex;
+  gap: 15px;
+  border-radius: 12px;
+`;
+
+const ListCardImage = styled.img`
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+`;
+
+const ListCardContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+`;
+
+const ListCardHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const ListCardFooter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+`;
+
+const ListCardPriceSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+`;
+
+const ListCardDiscountPrice = styled.p`
+  font-size: 16px;
+  font-weight: 700;
+  color: black;
+  margin: 0;
+`;
+
+const ListCardOriginalPrice = styled.p`
+  font-size: 12px;
+  color: #999;
+  text-decoration: line-through;
+  margin: 0;
+`;
+
+const ListCardDiscountRate = styled.span`
+  font-size: 12px;
+  color: #37ca79;
+  font-weight: 600;
+`;
+
+const ListCardCategory = styled.span`
+  font-size: 12px;
+  color: #8a8a8a;
+`;
+
+const ListCardExpiry = styled.div`
+  font-size: 11px;
+  color: #ff6b6b;
+  font-weight: 600;
+`;
+
+const ProductName2 = styled.p`
+  font-size: 18px;
+  color: black;
+  font-weight: 700;
+  margin: 0;
+`;
+
 export {
   CardContainer,
   CardImage,
@@ -131,4 +221,17 @@ export {
   ProductCardPrice,
   ProductCardDiscountRate,
   ProductCardPriceSection,
+  ListCardContainer,
+  ListCardImage,
+  ListCardContent,
+  ListCardHeader,
+  ListCardFooter,
+  ListCardPriceSection,
+  ListCardDiscountPrice,
+  ListCardOriginalPrice,
+  ListCardDiscountRate,
+  ListCardCategory,
+  ListCardExpiry,
+  ListCardContainer2,
+  ProductName2,
 };

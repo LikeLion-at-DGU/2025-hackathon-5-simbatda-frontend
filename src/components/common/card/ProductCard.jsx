@@ -19,12 +19,26 @@ import {
   ProductCardPriceSection,
   ProductName,
   StoreName,
+  ListCardContainer,
+  ListCardImage,
+  ListCardContent,
+  ListCardHeader,
+  ListCardFooter,
+  ListCardPriceSection,
+  ListCardDiscountPrice,
+  ListCardOriginalPrice,
+  ListCardDiscountRate,
+  ListCardCategory,
+  ListCardExpiry,
+  ListCardContainer2,
+  ProductName2,
 } from "./ProductCard.styles";
 
 const ProductCard = ({
   variant = "default",
   storeName,
   productName,
+  categoryName,
   originalPrice,
   discountPrice,
   imageUrl,
@@ -33,6 +47,7 @@ const ProductCard = ({
   onLikeToggle,
   onClick,
   className = "",
+  expiryTime,
   ...props
 }) => {
   const [liked, setLiked] = useState(isLiked);
@@ -58,6 +73,26 @@ const ProductCard = ({
     const newLikedState = !liked;
     setLiked(newLikedState);
     onLikeToggle?.(newLikedState);
+  };
+
+  // 유통기한 계산
+  const getExpiryText = (expiryTime) => {
+    if (!expiryTime) return "";
+    const now = Date.now();
+    const diff = expiryTime - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) {
+      return `D-${days}, ${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:00 남음`;
+    } else if (hours > 0) {
+      return `${hours}시간 ${minutes}분 남음`;
+    } else {
+      return `${minutes}분 남음`;
+    }
   };
 
   return (
@@ -87,7 +122,7 @@ const ProductCard = ({
             </PriceSection>
           </CardContent>
         </CardContainer>
-      ) : (
+      ) : variant === "compact" ? (
         <ProductCardContainer onClick={onClick} style={{ cursor: "pointer" }}>
           <LikeButton
             onClick={handleLikeClick}
@@ -114,7 +149,42 @@ const ProductCard = ({
             </ProductCardPriceSection>
           </ProductCardContent>
         </ProductCardContainer>
-      )}
+      ) : variant === "list" ? (
+        <ListCardContainer onClick={onClick} style={{ cursor: "pointer" }}>
+          <ListCardExpiry>{getExpiryText(expiryTime)}</ListCardExpiry>
+          <LikeButton
+            onClick={handleLikeClick}
+            aria-label={liked ? "좋아요 취소" : "좋아요"}
+          >
+            <LikeIcon
+              src={liked ? likeIcon : unlikeIcon}
+              alt={liked ? "좋아요" : "좋아요 안함"}
+            />
+          </LikeButton>
+          <ListCardContainer2>
+            <ListCardImage src={displayImage} alt={productName} />
+            <ListCardContent>
+              <ListCardHeader>
+                <StoreName>{storeName}</StoreName>
+                <ProductName2>{productName}</ProductName2>
+                {categoryName && (
+                  <ListCardCategory>{categoryName}</ListCardCategory>
+                )}
+              </ListCardHeader>
+              <ListCardFooter>
+                <ListCardPriceSection>
+                  {hasDiscount && (
+                    <ListCardDiscountRate>{discountRate}%</ListCardDiscountRate>
+                  )}
+                  <ListCardDiscountPrice>
+                    {discountPriceText}원
+                  </ListCardDiscountPrice>
+                </ListCardPriceSection>
+              </ListCardFooter>
+            </ListCardContent>
+          </ListCardContainer2>
+        </ListCardContainer>
+      ) : null}
     </>
   );
 };
