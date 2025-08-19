@@ -848,4 +848,9 @@ export const mockUtils = {
     }
     return order;
   },
+
+  // 카테고리 ID로 카테고리 정보 가져오기
+  getCategoryById: (categoryId) => {
+    return unifiedMockData.categories.find((c) => c.id === categoryId);
+  },
 };
