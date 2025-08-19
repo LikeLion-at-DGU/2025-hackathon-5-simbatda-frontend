@@ -545,6 +545,8 @@ export const unifiedMockData = {
       paymentStatus: "paid",
       createdAt: "2025-01-15T00:00:00Z",
       updatedAt: "2025-01-15T00:00:00Z",
+      pickupTime: "2025-01-16T21:00:00Z", // 오후 9시 픽업
+      pickupMessage: "주문하신 음식을 시간 내에 픽업해주세요.",
     },
     {
       id: 3,
@@ -558,6 +560,47 @@ export const unifiedMockData = {
       paymentStatus: "paid",
       createdAt: "2025-01-16T00:00:00Z",
       updatedAt: "2025-01-16T00:00:00Z",
+      pickupTime: "2025-01-17T18:00:00Z", // 오후 6시 픽업
+      pickupMessage: "주문하신 음식을 시간 내에 픽업해주세요.",
+    },
+    {
+      id: 4,
+      userId: 1,
+      storeId: 4,
+      totalAmount: 15000,
+      discountAmount: 3000,
+      finalAmount: 12000,
+      status: "completed", // 픽업 완료
+      paymentMethod: "card",
+      paymentStatus: "paid",
+      createdAt: "2025-01-08T00:00:00Z",
+      updatedAt: "2025-01-08T00:00:00Z",
+    },
+    {
+      id: 5,
+      userId: 1,
+      storeId: 5,
+      totalAmount: 8000,
+      discountAmount: 2000,
+      finalAmount: 6000,
+      status: "completed", // 픽업 완료
+      paymentMethod: "card",
+      paymentStatus: "paid",
+      createdAt: "2025-01-05T00:00:00Z",
+      updatedAt: "2025-01-05T00:00:00Z",
+    },
+    {
+      id: 6,
+      userId: 1,
+      storeId: 6,
+      totalAmount: 12000,
+      discountAmount: 4000,
+      finalAmount: 8000,
+      status: "completed", // 픽업 완료
+      paymentMethod: "card",
+      paymentStatus: "paid",
+      createdAt: "2025-01-03T00:00:00Z",
+      updatedAt: "2025-01-03T00:00:00Z",
     },
   ],
 
@@ -586,6 +629,30 @@ export const unifiedMockData = {
       quantity: 1,
       unitPrice: 9000,
       totalPrice: 9000,
+    },
+    {
+      id: 4,
+      orderId: 4,
+      productId: 7,
+      quantity: 2,
+      unitPrice: 7500,
+      totalPrice: 15000,
+    },
+    {
+      id: 5,
+      orderId: 5,
+      productId: 8,
+      quantity: 1,
+      unitPrice: 8000,
+      totalPrice: 8000,
+    },
+    {
+      id: 6,
+      orderId: 6,
+      productId: 9,
+      quantity: 1,
+      unitPrice: 12000,
+      totalPrice: 12000,
     },
   ],
 
