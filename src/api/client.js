@@ -1,4 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+// 프록시를 사용하여 CORS 문제 해결
+const API_BASE_URL =
+  import.meta.env.VITE_DEV_MODE === "true"
+    ? ""
+    : import.meta.env.VITE_API_BASE_URL || "";
 
 export const getStoredTokens = () => {
   try {
