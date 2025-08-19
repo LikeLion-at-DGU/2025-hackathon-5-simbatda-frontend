@@ -9,10 +9,30 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": {
+      "/accounts": {
         target: "https://yeonhee.shop",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false,
+      },
+      "/categories": {
+        target: "https://yeonhee.shop",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/products": {
+        target: "https://yeonhee.shop",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/reservations": {
+        target: "https://yeonhee.shop",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/stores": {
+        target: "https://yeonhee.shop",
+        changeOrigin: true,
+        secure: false,
       },
     },
   },

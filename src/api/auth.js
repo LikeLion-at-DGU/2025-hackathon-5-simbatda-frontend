@@ -28,13 +28,16 @@ export async function consumerSignup(payload) {
     body: payload,
   });
 
+  const data = await res.json();
+
   if (res.status === 409) {
-    const data = await res.json();
     throw { email: data.email };
   }
 
-  const data = await res.json();
-  if (!res.ok) throw data;
+  if (!res.ok) {
+    console.error("Consumer signup failed:", data);
+    throw data;
+  }
 
   const { auth } = data;
   if (auth?.accessToken && auth?.refreshToken) {
@@ -50,7 +53,10 @@ export async function consumerLogin(payload) {
   });
 
   const data = await res.json();
-  if (!res.ok) throw data;
+  if (!res.ok) {
+    console.error("Consumer login failed:", data);
+    throw data;
+  }
 
   const { auth } = data;
   if (auth?.accessToken && auth?.refreshToken) {
@@ -65,6 +71,8 @@ export async function sellerSignup(payload) {
     body: payload,
   });
 
+  const data = await res.json();
+
   if (res.status === 409) {
     throw {
       error: "EMAIL_ALREADY_EXISTS",
@@ -72,8 +80,10 @@ export async function sellerSignup(payload) {
     };
   }
 
-  const data = await res.json();
-  if (!res.ok) throw data;
+  if (!res.ok) {
+    console.error("Seller signup failed:", data);
+    throw data;
+  }
 
   const { auth } = data;
   if (auth?.accessToken && auth?.refreshToken) {
@@ -89,7 +99,10 @@ export async function sellerLogin(payload) {
   });
 
   const data = await res.json();
-  if (!res.ok) throw data;
+  if (!res.ok) {
+    console.error("Seller login failed:", data);
+    throw data;
+  }
 
   const { auth } = data;
   if (auth?.accessToken && auth?.refreshToken) {

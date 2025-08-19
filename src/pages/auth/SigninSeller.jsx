@@ -90,10 +90,24 @@ function SigninSeller() {
     }
 
     try {
-      await sellerLogin({ email: formData.email, password: formData.password });
-      navigate("/mainpage-seller");
+      const response = await sellerLogin({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.user && response.auth) {
+        alert("판매자 로그인이 완료되었습니다!");
+        navigate("/mainpage-seller");
+      }
     } catch (err) {
-      alert(err?.error || "이메일 또는 비밀번호가 올바르지 않습니다.");
+      console.error("Seller login error:", err);
+      if (err?.detail) {
+        alert(err.detail);
+      } else if (err?.error) {
+        alert(err.error);
+      } else {
+        alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+      }
     }
   };
 

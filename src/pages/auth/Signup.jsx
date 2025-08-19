@@ -126,17 +126,29 @@ function Signup() {
     }
 
     try {
-      await consumerSignup({
+      const response = await consumerSignup({
         email: formData.email,
         password: formData.password,
         password2: formData.confirmPassword,
         name: formData.name,
         phone: formData.phone,
       });
-      navigate("/mainpage");
+
+      if (response.user && response.auth) {
+        alert("회원가입이 완료되었습니다!");
+        navigate("/mainpage");
+      }
     } catch (err) {
-      if (err?.email && Array.isArray(err.email)) alert(err.email[0]);
-      else alert("회원가입에 실패했습니다.");
+      console.error("Signup error:", err);
+      if (err?.email && Array.isArray(err.email)) {
+        alert(err.email[0]);
+      } else if (err?.detail) {
+        alert(err.detail);
+      } else if (err?.message) {
+        alert(err.message);
+      } else {
+        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
     }
   };
 
