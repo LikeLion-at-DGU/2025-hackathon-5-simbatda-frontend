@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { sellerSignup, createStore, uploadDocuments } from "../../api/auth";
 import Button from "../../components/common/button/Button";
 import squirrelIcon from "../../assets/icons/squirrel.svg";
 
@@ -21,6 +22,24 @@ import {
 
 function StoreDocumentUpload() {
   const navigate = useNavigate();
+
+  // 1, 2단계 정보 확인
+  useEffect(() => {
+    const signupData = localStorage.getItem("sellerSignupData");
+    if (!signupData) {
+      alert("회원가입 정보가 없습니다. 처음부터 다시 시작해주세요.");
+      navigate("/signup-seller");
+      return;
+    }
+
+    const parsedData = JSON.parse(signupData);
+    if (parsedData.step !== 2) {
+      alert("2단계 정보가 없습니다. 처음부터 다시 시작해주세요.");
+      navigate("/signup-seller");
+      return;
+    }
+  }, [navigate]);
+
   const [files, setFiles] = useState({
     bizReg: null,
     permit: null,
@@ -54,22 +73,66 @@ function StoreDocumentUpload() {
     setFiles((prev) => ({ ...prev, [key]: file }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) return;
 
-    const formData = new FormData();
-    formData.append("bizReg", files.bizReg);
-    formData.append("permit", files.permit);
-    formData.append("bankbook", files.bankbook);
+    try {
+      // 1, 2단계 정보 가져오기
+      const signupData = JSON.parse(localStorage.getItem("sellerSignupData"));
 
-    console.log("서류 업로드 시도:", {
-      bizReg: files.bizReg?.name,
-      permit: files.permit?.name,
-      bankbook: files.bankbook?.name,
-    });
+      // 1단계: 기본 사용자 정보로 회원가입
+      const userResponse = await sellerSignup({
+        email: signupData.email,
+        password: signupData.password,
+        password2: signupData.password2,
+        name: signupData.name,
+        phone: signupData.phone,
+      });
 
-    navigate("/mainpage-seller");
+      if (userResponse.user && userResponse.auth) {
+        // 2단계: 상점 정보 저장
+        const storeData = {
+          name: signupData.storeName,
+          opening_hours: signupData.openingHours,
+          address: signupData.address,
+          address_detail: signupData.addressDetail,
+        };
+
+        const storeResponse = await createStore(storeData);
+        const storeId = storeResponse.store.id;
+
+        // 3단계: 서류 파일 업로드
+        await uploadDocuments(files, storeId);
+
+        // localStorage 정리
+        localStorage.removeItem("sellerSignupData");
+
+        alert("판매자 회원가입이 완료되었습니다!");
+        navigate("/mainpage-seller");
+      }
+    } catch (err) {
+      console.error("Seller signup error:", err);
+      console.error("Error details:", {
+        name: err?.name,
+        message: err?.message,
+        detail: err?.detail,
+        status: err?.status,
+        response: err?.response,
+      });
+
+      if (err?.detail) {
+        alert(`에러 상세: ${err.detail}`);
+      } else if (err?.message) {
+        alert(`에러 메시지: ${err.message}`);
+      } else if (err?.email && Array.isArray(err.email)) {
+        alert(`이메일 에러: ${err.email[0]}`);
+      } else if (err?.status === 500) {
+        alert("백엔드 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      } else {
+        alert("판매자 회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
+    }
   };
 
   return (
@@ -173,7 +236,7 @@ function StoreDocumentUpload() {
           </UploadGroup>
 
           <Button type="submit" variant="primary" disabled={!isFormValid}>
-            시작하기
+            회원가입 완료
           </Button>
         </FormSection>
 

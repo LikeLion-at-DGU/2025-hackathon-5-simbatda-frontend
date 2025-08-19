@@ -10,7 +10,7 @@ import BottomSheet from "../../components/common/bottomsheet/BottomSheet";
 import { apiRequest } from "../../api/client";
 import { unifiedMockData, mockUtils } from "../../mocks/UnifiedMockData";
 import { PageContainer, Content } from "./MainPage.styles";
-
+import { useAuth } from "../../hooks/useAuth";
 
 function MainPage() {
   const [userInfo, setUserInfo] = useState(null);
@@ -21,8 +21,7 @@ function MainPage() {
   const [selectedLocationInfo, setSelectedLocationInfo] = useState(null);
   const [locationProducts, setLocationProducts] = useState([]);
   const navigate = useNavigate();
-  
-
+  const { logout } = useAuth();
 
   useEffect(() => {
     // TODO: API 연결 X - mock 데이터 사용
@@ -30,30 +29,33 @@ function MainPage() {
 
     // 추천상품 데이터 (통합 목데이터 사용)
     const recommended = mockUtils.getRecommendedProducts();
-    setRecommendedProducts(recommended.map(product => ({
-      id: product.id,
-      storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
-      productName: product.name,
-      originalPrice: product.originalPrice,
-      discountPrice: product.discountPrice,
-      isLiked: mockUtils.isProductLiked(1, product.id),
-    })));
+    setRecommendedProducts(
+      recommended.map((product) => ({
+        id: product.id,
+        storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
+        productName: product.name,
+        originalPrice: product.originalPrice,
+        discountPrice: product.discountPrice,
+        isLiked: mockUtils.isProductLiked(1, product.id),
+      }))
+    );
 
     // 특가상품 데이터 (통합 목데이터 사용)
     const specialPrice = mockUtils.getSpecialPriceProducts();
-    setSpecialPriceProducts(specialPrice.map(product => ({
-      id: product.id,
-      storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
-      productName: product.name,
-      originalPrice: product.originalPrice,
-      discountPrice: product.discountPrice,
-      isLiked: mockUtils.isProductLiked(1, product.id),
-    })));
-
+    setSpecialPriceProducts(
+      specialPrice.map((product) => ({
+        id: product.id,
+        storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
+        productName: product.name,
+        originalPrice: product.originalPrice,
+        discountPrice: product.discountPrice,
+        isLiked: mockUtils.isProductLiked(1, product.id),
+      }))
+    );
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
+    logout();
     navigate("/signin");
   };
 
@@ -67,7 +69,7 @@ function MainPage() {
         originalPrice: 8000,
         discountPrice: 6000,
         imageUrl: "",
-        isLiked: false
+        isLiked: false,
       },
       {
         id: 202,
@@ -76,7 +78,7 @@ function MainPage() {
         originalPrice: 5000,
         discountPrice: 4000,
         imageUrl: "",
-        isLiked: true
+        isLiked: true,
       },
       {
         id: 203,
@@ -85,20 +87,82 @@ function MainPage() {
         originalPrice: 12000,
         discountPrice: 9000,
         imageUrl: "",
-        isLiked: false
-      }
+        isLiked: false,
+      },
     ];
-    
+
     setLocationProducts(searchResults);
-    setSelectedLocationInfo({ name: "검색상품", type: "search", query: searchTerm });
+    setSelectedLocationInfo({
+      name: "검색상품",
+      type: "search",
+      query: searchTerm,
+    });
     setBottomSheetOpen(true);
   };
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
-    
-    // 카테고리별 상품 데이터 
+
+    // 카테고리별 상품 데이터
     const categoryProducts = [
+      {
+        id: 301,
+        storeName: `${category} 전문점`,
+        productName: `${category} 상품 1`,
+        originalPrice: 7000,
+        discountPrice: 5500,
+        imageUrl: "",
+        isLiked: false,
+      },
+      {
+        id: 302,
+        storeName: `${category} 전문점`,
+        productName: `${category} 상품 2`,
+        originalPrice: 9000,
+        discountPrice: 7200,
+        imageUrl: "",
+        isLiked: true,
+      },
+      {
+        id: 303,
+        storeName: `${category} 전문점`,
+        productName: `${category} 상품 3`,
+        originalPrice: 6000,
+        discountPrice: 4500,
+        imageUrl: "",
+        isLiked: false,
+      },
+      {
+        id: 304,
+        storeName: `${category} 전문점`,
+        productName: `${category} 상품 4`,
+        originalPrice: 11000,
+        discountPrice: 8800,
+        imageUrl: "",
+        isLiked: false,
+      },
+    ];
+
+    setLocationProducts(categoryProducts);
+    setSelectedLocationInfo({
+      name: "카테고리 상품",
+      type: "category",
+      query: category,
+    });
+    setBottomSheetOpen(true);
+  };
+
+  // 지도 플레이스홀더 클릭 시 바텀시트 열기
+  const handleMapClick = () => {
+    // 실제로는 지도 핀 클릭 시 호출됨
+    setSelectedLocationInfo({
+      name: "주변 상품",
+      type: "nearby",
+      query: "강남역 상점가",
+    });
+
+    // 상품 데이터
+    setLocationProducts([
       {
         id: 101,
         storeName: "강남 베이커리",
@@ -106,16 +170,25 @@ function MainPage() {
         originalPrice: 6000,
         discountPrice: 4000,
         imageUrl: "",
-        isLiked: true
+        isLiked: false,
       },
       {
         id: 102,
-        storeName: "강남 커피숍",
-        productName: "아메리카노 2잔",
+        storeName: "강남 카페",
+        productName: "아메리카노",
+        originalPrice: 4500,
+        discountPrice: 3000,
+        imageUrl: "",
+        isLiked: true,
+      },
+      {
+        id: 103,
+        storeName: "강남 식자재점",
+        productName: "신선 채소 세트",
         originalPrice: 8000,
         discountPrice: 6000,
         imageUrl: "",
-        isLiked: false
+        isLiked: false,
       },
       {
         id: 103,
@@ -124,7 +197,7 @@ function MainPage() {
         originalPrice: 12000,
         discountPrice: 9000,
         imageUrl: "",
-        isLiked: true
+        isLiked: true,
       },
       {
         id: 104,
@@ -133,7 +206,7 @@ function MainPage() {
         originalPrice: 5000,
         discountPrice: 3500,
         imageUrl: "",
-        isLiked: false
+        isLiked: false,
       },
       {
         id: 105,
@@ -142,7 +215,7 @@ function MainPage() {
         originalPrice: 7000,
         discountPrice: 5000,
         imageUrl: "",
-        isLiked: true
+        isLiked: true,
       },
       {
         id: 106,
@@ -151,7 +224,7 @@ function MainPage() {
         originalPrice: 12000,
         discountPrice: 8000,
         imageUrl: "",
-        isLiked: false
+        isLiked: false,
       },
       {
         id: 107,
@@ -160,7 +233,7 @@ function MainPage() {
         originalPrice: 8000,
         discountPrice: 6000,
         imageUrl: "",
-        isLiked: false
+        isLiked: false,
       },
       {
         id: 108,
@@ -169,7 +242,7 @@ function MainPage() {
         originalPrice: 5000,
         discountPrice: 3500,
         imageUrl: "",
-        isLiked: true
+        isLiked: true,
       },
       {
         id: 109,
@@ -178,7 +251,7 @@ function MainPage() {
         originalPrice: 18000,
         discountPrice: 15000,
         imageUrl: "",
-        isLiked: false
+        isLiked: false,
       },
       {
         id: 110,
@@ -187,49 +260,12 @@ function MainPage() {
         originalPrice: 25000,
         discountPrice: 20000,
         imageUrl: "",
-        isLiked: false
-      }
-    ];
-    
+        isLiked: false,
+      },
+    ]);
+
     setLocationProducts(categoryProducts);
     setSelectedLocationInfo({ name: category, type: "category" });
-    setBottomSheetOpen(true);
-  };
-
-  const handleMapClick = () => {
-    // 지도 클릭 시 주변 상품 데이터
-    const nearbyProducts = [
-      {
-        id: 301,
-        storeName: "주변 상점 1",
-        productName: "주변 상품 1",
-        originalPrice: 10000,
-        discountPrice: 8000,
-        imageUrl: "",
-        isLiked: false
-      },
-      {
-        id: 302,
-        storeName: "주변 상점 2",
-        productName: "주변 상품 2",
-        originalPrice: 8000,
-        discountPrice: 6000,
-        imageUrl: "",
-        isLiked: true
-      },
-      {
-        id: 303,
-        storeName: "주변 상점 3",
-        productName: "주변 상품 3",
-        originalPrice: 15000,
-        discountPrice: 12000,
-        imageUrl: "",
-        isLiked: false
-      }
-    ];
-    
-    setLocationProducts(nearbyProducts);
-    setSelectedLocationInfo({ name: "주변 상품", type: "map" });
     setBottomSheetOpen(true);
   };
 
@@ -263,7 +299,6 @@ function MainPage() {
           name={userInfo?.name || "사용자"}
         />
         <SpecialPriceProducts products={specialPriceProducts} />
-        
         <BottomSheet
           isOpen={bottomSheetOpen}
           onClose={handleBottomSheetClose}
@@ -272,7 +307,6 @@ function MainPage() {
           onProductClick={handleProductClick}
           onProductLikeToggle={handleProductLikeToggle}
         />
-
       </Content>
     </PageContainer>
   );
