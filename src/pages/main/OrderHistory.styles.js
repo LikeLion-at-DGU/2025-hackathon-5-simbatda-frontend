@@ -124,7 +124,8 @@ const EmptyState = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 60vh;
+  gap: 15px;
+  height: 100vh;
 `;
 
 const EmptyText = styled.div`
