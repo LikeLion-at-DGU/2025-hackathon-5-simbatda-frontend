@@ -137,6 +137,7 @@ export const StepCheck = styled.span`
   line-height: 1;
   background: ${(p) => (p.$done ? "#37ca79" : "#e0e0e0")};
   transition: all 0.2s ease;
+  order: -1;
 
   img {
     display: flex;
