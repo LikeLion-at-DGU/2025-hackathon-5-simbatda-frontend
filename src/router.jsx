@@ -14,8 +14,7 @@ import StoreRegistration from "./pages/auth/StoreRegistration.jsx";
 import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
 import ProductRegister from "./pages/main/ProductRegister.jsx";
 import Registeration from "./pages/main/Registeration.jsx";
-import Splash from "./pages/common/Splash.jsx";
-import WishList from "./pages/main/WishList.jsx";
+import OrderHistory from "./pages/main/OrderHistory.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,8 +38,7 @@ const router = createBrowserRouter([
       { path: "inventory", element: <div>재고관리</div> },
       { path: "product-register", element: <ProductRegister /> },
       { path: "registeration/:productId", element: <Registeration /> },
-      { path: "splash", element: <Splash /> },
-      { path: "wishlist", element: <WishList /> },
+      { path: "order-history", element: <OrderHistory /> },
     ],
   },
 ]);
