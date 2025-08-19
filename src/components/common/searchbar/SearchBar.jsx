@@ -9,6 +9,7 @@ import {
 const SearchBar = ({
   placeholder = "텍스트를 입력해 주세요.",
   onSearch,
+  onChange,
   ...props
 }) => {
   const handleKeyPress = (e) => {
@@ -17,12 +18,22 @@ const SearchBar = ({
     }
   };
 
+  const handleChange = (e) => {
+    if (onChange) {
+      onChange(e.target.value);
+    }
+  };
+
   return (
     <SearchBarContainer {...props}>
       <SearchIcon>
         <img src={searchIcon} alt="검색" width={24} height={24} />
       </SearchIcon>
-      <SearchInput placeholder={placeholder} onKeyPress={handleKeyPress} />
+      <SearchInput
+        placeholder={placeholder}
+        onKeyPress={handleKeyPress}
+        onChange={handleChange}
+      />
     </SearchBarContainer>
   );
 };
