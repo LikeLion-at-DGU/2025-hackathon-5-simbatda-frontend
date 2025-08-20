@@ -1,11 +1,16 @@
 import { Outlet } from "react-router-dom";
 import "./styles/global.css";
+import { OrderAcceptanceProvider } from "./contexts/OrderAcceptanceContext";
+import OrderAcceptanceModal from "./components/common/modal/OrderAcceptanceModal";
 
 function App() {
   return (
-    <div className="app">
-      <Outlet />
-    </div>
+    <OrderAcceptanceProvider>
+      <div className="app">
+        <Outlet />
+        <OrderAcceptanceModal />
+      </div>
+    </OrderAcceptanceProvider>
   );
 }
 

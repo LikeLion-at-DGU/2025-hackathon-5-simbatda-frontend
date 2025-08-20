@@ -19,12 +19,28 @@ import {
   ProductCardPriceSection,
   ProductName,
   StoreName,
+  ListCardContainer,
+  ListCardImage,
+  ListCardContent,
+  ListCardHeader,
+  ListCardFooter,
+  ListCardPriceSection,
+  ListCardDiscountPrice,
+  ListCardOriginalPrice,
+  ListCardDiscountRate,
+  ListCardCategory,
+  ListCardStock,
+  ListCardExpiry,
+  ListCardContainer2,
+  ProductName2,
 } from "./ProductCard.styles";
 
 const ProductCard = ({
   variant = "default",
   storeName,
+  storeId,
   productName,
+  categoryName,
   originalPrice,
   discountPrice,
   imageUrl,
@@ -32,7 +48,10 @@ const ProductCard = ({
   isLiked = false,
   onLikeToggle,
   onClick,
+  onStoreClick,
   className = "",
+  expiryTime,
+  stock,
   ...props
 }) => {
   const [liked, setLiked] = useState(isLiked);
@@ -60,6 +79,32 @@ const ProductCard = ({
     onLikeToggle?.(newLikedState);
   };
 
+  const handleStoreClick = (e) => {
+    if (!onStoreClick) return;
+    e.stopPropagation();
+    onStoreClick(storeId);
+  };
+
+  // 유통기한 계산
+  const getExpiryText = (expiryTime) => {
+    if (!expiryTime) return "";
+    const now = Date.now();
+    const diff = expiryTime - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) {
+      return `D-${days}, ${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:00 남음`;
+    } else if (hours > 0) {
+      return `${hours}시간 ${minutes}분 남음`;
+    } else {
+      return `${minutes}분 남음`;
+    }
+  };
+
   return (
     <>
       {variant === "default" ? (
@@ -75,7 +120,12 @@ const ProductCard = ({
           </LikeButton>
           <CardImage src={displayImage} alt={productName} />
           <CardContent>
-            <StoreName>{storeName}</StoreName>
+            <StoreName
+              onClick={onStoreClick ? handleStoreClick : undefined}
+              style={onStoreClick ? { cursor: "pointer" } : {}}
+            >
+              {storeName}
+            </StoreName>
             <ProductName>{productName}</ProductName>
             <PriceSection>
               <p>{discountPriceText}원</p>
@@ -87,7 +137,7 @@ const ProductCard = ({
             </PriceSection>
           </CardContent>
         </CardContainer>
-      ) : (
+      ) : variant === "compact" ? (
         <ProductCardContainer onClick={onClick} style={{ cursor: "pointer" }}>
           <LikeButton
             onClick={handleLikeClick}
@@ -100,8 +150,12 @@ const ProductCard = ({
           </LikeButton>
           <ProductCardImage src={displayImage} alt={productName} />
           <ProductCardContent>
-            <StoreName>{storeName}</StoreName>
-            <ProductName>{productName}</ProductName>
+            <StoreName
+              onClick={onStoreClick ? handleStoreClick : undefined}
+              style={onStoreClick ? { cursor: "pointer" } : {}}
+            >
+              {storeName}
+            </StoreName>
             <ProductCardPriceSection>
               {hasDiscount ? (
                 <ProductCardDiscountRate>
@@ -114,7 +168,62 @@ const ProductCard = ({
             </ProductCardPriceSection>
           </ProductCardContent>
         </ProductCardContainer>
-      )}
+      ) : variant === "list" ? (
+        <ListCardContainer onClick={onClick} style={{ cursor: "pointer" }}>
+          <ListCardExpiry>{getExpiryText(expiryTime)}</ListCardExpiry>
+          <LikeButton
+            onClick={handleLikeClick}
+            aria-label={liked ? "좋아요 취소" : "좋아요"}
+          >
+            <LikeIcon
+              src={liked ? likeIcon : unlikeIcon}
+              alt={liked ? "좋아요" : "좋아요 안함"}
+            />
+          </LikeButton>
+          <ListCardContainer2>
+            <ListCardImage src={displayImage} alt={productName} />
+            <ListCardContent>
+              <ListCardHeader>
+                <StoreName
+                  onClick={onStoreClick ? handleStoreClick : undefined}
+                  style={onStoreClick ? { cursor: "pointer" } : {}}
+                >
+                  {storeName}
+                </StoreName>
+                <ProductName2>{productName}</ProductName2>
+                {stock !== undefined && (
+                  <ListCardStock>재고: {stock}개</ListCardStock>
+                )}
+              </ListCardHeader>
+              <ListCardFooter>
+                <ListCardPriceSection>
+                  {hasDiscount && (
+                    <ListCardOriginalPrice>
+                      {originalPrice.toLocaleString()}원
+                    </ListCardOriginalPrice>
+                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                    }}
+                  >
+                    {hasDiscount && (
+                      <ListCardDiscountRate>
+                        {discountRate}%
+                      </ListCardDiscountRate>
+                    )}
+                    <ListCardDiscountPrice>
+                      {discountPriceText}원
+                    </ListCardDiscountPrice>
+                  </div>
+                </ListCardPriceSection>
+              </ListCardFooter>
+            </ListCardContent>
+          </ListCardContainer2>
+        </ListCardContainer>
+      ) : null}
     </>
   );
 };

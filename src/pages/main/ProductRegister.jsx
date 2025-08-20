@@ -163,6 +163,7 @@ function ProductRegister() {
         id: Date.now(),
         name: menuName,
         categories: selectedCategories,
+        expiryTime: expiryDate.getTime(), // 유통기한을 타임스탬프로 저장
         expiryISO: expiryDate.toISOString(),
         basePrice: parsedBase,
         discountPercent: parsedPercent,

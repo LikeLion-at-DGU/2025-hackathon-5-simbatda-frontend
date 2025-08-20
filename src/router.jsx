@@ -9,11 +9,16 @@ import MainPage from "./pages/main/MainPage.jsx";
 import MainPageSeller from "./pages/main/MainPageSeller.jsx";
 import OrderInProgress from "./pages/main/OrderInProgress.jsx";
 import OrderDetail from "./pages/main/OrderDetail.jsx";
+import CustomerOrderDetail from "./pages/main/CustomerOrderDetail.jsx";
 import OrderCompleted from "./pages/main/OrderCompleted.jsx";
 import StoreRegistration from "./pages/auth/StoreRegistration.jsx";
 import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
 import ProductRegister from "./pages/main/ProductRegister.jsx";
 import Registeration from "./pages/main/Registeration.jsx";
+import OrderHistory from "./pages/main/OrderHistory.jsx";
+import SpecialPricePage from "./pages/products/SpecialPricePage.jsx";
+import RecommendedPage from "./pages/products/RecommendedPage.jsx";
+import StoreDetail from "./pages/store/StoreDetail.jsx";
 import Splash from "./pages/common/Splash.jsx";
 import WishList from "./pages/main/WishList.jsx";
 import ProtectedRoute from "./components/common/ProtectedRoute.jsx";
@@ -46,6 +51,24 @@ const router = createBrowserRouter([
       { path: "signin-seller", element: <SigninSeller /> },
       { path: "signup", element: <Signup /> },
       { path: "signup-seller", element: <SignupSeller /> },
+      { path: "store-registration", element: <StoreRegistration /> },
+      { path: "store-document-upload", element: <StoreDocumentUpload /> },
+      { path: "mainpage-seller", element: <MainPageSeller /> },
+      { path: "order-in-progress", element: <OrderInProgress /> },
+      { path: "order-detail", element: <OrderDetail /> },
+      {
+        path: "customer-order-detail/:orderId",
+        element: <CustomerOrderDetail />,
+      },
+      { path: "order-completed", element: <OrderCompleted /> },
+      { path: "dashboard", element: <div>대시보드</div> },
+      { path: "inventory", element: <div>재고관리</div> },
+      { path: "product-register", element: <ProductRegister /> },
+      { path: "registeration/:productId", element: <Registeration /> },
+      { path: "order-history", element: <OrderHistory /> },
+      { path: "special-price", element: <SpecialPricePage /> },
+      { path: "recommended", element: <RecommendedPage /> },
+      { path: "store/:storeId", element: <StoreDetail /> },
       {
         path: "store-registration",
         element: <StoreRegistration />,

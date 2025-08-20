@@ -166,9 +166,9 @@ function MainPage() {
       {
         id: 101,
         storeName: "강남 베이커리",
-        productName: "크로아상",
-        originalPrice: 5000,
-        discountPrice: 3500,
+        productName: "크로아상 2개",
+        originalPrice: 6000,
+        discountPrice: 4000,
         imageUrl: "",
         isLiked: false,
       },
@@ -191,20 +191,29 @@ function MainPage() {
         isLiked: false,
       },
       {
+        id: 103,
+        storeName: "강남 도넛가게",
+        productName: "도넛 6개 세트",
+        originalPrice: 12000,
+        discountPrice: 9000,
+        imageUrl: "",
+        isLiked: true,
+      },
+      {
         id: 104,
-        storeName: "강남 편의점",
-        productName: "삼각김밥",
-        originalPrice: 3000,
-        discountPrice: 2000,
+        storeName: "강남 샌드위치",
+        productName: "치킨 샌드위치",
+        originalPrice: 5000,
+        discountPrice: 3500,
         imageUrl: "",
         isLiked: false,
       },
       {
         id: 105,
-        storeName: "강남 마트",
-        productName: "신선 우유 1L",
-        originalPrice: 4000,
-        discountPrice: 3200,
+        storeName: "강남 스무디",
+        productName: "딸기 스무디",
+        originalPrice: 7000,
+        discountPrice: 5000,
         imageUrl: "",
         isLiked: true,
       },
@@ -255,6 +264,8 @@ function MainPage() {
       },
     ]);
 
+    setLocationProducts(categoryProducts);
+    setSelectedLocationInfo({ name: category, type: "category" });
     setBottomSheetOpen(true);
   };
 
@@ -288,7 +299,6 @@ function MainPage() {
           name={userInfo?.name || "사용자"}
         />
         <SpecialPriceProducts products={specialPriceProducts} />
-
         <BottomSheet
           isOpen={bottomSheetOpen}
           onClose={handleBottomSheetClose}

@@ -39,6 +39,13 @@ const StoreName = styled.h2`
   font-weight: 600;
   color: #775c4a;
   margin: 0 0 8px 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #37ca79;
+    text-decoration: underline;
+  }
 `;
 
 const ProductName = styled.h1`
@@ -287,6 +294,13 @@ const StoreNameSmall = styled.p`
   font-size: 16px;
   color: #775c4a;
   margin: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #37ca79;
+    text-decoration: underline;
+  }
 `;
 
 const ProductNameSmallContainer = styled.div`
@@ -594,7 +608,7 @@ const ConfirmButton = styled.button`
 
 const ModalNotice = styled.p`
   font-size: 14px;
-  color: #BE4A31;
+  color: #be4a31;
   font-weight: 400;
   margin: 20px 0 0 0;
   line-height: 1.5;

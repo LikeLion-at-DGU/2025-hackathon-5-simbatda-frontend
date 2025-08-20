@@ -154,6 +154,7 @@ export const unifiedMockData = {
       origin: "국내산",
       storage: "냉장 보관",
       expiryDate: "구매 후 7일",
+      expiryTime: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7일 후 유통기한
       allergens: ["없음"],
       images: ["product1.jpg", "product1_detail.jpg"],
       tags: ["김치찌개", "1인분", "조리용", "밑반찬"],
@@ -183,6 +184,7 @@ export const unifiedMockData = {
       origin: "국내산",
       storage: "냉장 보관",
       expiryDate: "구매 후 7일",
+      expiryTime: Date.now() + 5 * 24 * 60 * 60 * 1000, // 5일 후 유통기한
       allergens: ["없음"],
       images: ["product2.jpg", "product2_detail.jpg"],
       tags: ["김치찌개", "2인분", "가족용"],
@@ -212,6 +214,7 @@ export const unifiedMockData = {
       origin: "국내산",
       storage: "냉장 보관",
       expiryDate: "구매 후 7일",
+      expiryTime: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7일 후 유통기한
       allergens: ["대두"],
       images: ["product3.jpg"],
       tags: ["된장찌개", "1인분", "구수한"],
@@ -545,6 +548,8 @@ export const unifiedMockData = {
       paymentStatus: "paid",
       createdAt: "2025-01-15T00:00:00Z",
       updatedAt: "2025-01-15T00:00:00Z",
+      pickupTime: "2025-01-16T21:00:00Z", // 오후 9시 픽업
+      pickupMessage: "주문하신 음식을 시간 내에 픽업해주세요.",
     },
     {
       id: 3,
@@ -558,6 +563,47 @@ export const unifiedMockData = {
       paymentStatus: "paid",
       createdAt: "2025-01-16T00:00:00Z",
       updatedAt: "2025-01-16T00:00:00Z",
+      pickupTime: "2025-01-17T18:00:00Z", // 오후 6시 픽업
+      pickupMessage: "주문하신 음식을 시간 내에 픽업해주세요.",
+    },
+    {
+      id: 4,
+      userId: 1,
+      storeId: 4,
+      totalAmount: 15000,
+      discountAmount: 3000,
+      finalAmount: 12000,
+      status: "completed", // 픽업 완료
+      paymentMethod: "card",
+      paymentStatus: "paid",
+      createdAt: "2025-01-08T00:00:00Z",
+      updatedAt: "2025-01-08T00:00:00Z",
+    },
+    {
+      id: 5,
+      userId: 1,
+      storeId: 5,
+      totalAmount: 8000,
+      discountAmount: 2000,
+      finalAmount: 6000,
+      status: "completed", // 픽업 완료
+      paymentMethod: "card",
+      paymentStatus: "paid",
+      createdAt: "2025-01-05T00:00:00Z",
+      updatedAt: "2025-01-05T00:00:00Z",
+    },
+    {
+      id: 6,
+      userId: 1,
+      storeId: 6,
+      totalAmount: 12000,
+      discountAmount: 4000,
+      finalAmount: 8000,
+      status: "completed", // 픽업 완료
+      paymentMethod: "card",
+      paymentStatus: "paid",
+      createdAt: "2025-01-03T00:00:00Z",
+      updatedAt: "2025-01-03T00:00:00Z",
     },
   ],
 
@@ -586,6 +632,30 @@ export const unifiedMockData = {
       quantity: 1,
       unitPrice: 9000,
       totalPrice: 9000,
+    },
+    {
+      id: 4,
+      orderId: 4,
+      productId: 7,
+      quantity: 2,
+      unitPrice: 7500,
+      totalPrice: 15000,
+    },
+    {
+      id: 5,
+      orderId: 5,
+      productId: 8,
+      quantity: 1,
+      unitPrice: 8000,
+      totalPrice: 8000,
+    },
+    {
+      id: 6,
+      orderId: 6,
+      productId: 9,
+      quantity: 1,
+      unitPrice: 12000,
+      totalPrice: 12000,
     },
   ],
 
@@ -755,6 +825,7 @@ export const mockUtils = {
       );
       return {
         ...item,
+        productId: item.productId, // productId 추가
         productName: product?.name || "상품명 없음",
         productImage: product?.images?.[0] || "",
       };
@@ -764,9 +835,25 @@ export const mockUtils = {
       ...order,
       storeName: store?.name || "상점명 없음",
       storeAddress: store?.address || "",
+      storePhone: store?.phone || "000-000-0000",
       items: itemsWithProducts,
-      pickupDate: "2025-01-20", // 실제로는 예약 정보에서 가져와야 함
-      pickupTime: "14:00 - 15:00", // 실제로는 예약 정보에서 가져와야 함
     };
+  },
+
+  // 주문 수락 상태 체크 (테스트용)
+  checkOrderAcceptance: () => {
+    // 테스트를 위해 주문 2번을 수락된 상태로 변경
+    const order = unifiedMockData.orders.find((o) => o.id === 2);
+    if (order) {
+      order.status = "processing";
+      order.orderAccepted = true;
+      order.showAcceptanceModal = true;
+    }
+    return order;
+  },
+
+  // 카테고리 ID로 카테고리 정보 가져오기
+  getCategoryById: (categoryId) => {
+    return unifiedMockData.categories.find((c) => c.id === categoryId);
   },
 };
