@@ -1,22 +1,23 @@
 import styled from "styled-components";
 
 export const LoginPageContainer = styled.div`
-  width: 375px;
-  min-height: 812px;
+  min-height: 100vh;
   background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 106px 24px 188px;
   margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
 `;
 
 export const MainContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 100%;
+  max-width: 500px;
 `;
 
 export const Title = styled.h1`

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { consumerLogin } from "../../api/auth";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
-import squirrelIcon from "../../assets/icons/squirrel.svg";
+import greenSquirrelIcon from "../../assets/images/greensquirrel.svg";
 
 import {
   LoginPageContainer,
@@ -30,15 +30,6 @@ function Signin() {
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
-
-  // 이미 로그인된 경우 메인 페이지로 리다이렉트
-  useEffect(() => {
-    // 로컬스토리지에서 직접 토큰 확인 (useAuth 훅 사용하지 않음)
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      navigate("/mainpage");
-    }
-  }, [navigate]);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -127,7 +118,7 @@ function Signin() {
 
         <PictureSection>
           <SquirrelContainer>
-            <img src={squirrelIcon} alt="다람쥐" />
+            <img src={greenSquirrelIcon} alt="다람쥐" />
           </SquirrelContainer>
           <ManagerLink>
             사장님이신가요? <Link to="/signin-seller">판매자 전용 페이지</Link>

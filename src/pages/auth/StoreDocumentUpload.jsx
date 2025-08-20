@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { sellerSignup, createStore, uploadDocuments } from "../../api/auth";
 import Button from "../../components/common/button/Button";
-import squirrelIcon from "../../assets/icons/squirrel.svg";
+import greenSquirrelIcon from "../../assets/images/greensquirrel.svg";
 
 import {
   LoginPageContainer,
@@ -140,7 +140,7 @@ function StoreDocumentUpload() {
       <MainContent>
         <PictureSection>
           <SquirrelContainer>
-            <img src={squirrelIcon} alt="다람쥐" />
+            <img src={greenSquirrelIcon} alt="다람쥐" />
           </SquirrelContainer>
         </PictureSection>
 

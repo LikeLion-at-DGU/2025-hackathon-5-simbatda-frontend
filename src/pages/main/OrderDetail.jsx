@@ -1,18 +1,32 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import forward from "../../assets/icons/forward.png";
+import BackHeader from "../../components/common/header/BackHeader";
 import {
   PageContainer,
-  Header,
-  BackButton,
-  Section,
-  Title,
-  MetaList,
-  MetaLabel,
-  MetaValue,
-  SectionHeader,
-  ProductRow,
-  ProductNote,
+  Content,
+  PickupStatus,
+  PickupStatusText,
+  OrderNumber,
+  OrderNumberLabel,
+  OrderNumberValue,
+  OrderInfoSection,
+  OrderInfoItem,
+  OrderInfoLabel,
+  OrderInfoValue,
+  ProductSection,
+  SectionTitle,
+  ProductItem,
+  ProductInfo,
+  ProductName,
+  ProductQuantity,
+  ProductPrice,
+  ProductExpiry,
+  StoreSection,
+  StoreInfoItem,
+  StoreInfoLabel,
+  StoreInfoValue,
+  CopyButton,
+  CopyButtonText,
 } from "./OrderDetail.styles";
 
 export default function OrderDetail() {
@@ -27,47 +41,110 @@ export default function OrderDetail() {
     items: orderData?.items || [
       { name: "김치찌개 1인분", qty: 1, price: 5600 },
     ],
-    reserver: "다람쥐쥐쥐쥐",
-    phone: "000-000-0000",
-    expire: "08.09. 22:00",
+    reserver: orderData?.reserver || "다람쥐쥐쥐쥐",
+    phone: orderData?.phone || "000-000-0000",
+    expire: orderData?.expire || "08.09. 22:00",
+    status: orderData?.status || "pending",
+    storeName: orderData?.storeName || "맛있는 김치찌개",
+    storePhone: orderData?.storePhone || "02-1234-5678",
+    storeAddress: orderData?.storeAddress || "서울특별시 중구 필동로 1길 30",
+  };
+
+  const formatPickupTime = (pickupTime) => {
+    if (!pickupTime) return "";
+    return pickupTime;
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "pending":
+        return "픽업대기중";
+      case "processing":
+        return "픽업대기중";
+      case "completed":
+        return "픽업완료";
+      default:
+        return "주문확인";
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
   };
 
   return (
     <PageContainer>
-      <Header>
-        <BackButton onClick={() => navigate(-1)}>
-          <img src={forward} alt="뒤로 가기" />
-        </BackButton>
-        주문 상세
-      </Header>
+      <BackHeader title="주문 상세" />
 
-      <Section>
-        <Title>{order.pickupTime} </Title>
-        <MetaList>
-          <MetaLabel>예약번호</MetaLabel>
-          <MetaValue>{order.orderNumber}</MetaValue>
-          <MetaLabel>주문시각</MetaLabel>
-          <MetaValue>{order.createdAt}</MetaValue>
-          <MetaLabel>예약자명</MetaLabel>
-          <MetaValue>{order.reserver}</MetaValue>
-          <MetaLabel>예약자 번호</MetaLabel>
-          <MetaValue>{order.phone}</MetaValue>
-        </MetaList>
-      </Section>
+      <Content>
+        {order.status !== "completed" && (
+          <PickupStatus>
+            <PickupStatusText>
+              {formatPickupTime(order.pickupTime)}
+            </PickupStatusText>
+          </PickupStatus>
+        )}
 
-      <Section>
-        <SectionHeader>주문 상품 정보</SectionHeader>
-        {order.items.map((it, idx) => (
-          <ProductRow key={idx} $isLastItem={order.items.length === 1}>
-            <div>{it.name}</div>
-            <div style={{ textAlign: "center" }}>{it.qty}</div>
-            <div style={{ textAlign: "right", fontWeight: 700 }}>
-              {it.price.toLocaleString()}원
-            </div>
-            <ProductNote>유통기한: {order.expire}</ProductNote>
-          </ProductRow>
-        ))}
-      </Section>
+        <OrderNumber>
+          <OrderNumberLabel>예약번호</OrderNumberLabel>
+          <OrderNumberValue>{getStatusText(order.status)}</OrderNumberValue>
+        </OrderNumber>
+
+        <OrderInfoSection>
+          <OrderInfoItem>
+            <OrderInfoLabel>예약번호</OrderInfoLabel>
+            <OrderInfoValue>{order.orderNumber}</OrderInfoValue>
+          </OrderInfoItem>
+          <OrderInfoItem>
+            <OrderInfoLabel>주문시각</OrderInfoLabel>
+            <OrderInfoValue>{order.createdAt}</OrderInfoValue>
+          </OrderInfoItem>
+          <OrderInfoItem>
+            <OrderInfoLabel>예약자명</OrderInfoLabel>
+            <OrderInfoValue>{order.reserver}</OrderInfoValue>
+          </OrderInfoItem>
+          <OrderInfoItem>
+            <OrderInfoLabel>예약자 번호</OrderInfoLabel>
+            <OrderInfoValue>{order.phone}</OrderInfoValue>
+          </OrderInfoItem>
+        </OrderInfoSection>
+
+        <OrderInfoSection>
+          <OrderInfoItem>
+            <OrderInfoLabel>가게명</OrderInfoLabel>
+            <OrderInfoValue>{order.storeName}</OrderInfoValue>
+          </OrderInfoItem>
+          <OrderInfoItem>
+            <OrderInfoLabel>가게연락처</OrderInfoLabel>
+            <OrderInfoValue>{order.storePhone}</OrderInfoValue>
+          </OrderInfoItem>
+        </OrderInfoSection>
+
+        <ProductSection>
+          <SectionTitle>주문 상품 정보</SectionTitle>
+          {order.items.map((item, index) => (
+            <ProductItem key={index}>
+              <ProductInfo>
+                <ProductName>{item.name}</ProductName>
+                <ProductQuantity>{item.qty}</ProductQuantity>
+                <ProductPrice>{item.price.toLocaleString()}원</ProductPrice>
+              </ProductInfo>
+              <ProductExpiry>유통기한: {order.expire}</ProductExpiry>
+            </ProductItem>
+          ))}
+        </ProductSection>
+
+        <StoreSection>
+          <SectionTitle>매장 정보</SectionTitle>
+          <StoreInfoItem>
+            <StoreInfoLabel>매장주소</StoreInfoLabel>
+            <StoreInfoValue>{order.storeAddress}</StoreInfoValue>
+            <CopyButton onClick={() => copyToClipboard(order.storeAddress)}>
+              <CopyButtonText>주소 복사</CopyButtonText>
+            </CopyButton>
+          </StoreInfoItem>
+        </StoreSection>
+      </Content>
     </PageContainer>
   );
 }

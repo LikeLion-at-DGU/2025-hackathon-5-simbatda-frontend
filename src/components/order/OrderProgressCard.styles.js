@@ -135,7 +135,7 @@ export const StepCheck = styled.span`
   align-items: center;
   justify-content: center;
   line-height: 1;
-  background: ${(p) => (p.$done ? "#37ca79" : "#e0e0e0")};
+
   transition: all 0.2s ease;
   order: -1;
 

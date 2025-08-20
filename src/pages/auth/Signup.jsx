@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { consumerSignup } from "../../api/auth";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
-import squirrelIcon from "../../assets/icons/squirrel.svg";
+import greenSquirrelIcon from "../../assets/images/greensquirrel.svg";
 
 import {
   LoginPageContainer,
@@ -159,7 +159,7 @@ function Signup() {
 
         <PictureSection>
           <SquirrelContainer>
-            <img src={squirrelIcon} alt="다람쥐" />
+            <img src={greenSquirrelIcon} alt="다람쥐" />
           </SquirrelContainer>
           <ManagerLink>
             사장님이신가요? <Link to="/signup-seller">판매자 전용 페이지</Link>
