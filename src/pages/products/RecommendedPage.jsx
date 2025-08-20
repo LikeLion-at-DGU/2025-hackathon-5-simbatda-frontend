@@ -9,13 +9,12 @@ const getRecommendedProducts = () => {
     id: product.id,
     storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
     productName: product.name,
-    categoryName:
-      mockUtils.getCategoryById(product.categoryId)?.name || "카테고리",
     originalPrice: product.originalPrice,
     discountPrice: product.discountPrice,
     imageUrl: product.images?.[0] || "",
     isLiked: mockUtils.isProductLiked(1, product.id),
     expiryTime: Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000,
+    stock: product.stock,
   }));
 };
 
@@ -25,7 +24,7 @@ const RecommendedPage = () => {
       title="추천 상품"
       getProducts={getRecommendedProducts}
       showExpiry={true}
-      showCategory={true}
+      showCategory={false}
       description="테스트 사용자님이 좋아하실 재고를 발견했어요!"
     />
   );
