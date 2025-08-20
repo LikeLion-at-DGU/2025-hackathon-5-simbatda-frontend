@@ -203,10 +203,10 @@ const AdvancedGoogleMap = ({
       title: "현재 위치",
       icon: {
         url: currentLocationPinIcon,
-        scaledSize: new window.google.maps.Size(32, 32),
-        anchor: new window.google.maps.Point(16, 32),
+        scaledSize: new window.google.maps.Size(48, 48),
+        anchor: new window.google.maps.Point(24, 48),
       },
-      zIndex: 1000, 
+      zIndex: 1000,
     });
 
     setCurrentLocationMarker(marker);
@@ -215,7 +215,7 @@ const AdvancedGoogleMap = ({
   const moveToCurrentLocation = () => {
     if (currentLocation && map) {
       map.setCenter(currentLocation);
-      map.setZoom(16); 
+      map.setZoom(16);
 
       if (!currentLocationMarker) {
         addCurrentLocationMarker(currentLocation, map);
@@ -267,7 +267,6 @@ const AdvancedGoogleMap = ({
           onClick(event);
         });
       }
-
     } catch (error) {
       console.error("구글 맵 초기화 오류:", error);
       setIsLoading(false);
@@ -323,7 +322,7 @@ const AdvancedGoogleMap = ({
         window.google.maps.event.clearInstanceListeners(map);
       }
     };
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (map && currentLocation) {
