@@ -9,13 +9,12 @@ const getSpecialPriceProducts = () => {
     id: product.id,
     storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
     productName: product.name,
-    categoryName:
-      mockUtils.getCategoryById(product.categoryId)?.name || "카테고리",
     originalPrice: product.originalPrice,
     discountPrice: product.discountPrice,
     imageUrl: product.images?.[0] || "",
     isLiked: mockUtils.isProductLiked(1, product.id),
     expiryTime: Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000, // 랜덤 유통기한 (7일 이내)
+    stock: product.stock,
   }));
 
   return mappedProducts;
@@ -27,7 +26,7 @@ const SpecialPricePage = () => {
       title="특가 상품"
       getProducts={getSpecialPriceProducts}
       showExpiry={true}
-      showCategory={true}
+      showCategory={false}
       description="30% 이상 할인된 상품을 확인해보세요!"
     />
   );
