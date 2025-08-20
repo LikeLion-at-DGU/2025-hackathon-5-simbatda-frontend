@@ -61,7 +61,7 @@ const Header = ({ userInfo, onLogout, title }) => {
   };
 
   const handleInventoryMap = () => {
-    navigate("/mainpage");
+    navigate("/inventory-map");
     setDrawerOpen(false);
   };
 

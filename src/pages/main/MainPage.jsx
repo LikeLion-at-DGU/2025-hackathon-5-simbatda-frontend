@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import Header from "../../components/common/header/Header";
 import SearchBar from "../../components/common/searchbar/SearchBar";
 import CategoryChips from "../../components/common/chips/CategoryChips";
-import MapPlaceholder from "../../components/common/map/MapPlaceholder";
+import AdvancedGoogleMap from "../../components/common/map/AdvancedGoogleMap";
 import RecommendedProducts from "../../components/common/products/RecommendedProducts";
 import SpecialPriceProducts from "../../components/common/products/SpecialPriceProducts";
 import BottomSheet from "../../components/common/bottomsheet/BottomSheet";
@@ -102,171 +103,114 @@ function MainPage() {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
-
+    
     // 카테고리별 상품 데이터
     const categoryProducts = [
       {
         id: 301,
-        storeName: `${category} 전문점`,
+        storeName: `${category} 상점`,
         productName: `${category} 상품 1`,
-        originalPrice: 7000,
-        discountPrice: 5500,
+        originalPrice: 10000,
+        discountPrice: 7000,
         imageUrl: "",
         isLiked: false,
       },
       {
         id: 302,
-        storeName: `${category} 전문점`,
+        storeName: `${category} 상점`,
         productName: `${category} 상품 2`,
-        originalPrice: 9000,
-        discountPrice: 7200,
+        originalPrice: 8000,
+        discountPrice: 6000,
         imageUrl: "",
         isLiked: true,
       },
       {
         id: 303,
-        storeName: `${category} 전문점`,
+        storeName: `${category} 상점`,
         productName: `${category} 상품 3`,
-        originalPrice: 6000,
-        discountPrice: 4500,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 304,
-        storeName: `${category} 전문점`,
-        productName: `${category} 상품 4`,
-        originalPrice: 11000,
-        discountPrice: 8800,
+        originalPrice: 15000,
+        discountPrice: 12000,
         imageUrl: "",
         isLiked: false,
       },
     ];
 
     setLocationProducts(categoryProducts);
-    setSelectedLocationInfo({
-      name: "카테고리 상품",
-      type: "category",
-      query: category,
-    });
+    setSelectedLocationInfo({ name: category, type: "category" });
     setBottomSheetOpen(true);
   };
 
-  // 지도 플레이스홀더 클릭 시 바텀시트 열기
-  const handleMapClick = () => {
+  // 지도 클릭 시 바텀시트 열기
+  const handleMapClick = (event) => {
+    // 구글 맵 클릭 이벤트에서 좌표 추출
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+
     // 실제로는 지도 핀 클릭 시 호출됨
     setSelectedLocationInfo({
       name: "주변 상품",
       type: "nearby",
-      query: "강남역 상점가",
+      query: `위치: ${lat.toFixed(6)}, ${lng.toFixed(6)}`,
     });
 
-    // 상품 데이터
-    setLocationProducts([
-      {
-        id: 101,
-        storeName: "강남 베이커리",
-        productName: "크로아상 2개",
-        originalPrice: 6000,
-        discountPrice: 4000,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 102,
-        storeName: "강남 카페",
-        productName: "아메리카노",
-        originalPrice: 4500,
-        discountPrice: 3000,
-        imageUrl: "",
-        isLiked: true,
-      },
-      {
-        id: 103,
-        storeName: "강남 식자재점",
-        productName: "신선 채소 세트",
-        originalPrice: 8000,
-        discountPrice: 6000,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 103,
-        storeName: "강남 도넛가게",
-        productName: "도넛 6개 세트",
-        originalPrice: 12000,
-        discountPrice: 9000,
-        imageUrl: "",
-        isLiked: true,
-      },
-      {
-        id: 104,
-        storeName: "강남 샌드위치",
-        productName: "치킨 샌드위치",
-        originalPrice: 5000,
-        discountPrice: 3500,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 105,
-        storeName: "강남 스무디",
-        productName: "딸기 스무디",
-        originalPrice: 7000,
-        discountPrice: 5000,
-        imageUrl: "",
-        isLiked: true,
-      },
-      {
-        id: 106,
-        storeName: "강남 과일가게",
-        productName: "딸기 500g",
-        originalPrice: 12000,
-        discountPrice: 8000,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 107,
-        storeName: "강남 정육점",
-        productName: "돼지고기 300g",
-        originalPrice: 8000,
-        discountPrice: 6000,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 108,
-        storeName: "강남 생선가게",
-        productName: "고등어 1마리",
-        originalPrice: 5000,
-        discountPrice: 3500,
-        imageUrl: "",
-        isLiked: true,
-      },
-      {
-        id: 109,
-        storeName: "강남 치킨집",
-        productName: "후라이드 치킨",
-        originalPrice: 18000,
-        discountPrice: 15000,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 110,
-        storeName: "강남 피자집",
-        productName: "페퍼로니 피자",
-        originalPrice: 25000,
-        discountPrice: 20000,
-        imageUrl: "",
-        isLiked: false,
-      },
-    ]);
-
-    setLocationProducts(categoryProducts);
-    setSelectedLocationInfo({ name: category, type: "category" });
+    // 상품 데이터 설정
+    setLocationProducts(getRandomProducts());
     setBottomSheetOpen(true);
+  };
+
+  // 마커 클릭 시 바텀시트 열기
+  const handleMarkerClick = (markerData) => {
+    setSelectedLocationInfo({
+      name: markerData.name,
+      type: "store",
+      query: markerData.title,
+    });
+
+    // 상품 데이터 설정
+    setLocationProducts(getRandomProducts());
+    setBottomSheetOpen(true);
+  };
+
+  // 클러스터 클릭 시 해당 영역으로 줌인
+  const handleClusterClick = (cluster) => {
+    const map = cluster.map;
+    const bounds = new window.google.maps.LatLngBounds();
+
+    cluster.markers.forEach((marker) => {
+      bounds.extend(marker.getPosition());
+    });
+
+    map.fitBounds(bounds);
+  };
+
+  // 랜덤 상품 데이터 생성 함수
+  const getRandomProducts = () => {
+    const productTemplates = [
+      { name: "크로아상", price: 4000, originalPrice: 6000 },
+      { name: "아메리카노", price: 3000, originalPrice: 4500 },
+      { name: "신선 채소 세트", price: 6000, originalPrice: 8000 },
+      { name: "도넛 6개 세트", price: 9000, originalPrice: 12000 },
+      { name: "치킨 샌드위치", price: 3500, originalPrice: 5000 },
+      { name: "딸기 스무디", price: 5000, originalPrice: 7000 },
+      { name: "딸기 500g", price: 8000, originalPrice: 12000 },
+      { name: "돼지고기 300g", price: 6000, originalPrice: 8000 },
+      { name: "고등어 1마리", price: 3500, originalPrice: 5000 },
+      { name: "후라이드 치킨", price: 15000, originalPrice: 18000 },
+      { name: "페퍼로니 피자", price: 20000, originalPrice: 25000 },
+    ];
+
+    return productTemplates
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 5)
+      .map((template, index) => ({
+        id: 200 + index,
+        storeName: "주변 상점",
+        productName: template.name,
+        originalPrice: template.originalPrice,
+        discountPrice: template.price,
+        imageUrl: "",
+        isLiked: Math.random() > 0.5,
+      }));
   };
 
   const handleBottomSheetClose = () => {
@@ -293,7 +237,11 @@ function MainPage() {
           onCategoryChange={handleCategoryChange}
           initialCategory={selectedCategory}
         />
-        <MapPlaceholder onClick={handleMapClick} />
+        <AdvancedGoogleMap
+          onClick={handleMapClick}
+          onMarkerClick={handleMarkerClick}
+          onClusterClick={handleClusterClick}
+        />
         <RecommendedProducts
           products={recommendedProducts}
           name={userInfo?.name || "사용자"}
