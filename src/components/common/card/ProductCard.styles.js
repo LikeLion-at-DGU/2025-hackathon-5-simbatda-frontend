@@ -192,6 +192,13 @@ const ListCardCategory = styled.span`
   color: #8a8a8a;
 `;
 
+const ListCardStock = styled.span`
+  font-size: 12px;
+  color: #8a8a8a;
+  font-weight: 500;
+  margin-top: 10px;
+`;
+
 const ListCardExpiry = styled.div`
   font-size: 11px;
   color: #ff6b6b;
@@ -199,7 +206,7 @@ const ListCardExpiry = styled.div`
 `;
 
 const ProductName2 = styled.p`
-  font-size: 18px;
+  font-size: 16px;
   color: black;
   font-weight: 700;
   margin: 0;
@@ -231,6 +238,7 @@ export {
   ListCardOriginalPrice,
   ListCardDiscountRate,
   ListCardCategory,
+  ListCardStock,
   ListCardExpiry,
   ListCardContainer2,
   ProductName2,

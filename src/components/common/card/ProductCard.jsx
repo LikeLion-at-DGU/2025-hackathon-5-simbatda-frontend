@@ -29,6 +29,7 @@ import {
   ListCardOriginalPrice,
   ListCardDiscountRate,
   ListCardCategory,
+  ListCardStock,
   ListCardExpiry,
   ListCardContainer2,
   ProductName2,
@@ -37,6 +38,7 @@ import {
 const ProductCard = ({
   variant = "default",
   storeName,
+  storeId,
   productName,
   categoryName,
   originalPrice,
@@ -46,8 +48,10 @@ const ProductCard = ({
   isLiked = false,
   onLikeToggle,
   onClick,
+  onStoreClick,
   className = "",
   expiryTime,
+  stock,
   ...props
 }) => {
   const [liked, setLiked] = useState(isLiked);
@@ -73,6 +77,12 @@ const ProductCard = ({
     const newLikedState = !liked;
     setLiked(newLikedState);
     onLikeToggle?.(newLikedState);
+  };
+
+  const handleStoreClick = (e) => {
+    if (!onStoreClick) return;
+    e.stopPropagation();
+    onStoreClick(storeId);
   };
 
   // 유통기한 계산
@@ -110,7 +120,12 @@ const ProductCard = ({
           </LikeButton>
           <CardImage src={displayImage} alt={productName} />
           <CardContent>
-            <StoreName>{storeName}</StoreName>
+            <StoreName
+              onClick={onStoreClick ? handleStoreClick : undefined}
+              style={onStoreClick ? { cursor: "pointer" } : {}}
+            >
+              {storeName}
+            </StoreName>
             <ProductName>{productName}</ProductName>
             <PriceSection>
               <p>{discountPriceText}원</p>
@@ -135,8 +150,12 @@ const ProductCard = ({
           </LikeButton>
           <ProductCardImage src={displayImage} alt={productName} />
           <ProductCardContent>
-            <StoreName>{storeName}</StoreName>
-            <ProductName>{productName}</ProductName>
+            <StoreName
+              onClick={onStoreClick ? handleStoreClick : undefined}
+              style={onStoreClick ? { cursor: "pointer" } : {}}
+            >
+              {storeName}
+            </StoreName>
             <ProductCardPriceSection>
               {hasDiscount ? (
                 <ProductCardDiscountRate>
@@ -165,20 +184,40 @@ const ProductCard = ({
             <ListCardImage src={displayImage} alt={productName} />
             <ListCardContent>
               <ListCardHeader>
-                <StoreName>{storeName}</StoreName>
+                <StoreName
+                  onClick={onStoreClick ? handleStoreClick : undefined}
+                  style={onStoreClick ? { cursor: "pointer" } : {}}
+                >
+                  {storeName}
+                </StoreName>
                 <ProductName2>{productName}</ProductName2>
-                {categoryName && (
-                  <ListCardCategory>{categoryName}</ListCardCategory>
+                {stock !== undefined && (
+                  <ListCardStock>재고: {stock}개</ListCardStock>
                 )}
               </ListCardHeader>
               <ListCardFooter>
                 <ListCardPriceSection>
                   {hasDiscount && (
-                    <ListCardDiscountRate>{discountRate}%</ListCardDiscountRate>
+                    <ListCardOriginalPrice>
+                      {originalPrice.toLocaleString()}원
+                    </ListCardOriginalPrice>
                   )}
-                  <ListCardDiscountPrice>
-                    {discountPriceText}원
-                  </ListCardDiscountPrice>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                    }}
+                  >
+                    {hasDiscount && (
+                      <ListCardDiscountRate>
+                        {discountRate}%
+                      </ListCardDiscountRate>
+                    )}
+                    <ListCardDiscountPrice>
+                      {discountPriceText}원
+                    </ListCardDiscountPrice>
+                  </div>
                 </ListCardPriceSection>
               </ListCardFooter>
             </ListCardContent>
