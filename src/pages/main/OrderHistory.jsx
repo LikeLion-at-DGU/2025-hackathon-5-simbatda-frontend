@@ -165,7 +165,6 @@ function OrderHistory() {
           <OrderHeader>
             <OrderInfo>
               <OrderDate>진행중인 주문</OrderDate>
-              <OrderStatus color="#37ca79">진행중</OrderStatus>
             </OrderInfo>
           </OrderHeader>
 
@@ -185,7 +184,13 @@ function OrderHistory() {
                     const progressSteps = getProgressSteps(order.status);
 
                     return (
-                      <ProgressStep key={order.id}>
+                      <ProgressStep
+                        key={order.id}
+                        onClick={() =>
+                          navigate(`/customer-order-detail/${order.id}`)
+                        }
+                        style={{ cursor: "pointer" }}
+                      >
                         <StepHeader>
                           <StepStoreName>
                             {orderWithDetails?.storeName}
@@ -282,7 +287,11 @@ function OrderHistory() {
             const orderWithDetails = mockUtils.getOrderWithDetails(order.id);
 
             return (
-              <OrderItem key={order.id}>
+              <OrderItem
+                key={order.id}
+                onClick={() => navigate(`/customer-order-detail/${order.id}`)}
+                style={{ cursor: "pointer" }}
+              >
                 <OrderHeader>
                   <OrderInfo>
                     <OrderDate>{formatDate(order.createdAt)}</OrderDate>
