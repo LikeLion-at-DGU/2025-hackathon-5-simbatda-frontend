@@ -2,13 +2,13 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getSellerMe,
-  logout,
+  getSellerStore,
   getSellerOrders,
   acceptOrder,
   rejectOrder,
   toggleStoreStatus,
-  getSellerStore,
-} from "../../api/auth";
+} from "../../api/seller";
+import { logout } from "../../api/auth";
 import Button from "../../components/common/button/Button";
 import OrderCard from "../../components/order/OrderCard";
 import {

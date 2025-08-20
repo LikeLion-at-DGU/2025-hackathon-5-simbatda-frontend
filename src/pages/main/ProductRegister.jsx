@@ -2,13 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getSellerMe,
-  logout,
   getSellerProducts,
   createProduct,
   deleteProduct,
-  getCategories,
   toggleStoreStatus,
-} from "../../api/auth";
+} from "../../api/seller";
+import { logout, getCategories } from "../../api/auth";
 import Button from "../../components/common/button/Button";
 import {
   PageContainer,
