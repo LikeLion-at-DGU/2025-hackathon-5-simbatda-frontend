@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { sellerSignup, createStore, uploadDocuments } from "../../api/auth";
 import Button from "../../components/common/button/Button";
-import greenSquirrelIcon from "../../assets/images/greenSquirrel.svg";
+import greenSquirrelIcon from "../../assets/images/greensquirrel.svg";
 
 import {
   LoginPageContainer,

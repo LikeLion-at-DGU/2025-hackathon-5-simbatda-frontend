@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { sellerSignup } from "../../api/auth";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
-import greenSquirrelIcon from "../../assets/images/greenSquirrel.svg";
+import greenSquirrelIcon from "../../assets/images/greensquirrel.svg";
 
 import {
   LoginPageContainer,
