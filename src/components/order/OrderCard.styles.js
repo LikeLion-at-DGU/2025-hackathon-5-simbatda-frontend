@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const CardContainer = styled.div`
+export const OrderCardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -18,7 +18,13 @@ export const CardHeader = styled.div`
   gap: 16px;
 `;
 
-export const OrderMeta = styled.div`
+export const LeftSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+export const Timestamp = styled.div`
   color: #5d5752;
   font-family: Pretendard;
   font-size: 12px;
@@ -27,45 +33,74 @@ export const OrderMeta = styled.div`
 `;
 
 export const OrderTitle = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   color: #5d5752;
   font-family: Pretendard;
   font-size: 18px;
   font-weight: 800;
   align-self: stretch;
   margin-top: 8px;
-
-  span {
-    color: #5d5752;
-    font-family: Pretendard;
-    font-size: 18px;
-    font-weight: 600;
-    align-self: stretch;
-  }
 `;
 
-export const RightColumn = styled.div`
+export const RightSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
 `;
 
-export const StatusBadge = styled.div`
+export const ButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 40px;
+`;
+
+export const AcceptButton = styled.button`
   padding: 10px 16px;
+  border: none;
   border-radius: 12px;
-  font-weight: 700;
+  background: #37ca79;
+  color: white;
   font-size: 16px;
+  cursor: pointer;
+  font-family: Pretendard;
+  font-weight: 700;
   min-width: 95px;
   text-align: center;
-  color: #fff;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  border-radius: 10px;
-  background: #b9b9b9;
+
+  &:hover {
+    background: #33b56d;
+  }
+`;
+
+export const RejectButton = styled.button`
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: Pretendard;
+  font-weight: 700;
+  min-width: 95px;
+  text-align: center;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
+export const StatusBadge = styled.div`
+  padding: 10px 16px;
+  background-color: #bdbdbd;
+  color: white;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: Pretendard;
+  min-width: 95px;
+  text-align: center;
 `;
 
 export const OrderInfo = styled.div`

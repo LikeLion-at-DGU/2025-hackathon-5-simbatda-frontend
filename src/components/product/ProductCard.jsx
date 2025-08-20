@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import dots from "../../assets/icons/dots.svg";
 import {
   CardContainer,
   StockNotice,
@@ -17,7 +18,6 @@ import {
   MoreMenu,
   MoreMenuItem,
 } from "./ProductCard.styles";
-import dot from "../../assets/icons/dot.png";
 
 function formatRemain(expiry) {
   const now = new Date();
@@ -85,7 +85,7 @@ export default function ProductCard({ product, onDelete }) {
             </StatusPill>
             <div style={{ position: "relative" }}>
               <StatusPill onClick={() => setMenuOpen((v) => !v)} $menu>
-                <img src={dot} alt="더보기" width={13} height={13} />
+                <img src={dots} alt="더보기" width={13} height={13} />
               </StatusPill>
               {menuOpen && (
                 <MoreMenu onMouseLeave={() => setMenuOpen(false)}>

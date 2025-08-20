@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSellerMe, logout } from "../../api/auth";
 import Button from "../../components/common/button/Button";
+import OrderCard from "../../components/order/OrderCard";
 import {
   PageContainer,
   Content,
@@ -11,15 +12,7 @@ import {
   SectionTitleWrapper,
   StatusButtons,
   EmptyMessage,
-  OrderModal,
-  ModalContent,
-  ModalHeader,
-  ModalTitle,
-  OrderInfo,
-  OrderNumber,
-  OrderItem,
-  OrderSummary,
-  ModalButtons,
+  OrdersContainer,
   RejectModal,
   RejectModalContent,
   RejectModalHeader,
@@ -31,7 +24,6 @@ import {
   RejectSelect,
   RejectButtons,
   RejectInfo,
-  ExpiryDate,
 } from "./MainPageSeller.styles";
 
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
@@ -42,11 +34,15 @@ import HeaderSeller from "../../components/common/header/HeaderSeller";
 function MainPageSeller() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
-  const [orderModalOpen, setOrderModalOpen] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [currentRejectOrder, setCurrentRejectOrder] = useState(null);
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [orderHistory, setOrderHistory] = useState(() => {
+    const savedHistory = localStorage.getItem("sellerOrderHistory");
+    return savedHistory ? JSON.parse(savedHistory) : [];
+  });
 
   const rejectReasons = [
     "상품의 상태가 좋지 않아요...",
@@ -54,21 +50,28 @@ function MainPageSeller() {
     "기타 사유",
   ];
 
-  // 테스트용 주문 데이터
-  const sampleOrder = {
-    orderNumber: "B12345",
-    items: [
-      {
-        name: "김치찌개 1인분",
-        quantity: 1,
-        price: 5600,
-        expiryDate: "25.08.06",
-      },
-    ],
-    total: 5600,
-    customer: "고객명",
-    orderTime: "오후 8시 33분",
-  };
+  const sampleOrders = [
+    {
+      id: 1,
+      reservation_number: "B12345",
+      product_name: "김치찌개 1인분",
+      quantity: 1,
+      price: 5600,
+      created_at: new Date(Date.now() - 30 * 60 * 1000),
+      pickup_time: new Date(Date.now() + 60 * 60 * 1000),
+      status: "pending",
+    },
+    {
+      id: 2,
+      reservation_number: "B12346",
+      product_name: "된장찌개 1인분",
+      quantity: 2,
+      price: 5200,
+      created_at: new Date(Date.now() - 15 * 60 * 1000),
+      pickup_time: new Date(Date.now() + 45 * 60 * 1000),
+      status: "pending",
+    },
+  ];
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -83,15 +86,17 @@ function MainPageSeller() {
     fetchUserInfo();
   }, [navigate]);
 
-  // (5초 후 모달 표시)
   useEffect(() => {
     const timer = setTimeout(() => {
-      setCurrentOrder(sampleOrder);
-      setOrderModalOpen(true);
+      setPendingOrders(sampleOrders);
     }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("sellerOrderHistory", JSON.stringify(orderHistory));
+  }, [orderHistory]);
 
   const handleLogout = async () => {
     try {
@@ -103,28 +108,70 @@ function MainPageSeller() {
     }
   };
 
-  const handleAcceptOrder = () => {
-    alert("주문을 접수했습니다!");
-    setOrderModalOpen(false);
-    setCurrentOrder(null);
+  const handleAcceptOrder = (orderId) => {
+    const order = pendingOrders.find((order) => order.id === orderId);
+    if (order) {
+      const updatedPendingOrders = pendingOrders.filter(
+        (order) => order.id !== orderId
+      );
+      setPendingOrders(updatedPendingOrders);
+
+      const acceptedOrder = {
+        ...order,
+        status: "accepted",
+        action_time: new Date(),
+        action_type: "accepted",
+      };
+      setOrderHistory((prev) => [acceptedOrder, ...prev]);
+
+      alert("주문을 접수했습니다!");
+
+      setTimeout(() => {
+        navigate("/order-in-progress");
+      }, 1000);
+    }
   };
 
-  const handleRejectOrder = () => {
+  const handleRejectOrder = (orderId) => {
+    const order = pendingOrders.find((o) => o.id === orderId);
+    setCurrentRejectOrder(order);
     setRejectModalOpen(true);
   };
 
   const handleConfirmReject = () => {
-    alert("주문을 거절했습니다.");
-    setRejectModalOpen(false);
-    setOrderModalOpen(false);
-    setCurrentOrder(null);
-    setRejectReason("");
+    if (currentRejectOrder) {
+      const updatedPendingOrders = pendingOrders.filter(
+        (order) => order.id !== currentRejectOrder.id
+      );
+      setPendingOrders(updatedPendingOrders);
+
+      const rejectedOrder = {
+        ...currentRejectOrder,
+        status: "rejected",
+        action_time: new Date(),
+        action_type: "rejected",
+        reject_reason: rejectReason || "상품이 방금 품절됐어요ㅠㅠ!",
+      };
+      setOrderHistory((prev) => [rejectedOrder, ...prev]);
+
+      alert("주문을 거절했습니다.");
+      setRejectModalOpen(false);
+      setCurrentRejectOrder(null);
+      setRejectReason("");
+    }
   };
 
   const handleCancelReject = () => {
     setRejectModalOpen(false);
+    setCurrentRejectOrder(null);
     setRejectReason("");
   };
+
+  const allOrders = [...pendingOrders, ...orderHistory].sort((a, b) => {
+    const timeA = a.action_time || a.created_at;
+    const timeB = b.action_time || b.created_at;
+    return new Date(timeB) - new Date(timeA);
+  });
 
   return (
     <PageContainer>
@@ -163,65 +210,31 @@ function MainPageSeller() {
           </Button>
         </StatusButtons>
 
-        <EmptyMessage>아직 주문 접수된 건이 없어요</EmptyMessage>
+        {allOrders.length === 0 ? (
+          <EmptyMessage>아직 주문 접수된 건이 없어요</EmptyMessage>
+        ) : (
+          <OrdersContainer>
+            {allOrders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                onAccept={
+                  order.status === "pending" ? handleAcceptOrder : undefined
+                }
+                onReject={
+                  order.status === "pending" ? handleRejectOrder : undefined
+                }
+                isHistory={order.status !== "pending"}
+                actionType={order.action_type}
+                actionTime={order.action_time}
+                rejectReason={order.reject_reason}
+              />
+            ))}
+          </OrdersContainer>
+        )}
       </Content>
 
-      {orderModalOpen && currentOrder && (
-        <>
-          <Backdrop $open={orderModalOpen} />
-          <OrderModal $open={orderModalOpen}>
-            <ModalContent>
-              <ModalHeader>
-                <ModalTitle>{currentOrder.orderTime} 접수</ModalTitle>
-              </ModalHeader>
-
-              <OrderInfo>
-                <OrderNumber>
-                  예약 번호
-                  <br />
-                  <strong>{currentOrder.orderNumber}</strong>
-                </OrderNumber>
-              </OrderInfo>
-
-              <OrderSummary>
-                <h4>주문 정보</h4>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>상품명</th>
-                      <th>수량</th>
-                      <th>금액</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentOrder.items.map((item, index) => (
-                      <OrderItem key={index}>
-                        <td>{item.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.price.toLocaleString()}원</td>
-                      </OrderItem>
-                    ))}
-                  </tbody>
-                </table>
-                <p className="note">
-                  10분 이내에 수락이 안 되면 예약이 자동 취소됩니다.
-                </p>
-              </OrderSummary>
-
-              <ModalButtons>
-                <Button variant="reject" onClick={handleRejectOrder}>
-                  거절
-                </Button>
-                <Button variant="accept" onClick={handleAcceptOrder}>
-                  수락
-                </Button>
-              </ModalButtons>
-            </ModalContent>
-          </OrderModal>
-        </>
-      )}
-
-      {rejectModalOpen && (
+      {rejectModalOpen && currentRejectOrder && (
         <>
           <Backdrop $open={rejectModalOpen} onClick={handleCancelReject} />
           <RejectModal $open={rejectModalOpen}>
@@ -237,13 +250,10 @@ function MainPageSeller() {
                 <RejectModalSubtitle>주문 상품 정보</RejectModalSubtitle>
                 <RejectInfo>
                   <RejectOrderInfo>
-                    <div>{currentOrder.items[0].name}</div>
-                    <div>{currentOrder.items[0].quantity}</div>
-                    <div>{currentOrder.items[0].price.toLocaleString()}원</div>
+                    <div>{currentRejectOrder.product_name}</div>
+                    <div>{currentRejectOrder.quantity}</div>
+                    <div>{currentRejectOrder.price.toLocaleString()}원</div>
                   </RejectOrderInfo>
-                  <ExpiryDate>
-                    유통기한: {currentOrder.items[0].expiryDate}
-                  </ExpiryDate>
                 </RejectInfo>
               </RejectModalSection>
 

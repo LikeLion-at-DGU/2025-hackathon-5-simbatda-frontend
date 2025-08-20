@@ -7,11 +7,6 @@ import {
   SectionTitle as MainSectionTitle,
   SectionTitleWrapper as MainSectionTitleWrapper,
   EmptyMessage as MainEmptyMessage,
-  OrderModal as MainOrderModal,
-  ModalContent as MainModalContent,
-  ModalHeader as MainModalHeader,
-  ModalTitle as MainModalTitle,
-  ModalButtons as MainModalButtons,
 } from "./MainPageSeller.styles";
 
 export const PageContainer = MainPageContainer;
@@ -22,23 +17,45 @@ export const SectionTitle = MainSectionTitle;
 export const SectionTitleWrapper = MainSectionTitleWrapper;
 export const EmptyMessage = MainEmptyMessage;
 
-export const OrderModal = MainOrderModal;
-export const ModalContent = MainModalContent;
-export const ModalHeader = styled(MainModalHeader)`
+export const OrderModal = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  transform: translateY(0%);
+  transition: transform 0.3s ease;
+  width: 100%;
+`;
+
+export const ModalContent = styled.div`
+  background: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+`;
+
+export const ModalHeader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   width: 100%;
 `;
-export const ModalTitle = styled(MainModalTitle)`
+
+export const ModalTitle = styled.h3`
   color: #686868;
   text-align: center;
   font-family: Pretendard;
   font-size: 18px;
   font-weight: 700;
 `;
-export const ModalButtons = styled(MainModalButtons)`
+
+export const ModalButtons = styled.div`
   margin-top: 20px;
   width: 100%;
   display: flex;
