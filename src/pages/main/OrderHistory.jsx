@@ -142,7 +142,11 @@ function OrderHistory() {
       <Container>
         <Header userInfo={userInfo} onLogout={handleLogout} title="주문 내역" />
         <EmptyState>
-          <img src={empty} alt="empty" style={{ width: "124px", height: "124px", opacity: 0.6 }} />
+          <img
+            src={empty}
+            alt="empty"
+            style={{ width: "124px", height: "124px", opacity: 0.6 }}
+          />
           <EmptyText>아직 주문 내역이 없습니다.</EmptyText>
         </EmptyState>
       </Container>
@@ -255,7 +259,7 @@ function OrderHistory() {
                                 />
                                 <StepLabel>{step.name}</StepLabel>
                                 {index < progressSteps.length - 1 && (
-                                  <StepLine isCompleted={step.isCompleted} />
+                                  <StepLine $isCompleted={step.isCompleted} />
                                 )}
                               </ProgressStepItem>
                             ))}

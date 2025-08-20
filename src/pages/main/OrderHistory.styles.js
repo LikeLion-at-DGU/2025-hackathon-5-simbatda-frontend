@@ -242,7 +242,7 @@ const StepLine = styled.div`
   left: 100%;
   width: 20px;
   height: 2px;
-  background: ${(props) => (props.isCompleted ? "#37ca79" : "#e5e7eb")};
+  background: ${(props) => (props.$isCompleted ? "#37ca79" : "#e5e7eb")};
   z-index: -1;
 `;
 
