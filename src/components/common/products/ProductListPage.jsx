@@ -90,7 +90,7 @@ const ProductListPage = ({
     }
 
     // 정렬 적용
-    let sorted = [...filtered]; 
+    let sorted = [...filtered];
     switch (sortBy) {
       case "price-low":
         sorted.sort((a, b) => a.discountPrice - b.discountPrice);
@@ -199,6 +199,7 @@ const ProductListPage = ({
                 key={product.id}
                 variant="list"
                 storeName={product.storeName}
+                storeId={product.storeId}
                 productName={product.productName}
                 categoryName={showCategory ? product.categoryName : undefined}
                 originalPrice={product.originalPrice}
@@ -206,6 +207,7 @@ const ProductListPage = ({
                 imageUrl={product.imageUrl}
                 isLiked={product.isLiked}
                 expiryTime={showExpiry ? product.expiryTime : undefined}
+                stock={product.stock}
                 onClick={() => handleProductClick(product.id)}
                 onLikeToggle={() =>
                   handleProductLikeToggle(product.id, product.isLiked)
