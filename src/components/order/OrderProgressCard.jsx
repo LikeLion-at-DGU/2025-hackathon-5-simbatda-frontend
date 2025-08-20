@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import forward from "../../assets/icons/forward.svg";
-import greencheck1 from "../../assets/icons/greencheck1.svg";
-import graycheck1 from "../../assets/icons/graycheck1.svg";
+import check from "../../assets/icons/check.svg";
+import uncheck from "../../assets/icons/uncheck.svg";
 import {
   CardContainer,
   CardHeader,
@@ -26,7 +26,7 @@ function StepCheckIcon({ done }) {
   return (
     <StepCheck $done={done}>
       <img
-        src={done ? greencheck1 : graycheck1}
+        src={done ? check : uncheck}
         alt={done ? "완료" : "미완료"}
         width={14}
         height={14}
