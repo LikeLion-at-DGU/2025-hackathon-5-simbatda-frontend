@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSellerMe, logout } from "../../api/auth";
+import {
+  getSellerMe,
+  getSellerProducts,
+  createProduct,
+  deleteProduct,
+  toggleStoreStatus,
+} from "../../api/seller";
+import { logout, getCategories } from "../../api/auth";
 import Button from "../../components/common/button/Button";
 import {
   PageContainer,
@@ -49,11 +56,10 @@ function ProductRegister() {
   const [userInfo, setUserInfo] = useState(null);
   const [isOpen, setIsOpen] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [products, setProducts] = useState(() => {
-    const savedProducts = localStorage.getItem("sellerProducts");
-    return savedProducts ? JSON.parse(savedProducts) : [];
-  });
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [menuName, setMenuName] = useState("");
   const [expiryYear, setExpiryYear] = useState("");
@@ -65,15 +71,82 @@ function ProductRegister() {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState("");
 
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+
+  const toggleCategory = (category) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const fetchCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const categoriesData = await getCategories();
+      setCategories(categoriesData);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+      setCategories([
+        { id: 1, name: "식자재" },
+        { id: 2, name: "한식" },
+        { id: 3, name: "중식" },
+        { id: 4, name: "일식" },
+        { id: 5, name: "양식" },
+        { id: 6, name: "분식" },
+        { id: 7, name: "카페/음료" },
+        { id: 8, name: "패스트푸드" },
+        { id: 9, name: "치킨" },
+        { id: 10, name: "피자" },
+        { id: 11, name: "베이커리" },
+        { id: 12, name: "기타" },
+      ]);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target.result);
+        setSelectedImageFile(file);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      const productsData = await getSellerProducts();
+      setProducts(productsData);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      alert("상품 목록을 불러오는데 실패했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem("sellerProducts", JSON.stringify(products));
-  }, [products]);
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const data = await getSellerMe();
         setUserInfo(data);
+
+        // 상점 정보도 함께 가져와서 영업상태 설정
+        if (data.store) {
+          setIsOpen(data.store.is_open);
+        }
       } catch (err) {
         console.error("Failed to fetch user info:", err);
         navigate("/signin-seller");
@@ -81,6 +154,10 @@ function ProductRegister() {
     };
     fetchUserInfo();
   }, [navigate]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -100,34 +177,6 @@ function ProductRegister() {
     setSheetOpen(false);
   };
 
-  const categories = [
-    "식자재",
-    "한식",
-    "중식",
-    "일식",
-    "양식",
-    "분식",
-    "카페/음료",
-    "패스트푸드",
-    "치킨",
-    "피자",
-    "베이커리",
-    "기타",
-  ];
-
-  const toggleCategory = (cat) => {
-    setSelectedCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-  };
-
   const parsedBase = Number(basePrice) || 0;
   const parsedPercent = Math.min(
     100,
@@ -142,8 +191,30 @@ function ProductRegister() {
     }
   }, [parsedBase, parsedPercent, finalPrice]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 필수 필드 검증
+    if (!menuName.trim()) {
+      alert("메뉴 이름을 입력해주세요.");
+      return;
+    }
+    if (!basePrice || Number(basePrice) <= 0) {
+      alert("원 가격을 입력해주세요.");
+      return;
+    }
+    if (!quantity || Number(quantity) < 1) {
+      alert("수량을 입력해주세요.");
+      return;
+    }
+    if (selectedCategories.length === 0) {
+      alert("카테고리를 선택해주세요.");
+      return;
+    }
+    if (!previewUrl) {
+      alert("이미지를 업로드해주세요.");
+      return;
+    }
 
     try {
       const [timePart, periodPart] = (expiryTime || "12:00 AM").split(" ");
@@ -159,25 +230,32 @@ function ProductRegister() {
       const day = Math.max(1, Math.min(31, parseInt(expiryDay || 1, 10)));
       const expiryDate = new Date(year, month, day, hh, mm || 0, 0, 0);
 
-      const newProduct = {
-        id: Date.now(),
-        name: menuName,
-        categories: selectedCategories,
-        expiryTime: expiryDate.getTime(), // 유통기한을 타임스탬프로 저장
-        expiryISO: expiryDate.toISOString(),
-        basePrice: parsedBase,
-        discountPercent: parsedPercent,
-        finalPrice: Number(finalPrice || 0),
-        description,
-        quantity: Number(quantity || 0),
-        imageUrl: previewUrl,
-        onSale: true,
-      };
+      const formData = new FormData();
+      formData.append("name", menuName);
+      formData.append("price", Number(basePrice || 0));
+      formData.append("discount_price", Number(finalPrice || basePrice || 0));
+      formData.append("description", description || "");
+      formData.append(
+        "category",
+        selectedCategories.length > 0
+          ? categories.find((cat) => cat.name === selectedCategories[0])?.id ||
+              1
+          : 1
+      );
+      formData.append("stock", Number(quantity || 1));
+      formData.append("expiration_date", expiryDate.toISOString());
+      if (selectedImageFile) {
+        formData.append("image", selectedImageFile);
+      }
 
-      setProducts((prev) => [newProduct, ...prev]);
+      const newProduct = await createProduct(formData);
+
+      await fetchProducts();
+
       setSheetOpen(false);
 
       setPreviewUrl("");
+      setSelectedImageFile(null);
       setSelectedCategories([]);
       setMenuName("");
       setExpiryYear("");
@@ -189,20 +267,63 @@ function ProductRegister() {
       setFinalPrice("");
       setDescription("");
       setQuantity("");
+
+      alert("상품이 성공적으로 등록되었습니다!");
     } catch (err) {
       console.error("상품 등록 처리 오류", err);
-      alert("입력값을 확인해주세요.");
+      alert(err.message || "상품 등록에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
-  const handleDeleteProduct = (id) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  const handleDeleteProduct = async (id) => {
+    if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) {
+      try {
+        await deleteProduct(id);
+        alert("상품이 삭제되었습니다.");
+        await fetchProducts();
+      } catch (err) {
+        console.error("상품 삭제 실패:", err);
+        alert(err.message || "상품 삭제에 실패했습니다.");
+      }
+    }
   };
 
   const handleToggleSale = (id) => {
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, onSale: !p.onSale } : p))
     );
+  };
+
+  const handleToggleOpenStatus = async () => {
+    try {
+      console.log("현재 영업 상태:", isOpen);
+      console.log("영업 상태 변경 요청 중...");
+
+      const result = await toggleStoreStatus();
+      console.log("API 응답:", result);
+
+      if (result && typeof result.is_open === "boolean") {
+        setIsOpen(result.is_open);
+        alert(
+          `영업 상태가 ${
+            result.is_open ? "영업중" : "마감"
+          }으로 변경되었습니다.`
+        );
+        console.log("영업 상태 업데이트 완료:", result.is_open);
+      } else {
+        const fallbackMsg =
+          "상점 정보가 없습니다. 상점 등록을 먼저 완료하세요.";
+        alert(fallbackMsg);
+        navigate("/store-registration");
+      }
+    } catch (err) {
+      console.error("Failed to toggle store status:", err);
+      const msg = err?.message || "영업 상태 변경에 실패했습니다.";
+      alert(msg);
+      if (typeof msg === "string" && msg.includes("상점")) {
+        navigate("/store-registration");
+      }
+    }
   };
 
   return (
@@ -212,7 +333,7 @@ function ProductRegister() {
         <OpenStatusSection>
           <Button
             variant={isOpen ? "open" : "close"}
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={handleToggleOpenStatus}
           >
             {isOpen ? "open" : "close"}
           </Button>
@@ -226,7 +347,9 @@ function ProductRegister() {
           <SectionTitle className="active">상품 등록</SectionTitle>
         </SectionTitleWrapper>
 
-        {products.length === 0 ? (
+        {isLoading ? (
+          <EmptyMessage>상품 목록을 불러오는 중입니다...</EmptyMessage>
+        ) : products.length === 0 ? (
           <EmptyMessage>아직 등록된 메뉴가 없습니다.</EmptyMessage>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -234,6 +357,7 @@ function ProductRegister() {
               <ProductCard
                 key={p.id}
                 product={p}
+                categories={categories}
                 onDelete={handleDeleteProduct}
                 onToggleSale={handleToggleSale}
               />
@@ -297,18 +421,24 @@ function ProductRegister() {
                   <Label>
                     메뉴 카테고리<span className="req">*</span>
                   </Label>
-                  <ChipGroup>
-                    {categories.map((cat) => (
-                      <Chip
-                        key={cat}
-                        type="button"
-                        $active={selectedCategories.includes(cat)}
-                        onClick={() => toggleCategory(cat)}
-                      >
-                        {cat}
-                      </Chip>
-                    ))}
-                  </ChipGroup>
+                  {categoriesLoading ? (
+                    <div style={{ padding: "12px", color: "#666" }}>
+                      카테고리를 불러오는 중...
+                    </div>
+                  ) : (
+                    <ChipGroup>
+                      {categories.map((cat) => (
+                        <Chip
+                          key={cat.id}
+                          type="button"
+                          $active={selectedCategories.includes(cat.name)}
+                          onClick={() => toggleCategory(cat.name)}
+                        >
+                          {cat.name}
+                        </Chip>
+                      ))}
+                    </ChipGroup>
+                  )}
                 </Field>
 
                 <Field>

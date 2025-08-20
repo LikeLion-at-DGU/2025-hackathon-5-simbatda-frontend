@@ -159,12 +159,6 @@ export async function getConsumerMe() {
   return data;
 }
 
-export async function getSellerMe() {
-  const mockApi = (await import("../mocks/mockApi.js")).default;
-  const response = await mockApi.getSellerMe();
-  return response.data;
-}
-
 // 상점 정보 저장 API - 1단계
 export async function createStore(storeData) {
   const res = await apiRequest("/stores/signup/step1/", {
@@ -224,4 +218,13 @@ export async function uploadDocuments(documents, storeId) {
     throw data;
   }
   return data;
+}
+
+// 카테고리 목록 조회 API
+export async function getCategories() {
+  const res = await apiRequest("/categories/", { auth: false });
+  if (!res.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+  return res.json();
 }

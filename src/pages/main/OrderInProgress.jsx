@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSellerMe, logout } from "../../api/auth";
+import { getSellerMe } from "../../api/seller";
+import { logout } from "../../api/auth";
 import OrderProgressCard from "../../components/order/OrderProgressCard";
 import Button from "../../components/common/button/Button";
 import {
