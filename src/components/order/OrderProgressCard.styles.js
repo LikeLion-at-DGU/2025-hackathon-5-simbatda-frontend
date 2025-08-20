@@ -3,10 +3,12 @@ import styled, { css } from "styled-components";
 export const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   padding: 16px;
   border-radius: 10px;
   background: #eae7e3;
+  position: relative;
+  min-height: 140px;
 `;
 
 export const CardHeader = styled.div`
@@ -16,7 +18,13 @@ export const CardHeader = styled.div`
   gap: 16px;
 `;
 
-export const OrderMeta = styled.div`
+export const LeftSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+export const Timestamp = styled.div`
   color: #5d5752;
   font-family: Pretendard;
   font-size: 12px;
@@ -25,25 +33,15 @@ export const OrderMeta = styled.div`
 `;
 
 export const OrderTitle = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   color: #5d5752;
   font-family: Pretendard;
   font-size: 18px;
   font-weight: 800;
   align-self: stretch;
-
-  span {
-    color: #5d5752;
-    font-family: Pretendard;
-    font-size: 18px;
-    font-weight: 600;
-    align-self: stretch;
-  }
+  margin-top: 8px;
 `;
 
-export const RightColumn = styled.div`
+export const RightSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -56,7 +54,7 @@ export const StatusBadge = styled.div`
   color: #fff;
   font-weight: 700;
   font-size: 16px;
-  min-width: 115px;
+  min-width: 95px;
   text-align: center;
 
   ${(p) =>
@@ -73,28 +71,46 @@ export const StatusBadge = styled.div`
         `};
 `;
 
-export const PickupTime = styled.div`
-  color: #5d5752;
-  text-align: center;
-  font-family: Pretendard;
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 16px;
+export const OrderInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: flex-start;
+  gap: 8px;
 `;
 
-export const CardBody = styled.div`
+export const InfoRow = styled.div`
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: 16px;
-  margin-top: -45px;
+`;
+
+export const InfoLabel = styled.div`
+  color: #5d5752;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 400;
+`;
+
+export const InfoValue = styled.div`
+  color: #5d5752;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 600;
 `;
 
 export const Steps = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   width: 100%;
-  gap: 10px;
+  gap: 16px;
+  margin-top: 10px;
+  margin-bottom: 23px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
 `;
 
 export const Step = styled.div`
@@ -102,22 +118,13 @@ export const Step = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 8px;
-
-  color: rgb(0, 0, 0);
+  flex: 1;
+  color: ${(p) => (p.$done ? "#000" : "#999")};
   text-align: center;
-  font-feature-settings: "liga" off, "clig" off;
   font-family: Pretendard;
   font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-
-  ${(p) =>
-    p.$done &&
-    css`
-      color: #000;
-      font-weight: 400;
-    `};
+  font-weight: ${(p) => (p.$done ? "600" : "400")};
+  transition: all 0.2s ease;
 `;
 
 export const StepCheck = styled.span`
@@ -128,6 +135,9 @@ export const StepCheck = styled.span`
   align-items: center;
   justify-content: center;
   line-height: 1;
+  background: ${(p) => (p.$done ? "#37ca79" : "#e0e0e0")};
+  transition: all 0.2s ease;
+  order: -1;
 
   img {
     display: flex;
@@ -145,10 +155,11 @@ export const DetailRow = styled.div`
   justify-content: flex-end;
   gap: 4px;
   padding: 2px 0;
-  margin-top: 16px;
-  margin-bottom: -20px;
   cursor: pointer;
   user-select: none;
+  position: absolute;
+  bottom: 10px;
+  right: 16px;
 
   &:hover {
     opacity: 0.7;

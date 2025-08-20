@@ -31,7 +31,7 @@ export const OrderList = styled.div`
 export const DateSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
 `;
 
 export const DateHeader = styled.div`
