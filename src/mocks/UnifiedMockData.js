@@ -154,6 +154,7 @@ export const unifiedMockData = {
       origin: "국내산",
       storage: "냉장 보관",
       expiryDate: "구매 후 7일",
+      expiryTime: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7일 후 유통기한
       allergens: ["없음"],
       images: ["product1.jpg", "product1_detail.jpg"],
       tags: ["김치찌개", "1인분", "조리용", "밑반찬"],
@@ -183,6 +184,7 @@ export const unifiedMockData = {
       origin: "국내산",
       storage: "냉장 보관",
       expiryDate: "구매 후 7일",
+      expiryTime: Date.now() + 5 * 24 * 60 * 60 * 1000, // 5일 후 유통기한
       allergens: ["없음"],
       images: ["product2.jpg", "product2_detail.jpg"],
       tags: ["김치찌개", "2인분", "가족용"],
@@ -212,6 +214,7 @@ export const unifiedMockData = {
       origin: "국내산",
       storage: "냉장 보관",
       expiryDate: "구매 후 7일",
+      expiryTime: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7일 후 유통기한
       allergens: ["대두"],
       images: ["product3.jpg"],
       tags: ["된장찌개", "1인분", "구수한"],
@@ -822,6 +825,7 @@ export const mockUtils = {
       );
       return {
         ...item,
+        productId: item.productId, // productId 추가
         productName: product?.name || "상품명 없음",
         productImage: product?.images?.[0] || "",
       };
@@ -831,9 +835,8 @@ export const mockUtils = {
       ...order,
       storeName: store?.name || "상점명 없음",
       storeAddress: store?.address || "",
+      storePhone: store?.phone || "000-000-0000",
       items: itemsWithProducts,
-      pickupDate: "2025-01-20", // 실제로는 예약 정보에서 가져와야 함
-      pickupTime: "14:00 - 15:00", // 실제로는 예약 정보에서 가져와야 함
     };
   },
 
