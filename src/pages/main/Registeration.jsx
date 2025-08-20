@@ -159,6 +159,10 @@ const Registeration = () => {
     console.log(`상품 ${productId} 좋아요 ${!isLiked ? "추가" : "제거"}`);
   };
 
+  const handleStoreClick = () => {
+    navigate(`/store/${store.id}`);
+  };
+
   if (!product || !store) {
     return <div>상품을 찾을 수 없습니다.</div>;
   }
@@ -182,7 +186,7 @@ const Registeration = () => {
       </ProductImageContainer>
 
       {/* 상점명 */}
-      <StoreName>{store.name}</StoreName>
+      <StoreName onClick={handleStoreClick}>{store.name} {" >"}</StoreName>
 
       {/* 상품명 */}
       <ProductName>{product.name}</ProductName>
@@ -268,7 +272,9 @@ const Registeration = () => {
               {/* 상품 정보 */}
               <ProductInfoSection>
                 <ProductDetails>
-                  <StoreNameSmall>{store.name}</StoreNameSmall>
+                  <StoreNameSmall onClick={handleStoreClick}>
+                    {store.name}
+                  </StoreNameSmall>
 
                   <QuantitySelector>
                     <ProductNameSmall>{product.name}</ProductNameSmall>
@@ -383,7 +389,9 @@ const Registeration = () => {
                   원
                 </strong>
               </ModalPriceInfo>
-              <ModalNotice>예약하신 상품은 예약 취소가 불가능합니다.</ModalNotice>
+              <ModalNotice>
+                예약하신 상품은 예약 취소가 불가능합니다.
+              </ModalNotice>
             </ModalContent>
             <ModalActions>
               <CancelButton onClick={handleCancelReservation}>
