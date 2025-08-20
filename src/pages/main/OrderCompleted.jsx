@@ -29,13 +29,13 @@ export default function OrderCompleted() {
         createdAt: "오후 8시 33분",
         orderNumber: "B12345",
         itemSummary: "김치찌개 1인분 1개",
-        pickupTime: "오후 9시",
+        pickupTime: "오후 9시 픽업",
       },
       {
         createdAt: "오후 8시 33분",
         orderNumber: "B12346",
         itemSummary: "김치찌개 1인분 1개",
-        pickupTime: "오후 9시",
+        pickupTime: "오후 9시 픽업",
       },
     ],
     "2025.08.05": [
@@ -43,7 +43,7 @@ export default function OrderCompleted() {
         createdAt: "오후 8시 33분",
         orderNumber: "B12347",
         itemSummary: "김치찌개 1인분 1개",
-        pickupTime: "오후 9시",
+        pickupTime: "오후 9시 픽업",
       },
     ],
   };
