@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import menuIcon from "../../../assets/icons/menu.png";
 import starsquirrelIcon from "../../../assets/icons/starsquirrel.png";
 import LocationIcon from "../../../assets/icons/Location.png";
@@ -39,6 +40,7 @@ const PageTitle = styled.h1`
 `;
 
 const WishListHeader = ({ userInfo, onLogout }) => {
+  const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
 
@@ -66,7 +68,7 @@ const WishListHeader = ({ userInfo, onLogout }) => {
   return (
     <>
       <HeaderContainer>
-        <Brand>
+        <Brand onClick={() => navigate("/")}>
           <BrandLogo src={textLogo} alt="심봤다" />
         </Brand>
         <PageTitle>찜 목록</PageTitle>
@@ -90,23 +92,23 @@ const WishListHeader = ({ userInfo, onLogout }) => {
           </ProfileInfo>
         </DrawerHeader>
         <DrawerList>
-          <DrawerItem>
+          <DrawerItem onClick={() => navigate("/inventory-map")}>
             <img src={LocationIcon} alt="재고지도" width={20} height={20} />
             재고 지도
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={() => navigate("/special-price")}>
             <img src={DiscountIcon} alt="특가상품" width={20} height={20} />
             특가 상품
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={() => navigate("/recommended")}>
             <img src={GoodQualityIcon} alt="추천상품" width={20} height={20} />
             추천 상품
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={() => navigate("/order-history")}>
             <img src={BillIcon} alt="예약내역" width={20} height={20} />
             예약 내역
           </DrawerItem>
-          <DrawerItem>
+          <DrawerItem onClick={() => navigate("/wishlist")}>
             <img src={FavoriteIcon} alt="찜" width={20} height={20} />찜
           </DrawerItem>
         </DrawerList>

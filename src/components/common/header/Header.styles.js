@@ -5,7 +5,7 @@ const HeaderContainer = styled.header`
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background-color: inherit;
+  background-color: #f5f5f5;
   position: fixed;
   top: 0;
   left: 0;
@@ -17,6 +17,7 @@ const Brand = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
 `;
 
 const BrandLogo = styled.img`
@@ -24,12 +25,13 @@ const BrandLogo = styled.img`
 `;
 
 const HeaderTitle = styled.h1`
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
   margin: 0;
   flex: 1;
   text-align: center;
+  font-family: Pretendard;
 `;
 
 const HamburgerButton = styled.button`

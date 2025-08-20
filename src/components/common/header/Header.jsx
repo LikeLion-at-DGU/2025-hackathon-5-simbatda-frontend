@@ -57,7 +57,7 @@ const Header = ({ userInfo, onLogout, title }) => {
   };
 
   const handleLogoClick = () => {
-    navigate("/mainpage");
+    navigate("/");
   };
 
   const handleInventoryMap = () => {
@@ -76,21 +76,15 @@ const Header = ({ userInfo, onLogout, title }) => {
   };
 
   const handleFavorites = () => {
-    // TODO: 찜 페이지 구현 후 링크 연결
-    console.log("찜 페이지로 이동");
+    navigate("/wishlist");
     setDrawerOpen(false);
   };
 
   return (
     <>
       <HeaderContainer>
-        <Brand>
-          <BrandLogo
-            src={textLogo}
-            alt="심봤다"
-            onClick={handleLogoClick}
-            style={{ cursor: "pointer" }}
-          />
+        <Brand onClick={handleLogoClick}>
+          <BrandLogo src={textLogo} alt="심봤다" />
         </Brand>
         {title && <HeaderTitle>{title}</HeaderTitle>}
         <HamburgerButton
