@@ -17,6 +17,7 @@ import Registeration from "./pages/main/Registeration.jsx";
 import OrderHistory from "./pages/main/OrderHistory.jsx";
 import SpecialPricePage from "./pages/products/SpecialPricePage.jsx";
 import RecommendedPage from "./pages/products/RecommendedPage.jsx";
+import StoreDetail from "./pages/store/StoreDetail.jsx";
 import Splash from "./pages/common/Splash.jsx";
 import WishList from "./pages/main/WishList.jsx";
 import ProtectedRoute from "./components/common/ProtectedRoute.jsx";
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
       { path: "order-history", element: <OrderHistory /> },
       { path: "special-price", element: <SpecialPricePage /> },
       { path: "recommended", element: <RecommendedPage /> },
+      { path: "store/:storeId", element: <StoreDetail /> },
       {
         path: "store-registration",
         element: <StoreRegistration />,
