@@ -9,6 +9,7 @@ import MainPage from "./pages/main/MainPage.jsx";
 import MainPageSeller from "./pages/main/MainPageSeller.jsx";
 import OrderInProgress from "./pages/main/OrderInProgress.jsx";
 import OrderDetail from "./pages/main/OrderDetail.jsx";
+import CustomerOrderDetail from "./pages/main/CustomerOrderDetail.jsx";
 import OrderCompleted from "./pages/main/OrderCompleted.jsx";
 import StoreRegistration from "./pages/auth/StoreRegistration.jsx";
 import StoreDocumentUpload from "./pages/auth/StoreDocumentUpload.jsx";
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       { path: "mainpage-seller", element: <MainPageSeller /> },
       { path: "order-in-progress", element: <OrderInProgress /> },
       { path: "order-detail", element: <OrderDetail /> },
+      {
+        path: "customer-order-detail/:orderId",
+        element: <CustomerOrderDetail />,
+      },
       { path: "order-completed", element: <OrderCompleted /> },
       { path: "dashboard", element: <div>대시보드</div> },
       { path: "inventory", element: <div>재고관리</div> },
