@@ -49,5 +49,9 @@ export default defineConfig({
   },
   define: {
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+
+    __ROUTER_FUTURE_FLAGS__: JSON.stringify({
+      v7_startTransition: true,
+    }),
   },
 });

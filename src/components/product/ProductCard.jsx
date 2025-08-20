@@ -36,46 +36,57 @@ function formatRemain(expiry) {
   return `D-${days}, ${hours}:${minutes}:${seconds} 남음`;
 }
 
-export default function ProductCard({ product, onDelete }) {
+export default function ProductCard({ product, categories, onDelete }) {
   const [remainText, setRemainText] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const expiry = useMemo(
-    () => new Date(product.expiryISO),
-    [product.expiryISO]
-  );
+  const productStock = product.stock || 0;
+  const productExpiry = product.expiration_date
+    ? new Date(product.expiration_date)
+    : null;
+  const productPrice = product.price || 0;
+
+  const productCategory =
+    categories?.find((cat) => cat.id === product.category)?.name || "기타";
+
+  const productImage = product.image || product.imageUrl;
 
   useEffect(() => {
-    setRemainText(formatRemain(expiry));
-    const timer = setInterval(() => setRemainText(formatRemain(expiry)), 1000);
-    return () => clearInterval(timer);
-  }, [expiry]);
+    if (productExpiry) {
+      setRemainText(formatRemain(productExpiry));
+      const timer = setInterval(
+        () => setRemainText(formatRemain(productExpiry)),
+        1000
+      );
+      return () => clearInterval(timer);
+    }
+  }, [productExpiry]);
 
   return (
     <CardContainer>
-      <StockNotice $low={Number(product.quantity) <= 1}>
+      <StockNotice $low={productStock <= 1}>
         <span>
-          현재 재고 {String(product.quantity).padStart(2, "")}개 남았습니다
+          현재 재고 {String(productStock).padStart(2, "")}개 남았습니다
         </span>
       </StockNotice>
 
       <CardBody>
         <LeftColumn>
           <Preview>
-            {product.imageUrl ? (
-              <img src={product.imageUrl} alt={product.name} />
+            {productImage ? (
+              <img src={productImage} alt={product.name} />
             ) : (
               <span>이미지 등록 필요</span>
             )}
           </Preview>
           <Meta>
-            <Category>{product.categories?.[0] || "기타"}</Category>
+            <Category>{productCategory}</Category>
             <Title>{product.name}</Title>
             {product.description && (
               <Description>{product.description}</Description>
             )}
+            {productExpiry && <ExpireLabel>{remainText}</ExpireLabel>}
           </Meta>
-          <ExpireLabel>{remainText}</ExpireLabel>
         </LeftColumn>
 
         <RightColumn>
@@ -98,7 +109,7 @@ export default function ProductCard({ product, onDelete }) {
           </div>
 
           <FooterRow>
-            <Price>{Number(product.finalPrice || 0).toLocaleString()}원</Price>
+            <Price>{productPrice.toLocaleString()}원</Price>
           </FooterRow>
         </RightColumn>
       </CardBody>
