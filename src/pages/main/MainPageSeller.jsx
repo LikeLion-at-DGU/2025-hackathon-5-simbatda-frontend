@@ -6,7 +6,6 @@ import {
   getSellerOrders,
   acceptOrder,
   rejectOrder,
-  toggleStoreStatus,
 } from "../../api/seller";
 import { logout } from "../../api/auth";
 import Button from "../../components/common/button/Button";
@@ -35,15 +34,16 @@ import {
 } from "./MainPageSeller.styles";
 
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
+import { useStoreStatus } from "../../hooks/useStoreStatus";
 
 import ImportantIcon from "../../assets/icons/Important.png";
 import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 function MainPageSeller() {
   const navigate = useNavigate();
+  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
   const [userInfo, setUserInfo] = useState(null);
   const [storeInfo, setStoreInfo] = useState(null);
-  const [isOpen, setIsOpen] = useState(true);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [currentRejectOrder, setCurrentRejectOrder] = useState(null);
@@ -82,9 +82,8 @@ function MainPageSeller() {
         ]);
         setUserInfo(userData);
         setStoreInfo(storeData);
-        if (storeData && storeData.length > 0) {
-          setIsOpen(storeData[0].is_open);
-        }
+        // storeData에서 영업 상태를 가져오지만, 커스텀 훅에서 관리
+        // setIsOpen(storeData[0].is_open);
       } catch (err) {
         console.error("Failed to fetch user/store info:", err);
         navigate("/signin-seller");
@@ -186,38 +185,6 @@ function MainPageSeller() {
     } catch (err) {
       console.error("Failed to logout:", err);
       alert("로그아웃 중 오류가 발생했습니다.");
-    }
-  };
-
-  const handleToggleOpenStatus = async () => {
-    try {
-      console.log("현재 영업 상태:", isOpen);
-      console.log("영업 상태 변경 요청 중...");
-
-      const result = await toggleStoreStatus();
-      console.log("API 응답:", result);
-
-      if (result && typeof result.is_open === "boolean") {
-        setIsOpen(result.is_open);
-        alert(
-          `영업 상태가 ${
-            result.is_open ? "영업중" : "마감"
-          }으로 변경되었습니다.`
-        );
-        console.log("영업 상태 업데이트 완료:", result.is_open);
-      } else {
-        const fallbackMsg =
-          "상점 정보가 없습니다. 상점 등록을 먼저 완료하세요.";
-        alert(fallbackMsg);
-        navigate("/store-registration");
-      }
-    } catch (err) {
-      console.error("Failed to toggle store status:", err);
-      const msg = err?.message || "영업 상태 변경에 실패했습니다.";
-      alert(msg);
-      if (typeof msg === "string" && msg.includes("상점")) {
-        navigate("/store-registration");
-      }
     }
   };
 

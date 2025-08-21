@@ -4,6 +4,7 @@ import { getSellerMe } from "../../api/seller";
 import { logout } from "../../api/auth";
 import OrderProgressCard from "../../components/order/OrderProgressCard";
 import Button from "../../components/common/button/Button";
+import { useStoreStatus } from "../../hooks/useStoreStatus";
 import {
   PageContainer,
   Content,
@@ -18,7 +19,7 @@ import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 export default function OrderInProgress() {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(true);
+  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const drawerRef = useRef(null);
@@ -54,7 +55,7 @@ export default function OrderInProgress() {
         <OpenStatusSection>
           <Button
             variant={isOpen ? "open" : "close"}
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={handleToggleOpenStatus}
           >
             {isOpen ? "open" : "close"}
           </Button>

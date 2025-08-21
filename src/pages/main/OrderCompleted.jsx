@@ -4,6 +4,7 @@ import { getSellerMe } from "../../api/seller";
 import { logout } from "../../api/auth";
 import CompletedCard from "../../components/order/CompletedCard";
 import Button from "../../components/common/button/Button";
+import { useStoreStatus } from "../../hooks/useStoreStatus";
 import {
   PageContainer,
   Content,
@@ -20,7 +21,7 @@ import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 export default function OrderCompleted() {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(true);
+  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
   const [userInfo, setUserInfo] = useState(null);
 
   // 샘플 주문 데이터 (날짜별로 그룹화)
@@ -80,7 +81,7 @@ export default function OrderCompleted() {
         <OpenStatusSection>
           <Button
             variant={isOpen ? "open" : "close"}
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={handleToggleOpenStatus}
           >
             {isOpen ? "open" : "close"}
           </Button>
