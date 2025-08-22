@@ -70,7 +70,7 @@ const ProductCard = ({
 
   const discountPriceText = discountPrice.toLocaleString();
 
-  const displayImage = customDefaultImage;
+  const displayImage = imageUrl || customDefaultImage;
 
   const handleLikeClick = (e) => {
     e.stopPropagation();
