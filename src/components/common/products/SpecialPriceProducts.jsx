@@ -19,7 +19,7 @@ const SpecialPriceProducts = ({ products = [] }) => {
   }
 
   const handleMoreClick = () => {
-    navigate("/special-price-products");
+    navigate("/special-price");
   };
 
   const handleProductClick = (productId) => {
