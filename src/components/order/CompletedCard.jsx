@@ -16,7 +16,7 @@ import {
   DetailText,
 } from "./CompletedCard.styles";
 
-export default function CompletedCard({ children, ...props }) {
+export default function CompletedCard({ children, stockInfo, ...props }) {
   const navigate = useNavigate();
 
   return (
@@ -32,20 +32,7 @@ export default function CompletedCard({ children, ...props }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigate("/order-detail", {
-                state: {
-                  orderNumber: children.orderNumber,
-                  createdAt: children.createdAt,
-                  pickupTime: children.pickupTime,
-                  items: [
-                    {
-                      name: children.itemSummary,
-                      qty: 1,
-                      price: 5600,
-                    },
-                  ],
-                },
-              });
+              navigate(`/order-detail/${children.id}`);
             }}
           >
             <DetailText>주문 정보 자세히</DetailText>

@@ -42,3 +42,10 @@ export const DateHeader = styled.div`
   line-height: normal;
   margin-bottom: 4px;
 `;
+
+export const EmptyMessage = styled.div`
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 16px;
+`;

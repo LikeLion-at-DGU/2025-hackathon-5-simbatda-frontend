@@ -46,6 +46,7 @@ export const useStoreStatus = () => {
 
   return {
     isOpen,
+    setIsOpen,
     handleToggleOpenStatus,
   };
 };

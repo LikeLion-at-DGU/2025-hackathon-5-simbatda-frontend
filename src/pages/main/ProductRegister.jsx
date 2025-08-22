@@ -5,6 +5,7 @@ import {
   getSellerProducts,
   createProduct,
   deleteProduct,
+  getSellerStore,
 } from "../../api/seller";
 import { logout, getCategories } from "../../api/auth";
 import Button from "../../components/common/button/Button";
@@ -52,7 +53,7 @@ import ProductCard from "../../components/product/ProductCard";
 
 function ProductRegister() {
   const navigate = useNavigate();
-  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
+  const { isOpen, setIsOpen, handleToggleOpenStatus } = useStoreStatus();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -75,11 +76,12 @@ function ProductRegister() {
   const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   const toggleCategory = (category) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
-    );
+    setSelectedCategories((prev) => {
+      if (prev.includes(category)) {
+        return prev.filter((c) => c !== category);
+      }
+      return [category];
+    });
   };
 
   const fetchCategories = async () => {
@@ -120,14 +122,24 @@ function ProductRegister() {
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (retryCount = 0) => {
     try {
       setIsLoading(true);
       const productsData = await getSellerProducts();
+
       setProducts(productsData);
     } catch (err) {
-      console.error("Failed to fetch products:", err);
-      alert("상품 목록을 불러오는데 실패했습니다.");
+      console.error(" fetchProducts 오류:", err);
+
+      if (err.message && err.message.includes("500")) {
+        if (retryCount < 3) {
+          setTimeout(() => fetchProducts(retryCount + 1), 2000);
+          return;
+        }
+        alert("백엔드 서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.");
+      } else {
+        alert("상품 목록을 불러오는데 실패했습니다.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -138,14 +150,45 @@ function ProductRegister() {
   }, []);
 
   useEffect(() => {
+    const handleFocus = () => {
+      fetchProducts();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    const interval = setInterval(fetchProducts, 9000);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const data = await getSellerMe();
         setUserInfo(data);
 
-        // 상점 정보도 함께 가져와서 영업상태 설정
         if (data.store) {
           setIsOpen(data.store.is_open);
+        } else {
+          try {
+            const storeData = await getSellerStore();
+
+            if (storeData && storeData.length > 0) {
+              const store = storeData[0];
+
+              setUserInfo((prev) => ({
+                ...prev,
+                store: store,
+              }));
+
+              setIsOpen(store.is_open);
+            }
+          } catch (storeErr) {
+            console.error("상점 정보 가져오기 실패:", storeErr);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch user info:", err);
@@ -194,7 +237,6 @@ function ProductRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 필수 필드 검증
     if (!menuName.trim()) {
       alert("메뉴 이름을 입력해주세요.");
       return;
@@ -246,6 +288,9 @@ function ProductRegister() {
       formData.append("expiration_date", expiryDate.toISOString());
       if (selectedImageFile) {
         formData.append("image", selectedImageFile);
+      } else {
+        alert("상품 이미지를 선택해주세요.");
+        return;
       }
 
       const newProduct = await createProduct(formData);
@@ -271,7 +316,27 @@ function ProductRegister() {
       alert("상품이 성공적으로 등록되었습니다!");
     } catch (err) {
       console.error("상품 등록 처리 오류", err);
-      alert(err.message || "상품 등록에 실패했습니다. 다시 시도해주세요.");
+
+      if (err.message && err.message.includes("500")) {
+        alert("백엔드 서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.");
+      } else if (err.response) {
+        const status = err.response.status;
+        if (status === 400) {
+          alert(
+            "입력 데이터에 문제가 있습니다. 모든 필수 항목을 확인해주세요."
+          );
+        } else if (status === 401) {
+          alert("로그인이 필요합니다. 다시 로그인해주세요.");
+        } else if (status === 403) {
+          alert("권한이 없습니다. 가게 등록을 먼저 완료해주세요.");
+        } else if (status >= 500) {
+          alert("백엔드 서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.");
+        } else {
+          alert(err.message || "상품 등록에 실패했습니다. 다시 시도해주세요.");
+        }
+      } else {
+        alert(err.message || "상품 등록에 실패했습니다. 다시 시도해주세요.");
+      }
     }
   };
 
@@ -313,23 +378,39 @@ function ProductRegister() {
             주문 현황
           </SectionTitle>
           <SectionTitle className="active">상품 등록</SectionTitle>
+          <Button
+            variant="accept"
+            onClick={() => fetchProducts()}
+            style={{
+              fontSize: "12px",
+              width: "200px",
+              padding: "6px 12px",
+              marginLeft: "auto",
+              minWidth: "auto",
+              whiteSpace: "nowrap",
+            }}
+          >
+            재고 새로고침
+          </Button>
         </SectionTitleWrapper>
 
         {isLoading ? (
           <EmptyMessage>상품 목록을 불러오는 중입니다...</EmptyMessage>
-        ) : products.length === 0 ? (
+        ) : products.filter((p) => p.stock > 0).length === 0 ? (
           <EmptyMessage>아직 등록된 메뉴가 없습니다.</EmptyMessage>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {products.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={p}
-                categories={categories}
-                onDelete={handleDeleteProduct}
-                onToggleSale={handleToggleSale}
-              />
-            ))}
+            {products
+              .filter((p) => p.stock > 0)
+              .map((p) => (
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  categories={categories}
+                  onDelete={handleDeleteProduct}
+                  onToggleSale={handleToggleSale}
+                />
+              ))}
           </div>
         )}
 
@@ -342,6 +423,7 @@ function ProductRegister() {
               fontWeight: "590",
               padding: "16px 32px",
             }}
+            disabled={!userInfo?.store}
           >
             메뉴 추가
           </Button>
@@ -394,18 +476,34 @@ function ProductRegister() {
                       카테고리를 불러오는 중...
                     </div>
                   ) : (
-                    <ChipGroup>
-                      {categories.map((cat) => (
-                        <Chip
-                          key={cat.id}
-                          type="button"
-                          $active={selectedCategories.includes(cat.name)}
-                          onClick={() => toggleCategory(cat.name)}
-                        >
-                          {cat.name}
-                        </Chip>
-                      ))}
-                    </ChipGroup>
+                    <div>
+                      <ChipGroup>
+                        {categories.map((cat) => {
+                          const isSelected = selectedCategories.includes(
+                            cat.name
+                          );
+                          const hasOtherSelection =
+                            selectedCategories.length > 0 && !isSelected;
+
+                          return (
+                            <Chip
+                              key={cat.id}
+                              type="button"
+                              $active={isSelected}
+                              onClick={() => toggleCategory(cat.name)}
+                              style={{
+                                opacity: hasOtherSelection ? 0.5 : 1,
+                                cursor: hasOtherSelection
+                                  ? "not-allowed"
+                                  : "pointer",
+                              }}
+                            >
+                              {cat.name}
+                            </Chip>
+                          );
+                        })}
+                      </ChipGroup>
+                    </div>
                   )}
                 </Field>
 
@@ -565,6 +663,9 @@ function ProductRegister() {
                       fontWeight: "590",
                       padding: "16px 32px",
                     }}
+                    disabled={
+                      !selectedImageFile || !menuName || !basePrice || !quantity
+                    }
                   >
                     메뉴 추가
                   </Button>

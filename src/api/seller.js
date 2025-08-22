@@ -50,18 +50,47 @@ export async function acceptOrder(orderId) {
 }
 
 export async function rejectOrder(orderId, rejectReason) {
-  const res = await apiRequest(`/reservations/${orderId}/`, {
+  const res = await apiRequest(`/reservations/${orderId}/cancel/`, {
     method: "PATCH",
     auth: true,
     body: {
-      status: "cancel",
-      reject_reason: rejectReason,
+      cancel_reason: rejectReason,
     },
   });
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     console.error("Failed to reject order:", data);
+    throw data;
+  }
+
+  return await res.json();
+}
+
+export async function markOrderReady(orderId) {
+  const res = await apiRequest(`/reservations/${orderId}/ready/`, {
+    method: "PATCH",
+    auth: true,
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    console.error("Failed to mark order ready:", data);
+    throw data;
+  }
+
+  return await res.json();
+}
+
+export async function markOrderPickup(orderId) {
+  const res = await apiRequest(`/reservations/${orderId}/pickup/`, {
+    method: "PATCH",
+    auth: true,
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    console.error("Failed to mark order pickup:", data);
     throw data;
   }
 
@@ -109,10 +138,29 @@ export async function getSellerStore() {
   return res.json();
 }
 
+export async function getProductById(productId) {
+  const res = await apiRequest(`/products/${productId}/`, {
+    method: "GET",
+    auth: true,
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    console.error("Failed to get product:", data);
+    throw data;
+  }
+  return await res.json();
+}
+
 export async function getSellerProducts() {
   const res = await apiRequest("/products/", { auth: true });
   if (!res.ok) {
-    throw new Error("Failed to fetch products");
+    const errorData = await res.json().catch(() => ({}));
+
+    if (res.status === 500) {
+      throw new Error("백엔드 서버 오류 (500): HTML");
+    }
+
+    throw new Error(errorData.detail || "Failed to fetch products");
   }
   return res.json();
 }
@@ -129,6 +177,12 @@ export async function createProduct(productData) {
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
+      console.error("상품 생성 API 에러 상세:", {
+        status: res.status,
+        statusText: res.statusText,
+        errorData: errorData,
+        response: res,
+      });
       throw new Error(
         errorData.detail || errorData.message || "Failed to create product"
       );
@@ -149,6 +203,16 @@ export async function createProduct(productData) {
     formData.append("image", productData.image);
   }
 
+  console.log("상품 생성 요청 데이터:", {
+    name: productData.name,
+    price: productData.price,
+    discount_price: productData.discount_price,
+    category: productData.category,
+    stock: productData.stock,
+    expiration_date: productData.expiration_date,
+    hasImage: !!productData.image,
+  });
+
   const res = await apiRequest("/products/", {
     method: "POST",
     auth: true,
@@ -157,18 +221,31 @@ export async function createProduct(productData) {
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(
+    console.error("상품 생성 API 에러 상세:", {
+      status: res.status,
+      statusText: res.statusText,
+      errorData: errorData,
+      response: res,
+    });
+
+    const error = new Error(
       errorData.detail || errorData.message || "Failed to create product"
     );
+    error.response = res;
+    throw error;
   }
 
   return res.json();
 }
 
 export async function updateProduct(productId, productData) {
+  console.log("updateProduct 호출됨 - 상품 ID:", productId);
+  console.log("전송할 데이터:", productData);
+
   const formData = new FormData();
 
   if (productData instanceof FormData) {
+    console.log("FormData로 업데이트");
     const res = await apiRequest(`/products/${productId}/`, {
       method: "PUT",
       auth: true,
@@ -177,14 +254,16 @@ export async function updateProduct(productId, productData) {
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
+      console.error("FormData 업데이트 실패:", errorData);
       throw new Error(
         errorData.detail || errorData.message || "Failed to update product"
       );
     }
 
-    return res.json();
+    return await res.json();
   }
 
+  console.log("일반 데이터로 업데이트");
   formData.append("name", productData.name);
   formData.append("price", productData.price);
   formData.append("discount_price", productData.discount_price);
@@ -193,8 +272,13 @@ export async function updateProduct(productId, productData) {
   formData.append("stock", productData.stock || 1);
   formData.append("expiration_date", productData.expiration_date);
 
-  if (productData.image) {
+  if (productData.image && productData.image instanceof File) {
     formData.append("image", productData.image);
+  }
+
+  console.log("FormData 내용:");
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
   }
 
   const res = await apiRequest(`/products/${productId}/`, {
@@ -205,12 +289,13 @@ export async function updateProduct(productId, productData) {
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
+    console.error("일반 데이터 업데이트 실패:", errorData);
     throw new Error(
       errorData.detail || errorData.message || "Failed to update product"
     );
   }
 
-  return res.json();
+  return await res.json();
 }
 
 export async function deleteProduct(productId) {
@@ -227,4 +312,39 @@ export async function deleteProduct(productId) {
   }
 
   return { success: true };
+}
+export async function getProductStock(productId) {
+  const res = await apiRequest(`/products/${productId}/`, {
+    method: "GET",
+    auth: true,
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    console.error("Failed to get product stock:", data);
+    throw data;
+  }
+
+  const product = await res.json();
+  return {
+    id: product.id,
+    name: product.name,
+    stock: product.stock,
+    is_active: product.is_active,
+  };
+}
+
+export async function getReservationDetail(reservationId) {
+  const res = await apiRequest(`/reservations/${reservationId}/`, {
+    method: "GET",
+    auth: true,
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    console.error("Failed to get reservation detail:", data);
+    throw data;
+  }
+
+  return await res.json();
 }
