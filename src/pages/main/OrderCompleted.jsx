@@ -126,6 +126,7 @@ export default function OrderCompleted() {
         minute: "2-digit",
         hour12: true,
       }),
+      originalCreatedAt: order.created_at,
       orderNumber:
         order.reservation_number || `B${order.id.toString().padStart(5, "0")}`,
       itemSummary: `${order.product_name || "상품명 없음"} ${order.quantity}개`,
@@ -199,14 +200,20 @@ export default function OrderCompleted() {
               .map(([date, orders]) => (
                 <DateSection key={date}>
                   <DateHeader>{date}</DateHeader>
-                  {orders.map((order, index) => (
-                    <CompletedCard
-                      key={`${date}-${index}`}
-                      stockInfo={order.currentStock}
-                    >
-                      {order}
-                    </CompletedCard>
-                  ))}
+                  {orders
+                    .sort((a, b) => {
+                      const timeA = new Date(a.originalCreatedAt);
+                      const timeB = new Date(b.originalCreatedAt);
+                      return timeB - timeA;
+                    })
+                    .map((order, index) => (
+                      <CompletedCard
+                        key={`${date}-${index}`}
+                        stockInfo={order.currentStock}
+                      >
+                        {order}
+                      </CompletedCard>
+                    ))}
                 </DateSection>
               ))
           )}
