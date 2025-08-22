@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChipsContainer, ChipsWrapper, Chip } from "./CategoryChips.styles";
+import { getCategories } from "../../../api/products";
 
-const categories = [
+const fallbackCategories = [
   "전체",
   "식자재",
   "베이커리",
@@ -13,12 +14,36 @@ const categories = [
   "피자",
   "치킨",
   "패스트푸드",
-  "족발/보쌈",
+  "분식",
   "기타",
 ];
 
 const CategoryChips = ({ onCategoryChange, initialCategory = "전체" }) => {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [categories, setCategories] = useState(["전체"]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadCategories = async () => {
+      try {
+        const list = await getCategories();
+        if (!isMounted) return;
+        const names = Array.isArray(list)
+          ? ["전체", ...list.map((c) => c.name)]
+          : fallbackCategories;
+        setCategories(names);
+      } catch (_) {
+        if (!isMounted) return;
+        setCategories(fallbackCategories);
+      }
+    };
+
+    loadCategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
