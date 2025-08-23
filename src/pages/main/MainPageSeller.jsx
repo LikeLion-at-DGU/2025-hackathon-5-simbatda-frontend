@@ -6,7 +6,6 @@ import {
   getSellerOrders,
   acceptOrder,
   rejectOrder,
-  toggleStoreStatus,
 } from "../../api/seller";
 import { logout } from "../../api/auth";
 import Button from "../../components/common/button/Button";
@@ -35,22 +34,28 @@ import {
 } from "./MainPageSeller.styles";
 
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
+import { useStoreStatus } from "../../hooks/useStoreStatus";
 
 import ImportantIcon from "../../assets/icons/Important.png";
 import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 function MainPageSeller() {
   const navigate = useNavigate();
+  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
   const [userInfo, setUserInfo] = useState(null);
   const [storeInfo, setStoreInfo] = useState(null);
-  const [isOpen, setIsOpen] = useState(true);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [currentRejectOrder, setCurrentRejectOrder] = useState(null);
   const [pendingOrders, setPendingOrders] = useState([]);
   const [orderHistory, setOrderHistory] = useState(() => {
-    const savedHistory = localStorage.getItem("sellerOrderHistory");
-    return savedHistory ? JSON.parse(savedHistory) : [];
+    try {
+      const savedHistory = localStorage.getItem("sellerOrderHistory");
+      return savedHistory ? JSON.parse(savedHistory) : [];
+    } catch (error) {
+      console.error("Failed to parse orderHistory from localStorage:", error);
+      return [];
+    }
   });
   const [isLoading, setIsLoading] = useState(false);
   const [newOrderAlert, setNewOrderAlert] = useState(null);
@@ -82,9 +87,6 @@ function MainPageSeller() {
         ]);
         setUserInfo(userData);
         setStoreInfo(storeData);
-        if (storeData && storeData.length > 0) {
-          setIsOpen(storeData[0].is_open);
-        }
       } catch (err) {
         console.error("Failed to fetch user/store info:", err);
         navigate("/signin-seller");
@@ -103,12 +105,13 @@ function MainPageSeller() {
         reservation_number: `B${order.id.toString().padStart(5, "0")}`,
         product_name: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
-        price: order.product?.price || 0,
+        price: order.product?.total_price || order.total_price || 0,
         created_at: order.created_at,
         pickup_time: order.reserved_at || order.created_at,
         status: order.status,
         consumer: order.consumer,
         product: order.product,
+        ...order,
       }));
 
       const pending = transformedOrders.filter(
@@ -137,23 +140,38 @@ function MainPageSeller() {
       setPreviousOrderCount(pending.length);
 
       setPendingOrders(pending);
-
       const existingHistory = orderHistoryRef.current.filter(
         (hist) => !transformedOrders.some((order) => order.id === hist.id)
       );
 
-      const newHistory = others.map((order) => ({
-        ...order,
-        action_time: order.reserved_at || order.created_at,
-        action_type:
-          order.status === "confirm"
-            ? "accepted"
-            : order.status === "cancel"
-            ? "rejected"
-            : order.status,
-      }));
+      const newHistory = others.map((order) => {
+        const existingOrder = orderHistoryRef.current.find(
+          (h) => h.id === order.id
+        );
+
+        let actionType;
+        if (existingOrder?.action_type === "accepted") {
+          actionType = "accepted";
+        } else if (existingOrder?.action_type === "rejected") {
+          actionType = "rejected";
+        } else {
+          actionType =
+            order.status === "confirm"
+              ? "accepted"
+              : order.status === "cancel"
+              ? "rejected"
+              : order.status;
+        }
+
+        return {
+          ...order,
+          action_time: order.reserved_at || order.created_at,
+          action_type: actionType,
+        };
+      });
 
       const combinedHistory = [...newHistory, ...existingHistory];
+
       const uniqueHistory = combinedHistory.filter(
         (order, index, self) =>
           index === self.findIndex((o) => o.id === order.id)
@@ -189,56 +207,26 @@ function MainPageSeller() {
     }
   };
 
-  const handleToggleOpenStatus = async () => {
-    try {
-      console.log("현재 영업 상태:", isOpen);
-      console.log("영업 상태 변경 요청 중...");
-
-      const result = await toggleStoreStatus();
-      console.log("API 응답:", result);
-
-      if (result && typeof result.is_open === "boolean") {
-        setIsOpen(result.is_open);
-        alert(
-          `영업 상태가 ${
-            result.is_open ? "영업중" : "마감"
-          }으로 변경되었습니다.`
-        );
-        console.log("영업 상태 업데이트 완료:", result.is_open);
-      } else {
-        const fallbackMsg =
-          "상점 정보가 없습니다. 상점 등록을 먼저 완료하세요.";
-        alert(fallbackMsg);
-        navigate("/store-registration");
-      }
-    } catch (err) {
-      console.error("Failed to toggle store status:", err);
-      const msg = err?.message || "영업 상태 변경에 실패했습니다.";
-      alert(msg);
-      if (typeof msg === "string" && msg.includes("상점")) {
-        navigate("/store-registration");
-      }
-    }
-  };
-
   const handleAddMenu = () => {
     navigate("/product-register");
   };
 
   const handleAcceptOrder = async (orderId) => {
     try {
-      await acceptOrder(orderId);
+      const order = pendingOrders.find((o) => o.id === orderId);
+      if (!order) {
+        console.error("주문을 찾을 수 없습니다:", orderId);
+        return;
+      }
 
-      alert("주문을 접수했습니다!");
+      await acceptOrder(orderId);
 
       await fetchOrders();
 
-      setTimeout(() => {
-        navigate("/order-in-progress");
-      }, 1000);
+      navigate("/order-in-progress");
     } catch (err) {
       console.error("Failed to accept order:", err);
-      alert("주문 접수에 실패했습니다.");
+      alert("주문 수락에 실패했습니다.");
     }
   };
 
@@ -251,7 +239,7 @@ function MainPageSeller() {
   const handleConfirmReject = async () => {
     if (currentRejectOrder) {
       try {
-        await rejectOrder(
+        const rejectResult = await rejectOrder(
           currentRejectOrder.id,
           rejectReason || "상품이 방금 품절됐어요ㅠㅠ!"
         );
@@ -333,22 +321,42 @@ function MainPageSeller() {
           <EmptyMessage>아직 주문 접수된 건이 없어요</EmptyMessage>
         ) : (
           <OrdersContainer>
-            {allOrders.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onAccept={
-                  order.status === "pending" ? handleAcceptOrder : undefined
-                }
-                onReject={
-                  order.status === "pending" ? handleRejectOrder : undefined
-                }
-                isHistory={order.status !== "pending"}
-                actionType={order.action_type}
-                actionTime={order.action_time}
-                rejectReason={order.reject_reason}
-              />
-            ))}
+            {allOrders.map((order) => {
+              let actionType;
+              if (order.status === "pending") {
+                actionType = undefined;
+              } else if (order.status === "confirm") {
+                actionType = "accepted";
+              } else if (order.status === "cancel") {
+                actionType = "rejected";
+              } else if (order.status === "ready") {
+                actionType = "ready";
+              } else if (order.status === "pickup") {
+                actionType = "pickup";
+              }
+
+              const isHistory = order.status !== "pending";
+
+              const historyOrder = orderHistory.find((h) => h.id === order.id);
+              const finalActionType = historyOrder?.action_type || actionType;
+
+              return (
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  onAccept={
+                    order.status === "pending" ? handleAcceptOrder : undefined
+                  }
+                  onReject={
+                    order.status === "pending" ? handleRejectOrder : undefined
+                  }
+                  isHistory={isHistory}
+                  actionType={finalActionType}
+                  actionTime={order.reserved_at || order.created_at}
+                  rejectReason={order.cancel_reason}
+                />
+              );
+            })}
           </OrdersContainer>
         )}
       </Content>
@@ -372,7 +380,11 @@ function MainPageSeller() {
                     <div>{currentRejectOrder.product_name}</div>
                     <div>{currentRejectOrder.quantity}</div>
                     <div>
-                      {currentRejectOrder.price?.toLocaleString() || 0}원
+                      {currentRejectOrder.product?.total_price?.toLocaleString() ||
+                        currentRejectOrder.total_price?.toLocaleString() ||
+                        currentRejectOrder.price?.toLocaleString() ||
+                        0}
+                      원
                     </div>
                   </RejectOrderInfo>
                 </RejectInfo>

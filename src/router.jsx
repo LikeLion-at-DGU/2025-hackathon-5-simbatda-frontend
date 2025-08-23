@@ -56,7 +56,14 @@ const router = createBrowserRouter([
       { path: "store-document-upload", element: <StoreDocumentUpload /> },
       { path: "mainpage-seller", element: <MainPageSeller /> },
       { path: "order-in-progress", element: <OrderInProgress /> },
-      { path: "order-detail", element: <OrderDetail /> },
+      {
+        path: "order-detail/:id",
+        element: (
+          <SellerProtectedRoute>
+            <OrderDetail />
+          </SellerProtectedRoute>
+        ),
+      },
       {
         path: "customer-order-detail/:orderId",
         element: <CustomerOrderDetail />,

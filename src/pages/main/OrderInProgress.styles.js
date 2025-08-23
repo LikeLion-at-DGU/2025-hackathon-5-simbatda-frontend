@@ -24,3 +24,10 @@ export const OrderList = styled.div`
   flex-direction: column;
   gap: 6px;
 `;
+
+export const EmptyMessage = styled.div`
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 16px;
+`;

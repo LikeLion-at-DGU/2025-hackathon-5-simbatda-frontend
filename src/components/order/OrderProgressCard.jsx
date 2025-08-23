@@ -36,8 +36,10 @@ function StepCheckIcon({ done }) {
 }
 
 export default function OrderProgressCard({
-  variant = "action",
   children,
+  variant = "action",
+  onReady,
+  onPickup,
   ...props
 }) {
   const navigate = useNavigate();
@@ -45,12 +47,20 @@ export default function OrderProgressCard({
     switch (variant) {
       case "action":
         return "준비 완료";
-      case "waiting":
-        return "픽업 대기";
+      case "ready":
+        return "픽업 완료";
       case "done":
         return "픽업 완료";
       default:
         return "준비 완료";
+    }
+  };
+
+  const handleStatusClick = () => {
+    if (variant === "action" && !children.steps?.prepare && onReady) {
+      onReady();
+    } else if (variant === "ready" && !children.steps?.pickup && onPickup) {
+      onPickup();
     }
   };
 
@@ -91,6 +101,23 @@ export default function OrderProgressCard({
     return `${ampm} ${displayHour}시`;
   };
 
+  const isStatusClickable =
+    (variant === "action" && !children.steps?.prepare && onReady) ||
+    (variant === "ready" && !children.steps?.pickup && onPickup);
+
+  const getStatusVariant = (variant) => {
+    switch (variant) {
+      case "action":
+        return "action";
+      case "ready":
+        return "ready";
+      case "done":
+        return "done";
+      default:
+        return "action";
+    }
+  };
+
   return (
     <CardContainer {...props}>
       <CardHeader>
@@ -99,27 +126,18 @@ export default function OrderProgressCard({
           <OrderTitle>{children.itemSummary}</OrderTitle>
         </LeftSection>
         <RightSection>
-          <StatusBadge $variant={variant}>
+          <StatusBadge
+            $variant={getStatusVariant(variant)}
+            $clickable={isStatusClickable}
+            onClick={isStatusClickable ? handleStatusClick : undefined}
+          >
             {getStatusLabel(variant)}
           </StatusBadge>
           <DetailRow
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigate("/order-detail", {
-                state: {
-                  orderNumber: children.orderNumber,
-                  createdAt: children.createdAt,
-                  pickupTime: children.pickupTime,
-                  items: [
-                    {
-                      name: children.itemSummary,
-                      qty: 1,
-                      price: 5600,
-                    },
-                  ],
-                },
-              });
+              navigate(`/order-detail/${children.id}`);
             }}
           >
             <DetailText>주문 정보 자세히</DetailText>
