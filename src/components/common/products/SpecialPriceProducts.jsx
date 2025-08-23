@@ -11,7 +11,7 @@ import {
   Description,
 } from "./SpecialPriceProducts.styles";
 
-const SpecialPriceProducts = ({ products = [] }) => {
+const SpecialPriceProducts = ({ products = [], onProductLikeToggle }) => {
   const navigate = useNavigate();
 
   if (!products || products.length === 0) {
@@ -27,8 +27,9 @@ const SpecialPriceProducts = ({ products = [] }) => {
   };
 
   const handleLikeToggle = (productId, isLiked) => {
-    console.log(`상품 ${productId} 좋아요 ${isLiked ? "추가" : "제거"}`);
-    // TODO: 좋아요 API 연동 (콘솔 제거 예정)
+    if (onProductLikeToggle) {
+      onProductLikeToggle(productId, isLiked);
+    }
   };
 
   return (
@@ -46,6 +47,7 @@ const SpecialPriceProducts = ({ products = [] }) => {
           {products.map((product) => (
             <ProductCard
               key={product.id}
+              id={product.id}
               variant="compact"
               storeName={product.storeName}
               productName={product.productName}
@@ -54,7 +56,7 @@ const SpecialPriceProducts = ({ products = [] }) => {
               discountRate={product.discountRate}
               imageUrl={product.imageUrl}
               isLiked={product.isLiked}
-              onLikeToggle={(isLiked) => handleLikeToggle(product.id, isLiked)}
+              onLikeToggle={handleLikeToggle}
               onClick={() => handleProductClick(product.id)}
             />
           ))}
