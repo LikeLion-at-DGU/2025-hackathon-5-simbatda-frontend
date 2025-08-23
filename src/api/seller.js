@@ -360,3 +360,39 @@ export async function getReservationDetail(reservationId) {
 
   return await res.json();
 }
+
+export async function createStore(storeData) {
+  const res = await apiRequest("/stores/", {
+    method: "POST",
+    auth: true,
+    body: storeData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error("Failed to create store:", errorData);
+    throw new Error(
+      errorData.detail || errorData.message || "Failed to create store"
+    );
+  }
+
+  return await res.json();
+}
+
+export async function updateStore(storeData) {
+  const res = await apiRequest("/stores/", {
+    method: "PUT",
+    auth: true,
+    body: storeData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error("Failed to update store:", errorData);
+    throw new Error(
+      errorData.detail || errorData.message || "Failed to update store"
+    );
+  }
+
+  return await res.json();
+}
