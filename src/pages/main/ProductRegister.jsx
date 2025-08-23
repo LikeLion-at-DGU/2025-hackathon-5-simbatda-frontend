@@ -379,20 +379,6 @@ function ProductRegister() {
             주문 현황
           </SectionTitle>
           <SectionTitle className="active">상품 등록</SectionTitle>
-          <Button
-            variant="accept"
-            onClick={() => fetchProducts()}
-            style={{
-              fontSize: "12px",
-              width: "200px",
-              padding: "6px 12px",
-              marginLeft: "auto",
-              minWidth: "auto",
-              whiteSpace: "nowrap",
-            }}
-          >
-            재고 새로고침
-          </Button>
         </SectionTitleWrapper>
 
         {isLoading ? (
