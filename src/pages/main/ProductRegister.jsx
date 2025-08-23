@@ -286,6 +286,7 @@ function ProductRegister() {
       );
       formData.append("stock", Number(quantity || 1));
       formData.append("expiration_date", expiryDate.toISOString());
+      formData.append("is_active", true);
       if (selectedImageFile) {
         formData.append("image", selectedImageFile);
       } else {
@@ -396,12 +397,12 @@ function ProductRegister() {
 
         {isLoading ? (
           <EmptyMessage>상품 목록을 불러오는 중입니다...</EmptyMessage>
-        ) : products.filter((p) => p.stock > 0).length === 0 ? (
+        ) : products.filter((p) => p.stock > 0 && p.is_active).length === 0 ? (
           <EmptyMessage>아직 등록된 메뉴가 없습니다.</EmptyMessage>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {products
-              .filter((p) => p.stock > 0)
+              .filter((p) => p.stock > 0 && p.is_active)
               .map((p) => (
                 <ProductCard
                   key={p.id}
