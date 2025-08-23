@@ -345,11 +345,13 @@ function OrderHistory() {
                         {order.pickupTime || order.reservedAt ? (
                           <PickupInfo>
                             <PickupTime>
-                              {formatDate(order.pickupTime || order.reservedAt)}{" "}
                               {(() => {
                                 const time =
                                   order.pickupTime || order.reservedAt;
                                 const date = new Date(time);
+                                const year = date.getFullYear();
+                                const month = date.getMonth() + 1;
+                                const day = date.getDate();
                                 const hour = date.getHours();
                                 const ampm = hour >= 12 ? "오후" : "오전";
                                 const displayHour =
@@ -357,9 +359,8 @@ function OrderHistory() {
                                 const minute = String(
                                   date.getMinutes()
                                 ).padStart(2, "0");
-                                return `${ampm} ${displayHour}시 ${minute}분`;
-                              })()}{" "}
-                              픽업
+                                return `${year}년 ${month}월 ${day}일 ${ampm} ${displayHour}시 ${minute}분 픽업`;
+                              })()}
                             </PickupTime>
                           </PickupInfo>
                         ) : (
