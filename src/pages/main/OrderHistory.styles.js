@@ -143,6 +143,7 @@ const ProgressStep = styled.div`
   background: #f9fafb;
   border-radius: 12px;
   padding: 20px;
+  min-width: 297px;
 `;
 
 const StepHeader = styled.div`
@@ -267,7 +268,7 @@ const PickupInfo = styled.div`
 `;
 
 const PickupTime = styled.div`
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: #775C4A;
 `;
@@ -276,6 +277,13 @@ const PickupMessage = styled.div`
   font-size: 12px;
   color: #6b7280;
   line-height: 1.4;
+`;
+
+const ExpireDate = styled.div`
+  font-size: 12px;
+  color: red;
+  line-height: 1.4;
+  margin-bottom: 5px;
 `;
 
 export {
@@ -316,4 +324,5 @@ export {
   PickupTime,
   ProgressStepBar,
   PickupMessage,
+  ExpireDate,
 };

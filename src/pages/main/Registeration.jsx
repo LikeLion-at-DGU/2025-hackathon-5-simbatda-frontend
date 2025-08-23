@@ -5,6 +5,8 @@ import {
   getStoreInfo,
   getRecommendedProducts,
   createReservation,
+  toggleWishlist,
+  getWishlistProducts,
 } from "../../api/products";
 import ProductCard from "../../components/common/card/ProductCard";
 import BackHeader from "../../components/common/header/BackHeader";
@@ -98,6 +100,19 @@ const Registeration = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isReserving, setIsReserving] = useState(false);
 
+  // 찜 토글 함수
+  const handleLikeToggle = async () => {
+    try {
+      const newLikedState = !isLiked;
+
+      await toggleWishlist(productId, newLikedState);
+
+      setIsLiked(newLikedState);
+    } catch (error) {
+      console.error("찜 토글 실패:", error);
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -110,6 +125,15 @@ const Registeration = () => {
           typeof detail.store === "number" ? detail.store : detail.store?.id;
         const storeInfo = storeId ? await getStoreInfo(storeId) : null;
 
+        // 찜 상태 확인
+        let productIsLiked = false;
+        try {
+          const wishlistProducts = await getWishlistProducts();
+          productIsLiked = wishlistProducts.some((p) => p.id === detail.id);
+        } catch (error) {
+          // 찜 목록 조회 실패 시 기본값 사용
+        }
+
         const expiry = detail.expiration_date
           ? new Date(detail.expiration_date)
           : null;
@@ -120,7 +144,7 @@ const Registeration = () => {
         const remainingTime = {
           days: Math.floor(diffMs / (1000 * 60 * 60 * 24)),
           hours: Math.floor((diffMs / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((diffMs / (1000 * 60)) % 60),
+          minutes: Math.floor((diffMs / 60) % 60),
           seconds: Math.floor((diffMs / 1000) % 60),
         };
 
@@ -149,7 +173,7 @@ const Registeration = () => {
           address: storeInfo?.address || "",
         });
 
-        setIsLiked(false);
+        setIsLiked(productIsLiked);
       } catch (e) {
         if (!mounted) return;
         setProduct(null);
@@ -238,10 +262,6 @@ const Registeration = () => {
     }
   };
 
-  const handleLikeToggle = (productId) => {
-    setIsLiked(!isLiked);
-  };
-
   const handleStoreClick = () => {
     if (store?.id) navigate(`/store/${store.id}`);
   };
@@ -260,7 +280,7 @@ const Registeration = () => {
             src={product.imageUrl || "/src/assets/images/defaultImage.svg"}
             alt={product.name}
           />
-          <LikeButton onClick={() => handleLikeToggle(product.id)}>
+          <LikeButton onClick={handleLikeToggle}>
             <img src={isLiked ? like : unlike} alt="좋아요" />
           </LikeButton>
         </ProductImageSection>

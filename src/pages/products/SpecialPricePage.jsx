@@ -1,6 +1,10 @@
 import React from "react";
 import ProductListPage from "../../components/common/products/ProductListPage";
-import { getSpecialPriceProducts, getStoreInfo } from "../../api/products";
+import {
+  getSpecialPriceProducts,
+  getStoreInfo,
+  getWishlistProducts,
+} from "../../api/products";
 
 const SpecialPricePage = () => {
   const getProducts = async () => {
@@ -24,6 +28,17 @@ const SpecialPricePage = () => {
       }
     }
 
+    // 찜 목록 가져오기
+    let wishlistProducts = [];
+    try {
+      wishlistProducts = await getWishlistProducts();
+    } catch (error) {
+      // 찜 목록 조회 실패 시 기본값 사용
+    }
+
+    // 찜 상품 ID Set 생성
+    const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
+
     const apiProducts = await getSpecialPriceProducts(lat, lng, radius);
 
     const mapped = await Promise.all(
@@ -32,6 +47,10 @@ const SpecialPricePage = () => {
           const storeInfo = product.store_id
             ? await getStoreInfo(product.store_id)
             : null;
+
+          // 찜 상태 확인
+          const isLiked = wishlistProductIds.has(product.id);
+
           return {
             id: product.id,
             storeName:
@@ -43,7 +62,7 @@ const SpecialPricePage = () => {
             originalPrice: product.price,
             discountPrice: product.discount_price,
             imageUrl: product.image || "",
-            isLiked: false,
+            isLiked: isLiked,
             expiryTime: product.expiration_date
               ? new Date(product.expiration_date).getTime()
               : undefined,
@@ -51,6 +70,9 @@ const SpecialPricePage = () => {
             categoryName: product.category_name || product.category?.name,
           };
         } catch (_) {
+          // 찜 상태 확인
+          const isLiked = wishlistProductIds.has(product.id);
+
           return {
             id: product.id,
             storeName: product.store_name || product.store?.name || "상점",
@@ -58,7 +80,7 @@ const SpecialPricePage = () => {
             originalPrice: product.price,
             discountPrice: product.discount_price,
             imageUrl: product.image || "",
-            isLiked: false,
+            isLiked: isLiked,
             expiryTime: product.expiration_date
               ? new Date(product.expiration_date).getTime()
               : undefined,

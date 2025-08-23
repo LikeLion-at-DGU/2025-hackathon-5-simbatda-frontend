@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/common/header/Header";
 import ProductCard from "../../components/common/card/ProductCard";
-import { getStoreInfo, getStoreProducts } from "../../api/products";
+import {
+  getStoreInfo,
+  getStoreProducts,
+  getWishlistProducts,
+  toggleWishlist,
+} from "../../api/products";
+import { getConsumerMe } from "../../api/auth";
 import {
   PageContainer,
   Content,
@@ -28,9 +34,22 @@ const StoreDetail = () => {
   const [storeProducts, setStoreProducts] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
 
+  // 사용자 정보 가져오기
   useEffect(() => {
-    setUserInfo({ name: "테스트 사용자" });
+    const fetchUserInfo = async () => {
+      try {
+        const userData = await getConsumerMe();
+        setUserInfo({ name: userData.name });
+      } catch (error) {
+        console.error("사용자 정보 조회 오류:", error);
+        setUserInfo({ name: "사용자" });
+      }
+    };
 
+    fetchUserInfo();
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
     const load = async () => {
       try {
@@ -56,19 +75,36 @@ const StoreDetail = () => {
           Array.isArray(products) && products.length > 0 ? products[0] : null
         );
         if (!mounted) return;
-        const mapped = (Array.isArray(products) ? products : []).map((p) => ({
-          id: p.id,
-          storeName: info?.store_name || info?.name || "상점",
-          productName: p.name,
-          originalPrice: p.price,
-          discountPrice: p.discount_price,
-          imageUrl: p.image || "",
-          isLiked: false,
-          expiryTime: p.expiration_date
-            ? new Date(p.expiration_date).getTime()
-            : undefined,
-          stock: p.stock,
-        }));
+
+        // 찜 목록 가져오기
+        let wishlistProducts = [];
+        try {
+          wishlistProducts = await getWishlistProducts();
+        } catch (error) {
+          // 찜 목록 조회 실패 시 기본값 사용
+        }
+
+        // 찜 상품 ID Set 생성
+        const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
+
+        const mapped = (Array.isArray(products) ? products : []).map((p) => {
+          // 찜 상태 확인
+          const isLiked = wishlistProductIds.has(p.id);
+
+          return {
+            id: p.id,
+            storeName: info?.store_name || info?.name || "상점",
+            productName: p.name,
+            originalPrice: p.price,
+            discountPrice: p.discount_price,
+            imageUrl: p.image || "",
+            isLiked: isLiked,
+            expiryTime: p.expiration_date
+              ? new Date(p.expiration_date).getTime()
+              : undefined,
+            stock: p.stock,
+          };
+        });
         setStoreProducts(mapped);
       } catch (e) {
         console.log("[StoreDetail] load error:", e);
@@ -93,8 +129,21 @@ const StoreDetail = () => {
     navigate(`/registeration/${productId}`);
   };
 
-  const handleProductLikeToggle = (productId, isLiked) => {
-    // TODO: 좋아요 API 연동
+  const handleProductLikeToggle = async (productId, isLiked) => {
+    try {
+      await toggleWishlist(productId, isLiked);
+
+      // 로컬 상태 업데이트
+      const updatedProducts = storeProducts.map((product) => {
+        if (product.id === productId) {
+          return { ...product, isLiked: !isLiked };
+        }
+        return product;
+      });
+      setStoreProducts(updatedProducts);
+    } catch (error) {
+      console.error("[StoreDetail] 찜 토글 실패:", error);
+    }
   };
 
   if (!store) {

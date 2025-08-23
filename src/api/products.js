@@ -15,7 +15,7 @@ export const getSpecialPriceProducts = async (
 
     const response = await apiRequest(`/products/discount/?${queryParams}`, {
       method: "GET",
-      auth: true, 
+      auth: true,
     });
 
     if (!response.ok) {
@@ -38,13 +38,13 @@ export const getSpecialPriceProducts = async (
 };
 
 // 근처 상품 조회 API
-export const getNearbyProducts = async ({
+export const getNearbyProducts = async (
   lat = 37.498095,
   lng = 127.02761,
   radius = 5,
   search = "",
-  category,
-} = {}) => {
+  category
+) => {
   try {
     const queryParams = new URLSearchParams({
       lat: lat?.toString?.() ?? "",
@@ -69,7 +69,7 @@ export const getNearbyProducts = async ({
 
     const response = await apiRequest(url, {
       method: "GET",
-      auth: true, 
+      auth: true,
     });
 
     if (!response.ok) {
@@ -108,7 +108,7 @@ export const getProductsByCategory = async (
 
     const response = await apiRequest(`/products/?${queryParams}`, {
       method: "GET",
-      auth: true, 
+      auth: true,
     });
 
     if (!response.ok) {
@@ -130,12 +130,39 @@ export const getProductsByCategory = async (
   }
 };
 
+// 전체 상품 목록 조회 API (위도/경도 파라미터 없음)
+export const getAllProducts = async () => {
+  try {
+    const response = await apiRequest(`/products/`, {
+      method: "GET",
+      auth: true,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`전체 상품 API 오류 상세:`, {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        response: errorText,
+      });
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("전체 상품 조회 오류:", error);
+    throw error;
+  }
+};
+
 // 추천 상품 조회 API (소비자 추천 엔드포인트 사용)
 export const getRecommendedProducts = async () => {
   try {
     const response = await apiRequest(`/accounts/consumer/recommends/`, {
       method: "GET",
-      auth: true, 
+      auth: true,
     });
 
     if (!response.ok) {
@@ -162,7 +189,7 @@ export const getProductDetail = async (productId) => {
   try {
     const response = await apiRequest(`/products/${productId}/`, {
       method: "GET",
-      auth: true, 
+      auth: true,
     });
 
     if (!response.ok) {
@@ -182,7 +209,7 @@ export const getStoreInfo = async (storeId) => {
   try {
     const response = await apiRequest(`/stores/${storeId}/`, {
       method: "GET",
-      auth: true, 
+      auth: true,
     });
 
     if (!response.ok) {
@@ -311,6 +338,64 @@ export const createReservation = async ({ productId, quantity }) => {
     return data;
   } catch (error) {
     console.error("예약 생성 오류:", error);
+    throw error;
+  }
+};
+
+// 찜 등록/해제 API
+export const toggleWishlist = async (productId, wishlisted) => {
+  try {
+    const response = await apiRequest(`/products/${productId}/wishlist/`, {
+      method: "POST",
+      auth: true,
+      body: JSON.stringify({
+        product_id: productId,
+        wishlisted: wishlisted,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`찜 ${wishlisted ? "등록" : "해제"} API 오류:`, {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        response: errorText,
+      });
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`찜 ${wishlisted ? "등록" : "해제"} 오류:`, error);
+    throw error;
+  }
+};
+
+// 찜 목록 조회 API
+export const getWishlistProducts = async () => {
+  try {
+    const response = await apiRequest(`/products/wishlist/`, {
+      method: "GET",
+      auth: true,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`찜 목록 조회 API 오류:`, {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        response: errorText,
+      });
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`찜 목록 조회 오류:`, error);
     throw error;
   }
 };

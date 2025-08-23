@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
 import likeIcon from "../../../assets/icons/like/like.svg";
 import unlikeIcon from "../../../assets/icons/like/unlike.svg";
@@ -53,9 +53,15 @@ const ProductCard = ({
   className = "",
   expiryTime,
   stock,
+  id, // productId 추가
   ...props
 }) => {
   const [liked, setLiked] = useState(isLiked);
+
+  // isLiked prop이 변경될 때 내부 상태 동기화
+  useEffect(() => {
+    setLiked(isLiked);
+  }, [isLiked, id]);
 
   const discountRate = useMemo(() => {
     if (discountRateProp !== undefined && discountRateProp !== null) {
@@ -85,7 +91,8 @@ const ProductCard = ({
     e.stopPropagation();
     const newLikedState = !liked;
     setLiked(newLikedState);
-    onLikeToggle?.(newLikedState);
+    // productId와 새로운 좋아요 상태를 전달
+    onLikeToggle?.(id, newLikedState);
   };
 
   const handleStoreClick = (e) => {
@@ -162,12 +169,7 @@ const ProductCard = ({
           </LikeButton>
           <ProductCardImage src={displayImage} alt={productName} />
           <ProductCardContent>
-            <StoreName
-              onClick={onStoreClick ? handleStoreClick : undefined}
-              style={onStoreClick ? { cursor: "pointer" } : {}}
-            >
-              {displayStoreName}
-            </StoreName>
+            <ProductName>{productName}</ProductName>
             <ProductCardPriceSection>
               {hasDiscount && discountRate > 0 ? (
                 <ProductCardDiscountRate>
