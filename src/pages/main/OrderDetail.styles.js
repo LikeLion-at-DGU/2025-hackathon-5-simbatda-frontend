@@ -195,7 +195,6 @@ export const CopyButtonText = styled.span`
   font-weight: 600;
 `;
 
-// 기존 스타일들도 유지 (하위 호환성을 위해)
 export const Header = styled.div`
   display: flex;
   align-items: center;

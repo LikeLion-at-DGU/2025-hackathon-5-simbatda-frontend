@@ -5,12 +5,19 @@ const STORE_STATUS_KEY = "store_open_status";
 
 export const useStoreStatus = () => {
   const [isOpen, setIsOpen] = useState(() => {
-    const saved = localStorage.getItem(STORE_STATUS_KEY);
-    return saved !== null ? JSON.parse(saved) : true;
+    try {
+      const saved = localStorage.getItem(STORE_STATUS_KEY);
+      return saved !== null ? JSON.parse(saved) : null;
+    } catch (error) {
+      console.error("localStorage 파싱 오류:", error);
+      return null;
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem(STORE_STATUS_KEY, JSON.stringify(isOpen));
+    if (isOpen !== null) {
+      localStorage.setItem(STORE_STATUS_KEY, JSON.stringify(isOpen));
+    }
   }, [isOpen]);
 
   const handleToggleOpenStatus = async () => {

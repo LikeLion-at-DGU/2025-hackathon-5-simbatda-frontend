@@ -183,6 +183,18 @@ export async function createProduct(productData) {
         errorData: errorData,
         response: res,
       });
+
+      // 백엔드에서 반환하는 구체적인 에러 메시지 확인
+      if (errorData && typeof errorData === "object") {
+        console.error("백엔드 에러 상세:", errorData);
+        // 필드별 에러 메시지가 있는지 확인
+        for (const [field, errors] of Object.entries(errorData)) {
+          if (Array.isArray(errors)) {
+            console.error(`필드 '${field}' 에러:`, errors);
+          }
+        }
+      }
+
       throw new Error(
         errorData.detail || errorData.message || "Failed to create product"
       );
@@ -344,6 +356,42 @@ export async function getReservationDetail(reservationId) {
     const data = await res.json().catch(() => ({}));
     console.error("Failed to get reservation detail:", data);
     throw data;
+  }
+
+  return await res.json();
+}
+
+export async function createStore(storeData) {
+  const res = await apiRequest("/stores/", {
+    method: "POST",
+    auth: true,
+    body: storeData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error("Failed to create store:", errorData);
+    throw new Error(
+      errorData.detail || errorData.message || "Failed to create store"
+    );
+  }
+
+  return await res.json();
+}
+
+export async function updateStore(storeData) {
+  const res = await apiRequest("/stores/", {
+    method: "PUT",
+    auth: true,
+    body: storeData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error("Failed to update store:", errorData);
+    throw new Error(
+      errorData.detail || errorData.message || "Failed to update store"
+    );
   }
 
   return await res.json();

@@ -91,7 +91,7 @@ function StoreDocumentUpload() {
       });
 
       if (userResponse.user && userResponse.auth) {
-        // 2단계: 상점 정보 저장
+        // 2단계: 상점 정보 저장 (위도/경도는 백엔드에서 처리)
         const storeData = {
           name: signupData.storeName,
           opening_hours: signupData.openingHours,

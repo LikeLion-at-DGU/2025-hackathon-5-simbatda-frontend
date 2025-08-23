@@ -58,7 +58,7 @@ export const StatusBadge = styled.div`
   border-radius: 12px;
   font-weight: 700;
   font-size: 16px;
-  min-width: 95px;
+  min-width: 95px;  
   text-align: center;
   color: #fff;
   justify-content: center;
