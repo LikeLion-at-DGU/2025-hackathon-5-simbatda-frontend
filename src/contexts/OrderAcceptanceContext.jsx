@@ -1,6 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getNotifications, markNotificationAsRead } from "../api/reservations";
 
+// 현재 사용자의 역할을 확인하는 함수
+const getUserRole = () => {
+  try {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      const parsed = JSON.parse(userInfo);
+      return parsed.role || "consumer"; // 기본값은 consumer
+    }
+    return "consumer";
+  } catch (error) {
+    return "consumer";
+  }
+};
+
 const OrderAcceptanceContext = createContext();
 
 export const useOrderAcceptance = () => {
@@ -20,6 +34,12 @@ export const OrderAcceptanceProvider = ({ children }) => {
 
   // 주문 알림 체크 함수 (수락/거절 모두 처리)
   const checkOrderAcceptance = async () => {
+    // 판매자인 경우 알림 조회하지 않음
+    const userRole = getUserRole();
+    if (userRole === "seller") {
+      return;
+    }
+
     try {
       const notifications = await getNotifications();
 
@@ -42,7 +62,7 @@ export const OrderAcceptanceProvider = ({ children }) => {
           reservationId: unreadConfirmNotification.reservation_id,
           status: unreadConfirmNotification.status,
           createdAt: unreadConfirmNotification.created_at,
-          storeName: "상점", // API에서 store 정보를 가져와야 함
+          storeName: "상점",
         };
 
         setAcceptedOrder(orderInfo);
@@ -56,7 +76,7 @@ export const OrderAcceptanceProvider = ({ children }) => {
           reservationId: unreadCancelNotification.reservation_id,
           status: unreadCancelNotification.status,
           createdAt: unreadCancelNotification.created_at,
-          storeName: "상점", // API에서 store 정보를 가져와야 함
+          storeName: "상점",
         };
 
         setAcceptedOrder(orderInfo);

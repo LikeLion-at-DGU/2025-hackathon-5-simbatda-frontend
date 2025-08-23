@@ -85,8 +85,6 @@ function MainPageSeller() {
           getSellerMe(),
           getSellerStore(),
         ]);
-        console.log("Fetched user data:", userData);
-        console.log("Fetched store data:", storeData);
         setUserInfo(userData);
         setStoreInfo(storeData);
       } catch (err) {
@@ -104,15 +102,17 @@ function MainPageSeller() {
 
       const transformedOrders = orders.map((order) => ({
         id: order.id,
-        reservation_number: `B${order.id.toString().padStart(5, "0")}`,
-        product_name: order.product?.name || "상품명 없음",
+        reservationCode: `B${order.id.toString().padStart(5, "0")}`,
+        productName: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
-        price: order.product?.total_price || order.total_price || 0,
-        created_at: order.created_at,
-        pickup_time: order.reserved_at || order.created_at,
+        totalPrice: order.product?.total_price || order.total_price || 0,
+        createdAt: order.created_at,
+        pickupTime: order.pickup_time || order.reserved_at || order.created_at,
+        expireDate: order.product?.expire_date,
         status: order.status,
         consumer: order.consumer,
         product: order.product,
+        cancel_reason: order.cancel_reason,
         ...order,
       }));
 
