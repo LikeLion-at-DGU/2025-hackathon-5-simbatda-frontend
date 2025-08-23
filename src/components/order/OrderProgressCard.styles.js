@@ -56,6 +56,22 @@ export const StatusBadge = styled.div`
   font-size: 16px;
   min-width: 95px;
   text-align: center;
+  cursor: ${(props) => (props.$clickable ? "pointer" : "default")};
+  transition: all 0.2s ease;
+
+  ${(props) =>
+    props.$clickable &&
+    `
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+  `}
 
   ${(p) =>
     p.$variant === "action"
@@ -135,7 +151,6 @@ export const StepCheck = styled.span`
   align-items: center;
   justify-content: center;
   line-height: 1;
-
   transition: all 0.2s ease;
   order: -1;
 
@@ -170,10 +185,8 @@ export const DetailRow = styled.div`
   }
 `;
 
-export const DetailText = styled.div`
-  color: #5d5752;
-  text-align: center;
-  font-family: Pretendard;
-  font-size: 12px;
-  font-weight: 400;
+export const DetailText = styled.span`
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
 `;

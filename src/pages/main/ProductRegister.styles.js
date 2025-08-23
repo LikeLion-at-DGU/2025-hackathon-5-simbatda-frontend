@@ -13,8 +13,22 @@ export const PageContainer = MainPageContainer;
 export const Content = MainContent;
 export const OpenStatusSection = MainOpenStatusSection;
 export const OpenStatusText = MainOpenStatusText;
-export const SectionTitle = MainSectionTitle;
-export const SectionTitleWrapper = MainSectionTitleWrapper;
+export const SectionTitle = styled(MainSectionTitle)`
+  white-space: nowrap;
+  flex-shrink: 0;
+`;
+export const SectionTitleWrapper = styled(MainSectionTitleWrapper)`
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 16px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+`;
+
 export const EmptyMessage = MainEmptyMessage;
 
 export const OrderModal = styled.div`
@@ -61,7 +75,7 @@ export const ModalButtons = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px auto 0; //중앙정렬
+  margin: 20px auto 0;
 
   button {
     width: 242px;

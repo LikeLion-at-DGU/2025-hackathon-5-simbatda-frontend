@@ -62,9 +62,8 @@ const OrderCard = ({
   };
 
   const getStatusText = () => {
-    if (actionType === "accepted") return "수락됨";
     if (actionType === "rejected") return "거절됨";
-    return "";
+    return "수락됨";
   };
 
   return (
@@ -93,22 +92,7 @@ const OrderCard = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigate("/order-detail", {
-                state: {
-                  orderNumber: order.reservation_number || order.id,
-                  createdAt: formatTime(order.created_at),
-                  pickupTime: formatPickupTime(
-                    order.pickup_time || order.created_at
-                  ),
-                  items: [
-                    {
-                      name: order.product_name || "상품명",
-                      qty: order.quantity || 1,
-                      price: order.price || 0,
-                    },
-                  ],
-                },
-              });
+              navigate(`/order-detail/${order.id}`);
             }}
           >
             <DetailText>주문 정보 자세히</DetailText>
@@ -128,6 +112,12 @@ const OrderCard = ({
             {formatPickupTime(order.pickup_time || order.created_at)}
           </InfoValue>
         </InfoRow>
+        {actionType === "rejected" && rejectReason && (
+          <InfoRow>
+            <InfoLabel>거절 사유</InfoLabel>
+            <InfoValue style={{ color: "#BE4A31" }}>{rejectReason}</InfoValue>
+          </InfoRow>
+        )}
       </OrderInfo>
     </OrderCardContainer>
   );
