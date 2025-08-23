@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getSellerMe,
+  getSellerStore,
   getSellerProducts,
   createProduct,
   deleteProduct,
@@ -165,21 +166,27 @@ function ProductRegister() {
   }, [products.length]);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const fetchUserAndStoreInfo = async () => {
       try {
-        const data = await getSellerMe();
-        setUserInfo(data);
+        const [userData, storeData] = await Promise.all([
+          getSellerMe(),
+          getSellerStore(),
+        ]);
+        console.log("Fetched user data:", userData);
+        console.log("Fetched store data:", storeData);
 
-        // 가게 정보만 설정하고, 영업상태는 useStoreStatus 훅에서 관리
-        if (data.store) {
-          console.log("사용자 정보에서 가져온 가게 정보:", data.store);
-        }
+        // 가게 정보를 userInfo에 포함
+        const userInfoWithStore = {
+          ...userData,
+          store: storeData,
+        };
+        setUserInfo(userInfoWithStore);
       } catch (err) {
-        console.error("Failed to fetch user info:", err);
+        console.error("Failed to fetch user/store info:", err);
         navigate("/signin-seller");
       }
     };
-    fetchUserInfo();
+    fetchUserAndStoreInfo();
   }, [navigate]);
 
   useEffect(() => {
@@ -278,6 +285,29 @@ function ProductRegister() {
       } else {
         alert("상품 이미지를 선택해주세요.");
         return;
+      }
+
+      // 디버깅을 위한 로그 추가
+      console.log("=== 상품 생성 요청 데이터 ===");
+      console.log("메뉴 이름:", menuName);
+      console.log("원 가격:", Number(basePrice || 0));
+      console.log("할인 가격:", Number(finalPrice || basePrice || 0));
+      console.log("설명:", description || "");
+      console.log(
+        "카테고리 ID:",
+        selectedCategories.length > 0
+          ? categories.find((cat) => cat.name === selectedCategories[0])?.id ||
+              1
+          : 1
+      );
+      console.log("수량:", Number(quantity || 1));
+      console.log("유통기한:", expiryDate.toISOString());
+      console.log("이미지 파일:", selectedImageFile);
+
+      // FormData 내용 확인
+      console.log("=== FormData 내용 ===");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
       }
 
       const newProduct = await createProduct(formData);

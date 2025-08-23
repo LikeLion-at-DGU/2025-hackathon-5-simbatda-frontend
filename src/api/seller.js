@@ -183,6 +183,18 @@ export async function createProduct(productData) {
         errorData: errorData,
         response: res,
       });
+
+      // 백엔드에서 반환하는 구체적인 에러 메시지 확인
+      if (errorData && typeof errorData === "object") {
+        console.error("백엔드 에러 상세:", errorData);
+        // 필드별 에러 메시지가 있는지 확인
+        for (const [field, errors] of Object.entries(errorData)) {
+          if (Array.isArray(errors)) {
+            console.error(`필드 '${field}' 에러:`, errors);
+          }
+        }
+      }
+
       throw new Error(
         errorData.detail || errorData.message || "Failed to create product"
       );
