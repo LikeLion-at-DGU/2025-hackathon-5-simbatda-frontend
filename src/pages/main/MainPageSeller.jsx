@@ -50,10 +50,10 @@ function MainPageSeller() {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [orderHistory, setOrderHistory] = useState(() => {
     try {
-      const savedHistory = localStorage.getItem("sellerOrderHistory");
-      return savedHistory ? JSON.parse(savedHistory) : [];
+      localStorage.removeItem("sellerOrderHistory");
+      return [];
     } catch (error) {
-      console.error("Failed to parse orderHistory from localStorage:", error);
+      console.error("Failed to clear orderHistory from localStorage:", error);
       return [];
     }
   });

@@ -5,7 +5,6 @@ import {
   getSellerProducts,
   createProduct,
   deleteProduct,
-  getSellerStore,
 } from "../../api/seller";
 import { logout, getCategories } from "../../api/auth";
 import Button from "../../components/common/button/Button";
@@ -171,25 +170,9 @@ function ProductRegister() {
         const data = await getSellerMe();
         setUserInfo(data);
 
+        // 가게 정보만 설정하고, 영업상태는 useStoreStatus 훅에서 관리
         if (data.store) {
-          setIsOpen(data.store.is_open);
-        } else {
-          try {
-            const storeData = await getSellerStore();
-
-            if (storeData && storeData.length > 0) {
-              const store = storeData[0];
-
-              setUserInfo((prev) => ({
-                ...prev,
-                store: store,
-              }));
-
-              setIsOpen(store.is_open);
-            }
-          } catch (storeErr) {
-            console.error("상점 정보 가져오기 실패:", storeErr);
-          }
+          console.log("사용자 정보에서 가져온 가게 정보:", data.store);
         }
       } catch (err) {
         console.error("Failed to fetch user info:", err);
@@ -202,6 +185,8 @@ function ProductRegister() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // localStorage에서 저장된 가게 상태 복원 (제거 - 서버에서만 상태를 가져옴)
 
   const handleLogout = async () => {
     try {
@@ -367,10 +352,11 @@ function ProductRegister() {
       <Content>
         <OpenStatusSection>
           <Button
-            variant={isOpen ? "open" : "close"}
+            variant={isOpen === null ? "loading" : isOpen ? "open" : "close"}
             onClick={handleToggleOpenStatus}
+            disabled={isOpen === null}
           >
-            {isOpen ? "open" : "close"}
+            {isOpen === null ? "로딩 중..." : isOpen ? "open" : "close"}
           </Button>
           <OpenStatusText>영업상태 변경</OpenStatusText>
         </OpenStatusSection>

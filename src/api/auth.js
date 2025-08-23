@@ -159,7 +159,6 @@ export async function getConsumerMe() {
   return data;
 }
 
-// 상점 정보 저장 API - 1단계
 export async function createStore(storeData) {
   const res = await apiRequest("/stores/signup/step1/", {
     method: "POST",
@@ -169,8 +168,8 @@ export async function createStore(storeData) {
       opening_time: storeData.opening_hours,
       address_search: storeData.address,
       address_detail: storeData.address_detail || "",
-      latitude: 37.5665, // 임시 위도 (실제로는 주소 검색 API에서 가져와야 함)
-      longitude: 126.978, // 임시 경도 (실제로는 주소 검색 API에서 가져와야 함)
+      latitude: storeData.latitude,
+      longitude: storeData.longitude,
     },
   });
 

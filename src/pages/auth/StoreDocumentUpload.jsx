@@ -91,12 +91,19 @@ function StoreDocumentUpload() {
       });
 
       if (userResponse.user && userResponse.auth) {
+        // 주소를 좌표로 변환
+        const coordinates = await convertAddressToCoordinates(
+          signupData.address
+        );
+
         // 2단계: 상점 정보 저장
         const storeData = {
           name: signupData.storeName,
           opening_hours: signupData.openingHours,
           address: signupData.address,
           address_detail: signupData.addressDetail,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
         };
 
         const storeResponse = await createStore(storeData);
@@ -132,6 +139,56 @@ function StoreDocumentUpload() {
       } else {
         alert("판매자 회원가입에 실패했습니다. 다시 시도해주세요.");
       }
+    }
+  };
+
+  // Google Maps Geocoding API를 사용하여 주소를 좌표로 변환하는 함수
+  const convertAddressToCoordinates = async (address) => {
+    try {
+      // API 키 디버깅
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      console.log("API Key:", apiKey ? "로드됨" : "로드되지 않음");
+      console.log("변환할 주소:", address);
+
+      // Google Maps Geocoding API 호출
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          address
+        )}&key=${apiKey}`
+      );
+
+      console.log("Google Maps API 응답 상태:", response.status);
+
+      const data = await response.json();
+      console.log("Google Maps API 응답 데이터:", data);
+
+      if (data.status === "OK" && data.results && data.results.length > 0) {
+        const result = data.results[0];
+        const location = result.geometry.location;
+
+        console.log("성공적으로 좌표 변환:", location);
+
+        return {
+          latitude: location.lat,
+          longitude: location.lng,
+        };
+      } else {
+        // 좌표 변환 실패 시 기본값 반환 (서울 시청)
+        console.warn("주소를 좌표로 변환할 수 없습니다. 기본값을 사용합니다.");
+        console.warn("API 응답 상태:", data.status);
+        console.warn("API 에러 메시지:", data.error_message);
+        return {
+          latitude: 37.5665,
+          longitude: 126.978,
+        };
+      }
+    } catch (error) {
+      console.error("좌표 변환 중 오류 발생:", error);
+      // 오류 발생 시 기본값 반환
+      return {
+        latitude: 37.5665,
+        longitude: 126.978,
+      };
     }
   };
 
