@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/header/Header";
 import { getReservations } from "../../api/reservations";
+import { getConsumerMe } from "../../api/auth";
 import greencheck from "../../assets/icons/check.svg";
 import graycheck from "../../assets/icons/uncheck.svg";
 import empty from "../../assets/images/crying-character.svg";
@@ -41,6 +42,7 @@ import {
   PickupInfo,
   PickupTime,
   ProgressStepBar,
+  ExpireDate,
 } from "./OrderHistory.styles";
 
 function OrderHistory() {
@@ -49,9 +51,6 @@ function OrderHistory() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 사용자 정보 설정
-    setUserInfo({ name: "테스트 사용자" });
-
     // 주문내역 API 호출
     const fetchOrders = async () => {
       try {
@@ -60,15 +59,21 @@ function OrderHistory() {
         // API 응답을 기존 형식에 맞게 변환
         const mappedOrders = reservations.map((reservation) => ({
           id: reservation.id,
+          reservationCode: reservation.reservation_code,
           status: reservation.status,
+          consumer: reservation.consumer,
           storeName: reservation.store.name,
           productName: reservation.product.name,
-          quantity: reservation.quantity,
+          quantity: reservation.product.quantity,
           reservedAt: reservation.reserved_at,
           createdAt: reservation.created_at,
           cancelReason: reservation.cancel_reason,
           storeLat: reservation.store.lat,
           storeLng: reservation.store.lng,
+          pickupTime: reservation.pickup_time,
+          totalPrice: reservation.product.total_price,
+          productImage: reservation.product.image,
+          expireDate: reservation.product.expire_date,
         }));
 
         // 주문 상태별 우선순위 정렬 (진행중인 주문이 맨 위에 오도록)
@@ -88,13 +93,32 @@ function OrderHistory() {
         });
 
         setOrders(sortedOrders);
+
+        // 첫 번째 주문에서 사용자 정보 가져오기 (fallback)
+        if (sortedOrders.length > 0 && sortedOrders[0].consumer) {
+          setUserInfo({ name: sortedOrders[0].consumer.name });
+        }
       } catch (error) {
         console.error("주문내역 조회 오류:", error);
         setOrders([]);
       }
     };
 
+    // 사용자 정보 가져오기 (우선)
+    const fetchUserInfo = async () => {
+      try {
+        const userData = await getConsumerMe();
+        setUserInfo({ name: userData.name });
+      } catch (error) {
+        console.error("사용자 정보 조회 오류:", error);
+        // 주문 내역에서 사용자 정보 가져오기 시도
+        fetchOrders();
+      }
+    };
+
+    // 주문내역과 사용자 정보 모두 가져오기
     fetchOrders();
+    fetchUserInfo();
   }, []);
 
   const handleLogout = () => {
@@ -274,6 +298,12 @@ function OrderHistory() {
                         }
                         style={{ cursor: "pointer" }}
                       >
+                        {/* 유통기한 */}
+                        {order.expireDate && (
+                          <ExpireDate>
+                            유통기한: {formatDate(order.expireDate)}
+                          </ExpireDate>
+                        )}
                         <StepHeader>
                           <StepStoreName>{order.storeName}</StepStoreName>
                           <StepStatus color={getStatusColor(order.status)}>
@@ -300,29 +330,43 @@ function OrderHistory() {
 
                         <StepSummary>
                           <div>주문일: {formatDate(order.createdAt)}</div>
+                          {/* 최종 결제 금액 표시 */}
+                          {order.totalPrice && (
+                            <div
+                              style={{ color: "#37CA79", fontWeight: "600" }}
+                            >
+                              최종 결제 금액:{" "}
+                              {order.totalPrice.toLocaleString()}원
+                            </div>
+                          )}
                         </StepSummary>
 
-                        {/* 픽업 시간 정보 */}
-                        {order.reservedAt ? (
+                        {/* 픽업 시간 정보 - pickupTime 우선, 없으면 reservedAt 사용 */}
+                        {order.pickupTime || order.reservedAt ? (
                           <PickupInfo>
                             <PickupTime>
-                              {formatDate(order.reservedAt)}{" "}
-                              {new Date(order.reservedAt).getHours() >= 12
-                                ? "오후"
-                                : "오전"}{" "}
-                              {new Date(order.reservedAt).getHours() > 12
-                                ? new Date(order.reservedAt).getHours() - 12
-                                : new Date(order.reservedAt).getHours()}
-                              :
-                              {String(
-                                new Date(order.reservedAt).getMinutes()
-                              ).padStart(2, "0")}{" "}
+                              {formatDate(order.pickupTime || order.reservedAt)}{" "}
+                              {(() => {
+                                const time =
+                                  order.pickupTime || order.reservedAt;
+                                const date = new Date(time);
+                                const hour = date.getHours();
+                                const ampm = hour >= 12 ? "오후" : "오전";
+                                const displayHour =
+                                  hour >= 12 ? hour - 12 : hour;
+                                const minute = String(
+                                  date.getMinutes()
+                                ).padStart(2, "0");
+                                return `${ampm} ${displayHour}시 ${minute}분`;
+                              })()}{" "}
                               픽업
                             </PickupTime>
                           </PickupInfo>
                         ) : (
                           <PickupInfo>
-                            <PickupTime>주문 수락 시 30분 이내 픽업 해야합니다.</PickupTime>
+                            <PickupTime>
+                              주문 수락 시 30분 이내 픽업 해야합니다.
+                            </PickupTime>
                           </PickupInfo>
                         )}
 
@@ -394,8 +438,20 @@ function OrderHistory() {
                   </OrderProduct>
 
                   <OrderSummary>
+                    {/* 유통기한을 상점명 위에 빨간 글씨로 표시 */}
+                    {order.expireDate && (
+                      <div style={{ color: "#ef4444", fontWeight: "600" }}>
+                        유통기한: {formatDate(order.expireDate)}
+                      </div>
+                    )}
                     <div>상점: {order.storeName}</div>
                     <div>주문일: {formatDate(order.createdAt)}</div>
+                    {/* 최종 결제 금액 표시 */}
+                    {order.totalPrice && (
+                      <div style={{ color: "#37CA79", fontWeight: "600" }}>
+                        최종 결제 금액: {order.totalPrice.toLocaleString()}원
+                      </div>
+                    )}
                   </OrderSummary>
                 </OrderDetails>
               </OrderItem>
@@ -440,6 +496,7 @@ function OrderHistory() {
                   <OrderSummary>
                     <div>상점: {order.storeName}</div>
                     <div>주문일: {formatDate(order.createdAt)}</div>
+                    {/* 취소된 주문에서는 유통기한과 결제 금액 표시하지 않음 */}
                     {order.cancelReason && (
                       <div style={{ color: "#ef4444" }}>
                         취소 사유: {order.cancelReason}
