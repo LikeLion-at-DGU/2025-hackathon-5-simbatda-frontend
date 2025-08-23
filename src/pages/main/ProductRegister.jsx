@@ -157,14 +157,13 @@ function ProductRegister() {
     window.addEventListener("focus", handleFocus);
 
     if (products.length > 0) {
-      console.log("🔄 상품 배열 변경 감지, 새로고침 실행");
-      fetchProducts();
+      console.log("새로운 상품 추가 감지, 재고 정보 업데이트");
     }
 
     return () => {
       window.removeEventListener("focus", handleFocus);
     };
-  }, [products]);
+  }, [products.length]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
