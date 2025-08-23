@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const PageContainer = styled.div`
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: #f8f9fa;
 `;
 
 export const Content = styled.div`
@@ -65,7 +65,6 @@ export const OrderInfoItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
 
   &:last-child {
     border-bottom: none;
@@ -86,7 +85,7 @@ export const OrderInfoValue = styled.span`
 
 export const ProductSection = styled.div`
   background: white;
-  padding: 20px;
+  padding: 20px 20px 10px 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
@@ -109,8 +108,15 @@ export const ProductItem = styled.div`
 `;
 
 export const ProductInfo = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+export const ProductInfo2 = styled.div`
+  display: flex;
   gap: 16px;
   align-items: center;
   margin-bottom: 8px;
@@ -140,6 +146,7 @@ export const ProductExpiry = styled.div`
   font-size: 14px;
   color: #be4a31;
   font-weight: 500;
+  margin-top: 20px;
 `;
 
 export const StoreSection = styled.div`
@@ -154,8 +161,7 @@ export const StoreInfoItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 12px 0 0 0;
 `;
 
 export const StoreInfoLabel = styled.span`

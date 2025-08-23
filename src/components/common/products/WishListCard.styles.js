@@ -15,16 +15,7 @@ export const CardContainer = styled.div`
   }
 `;
 
-export const DistanceBadge = styled.div`
-  position: absolute;
-  top: 12px;
-  left: 16px;
 
-  color: #8a8a8a;
-  font-family: Pretendard;
-  font-size: 12px;
-  font-weight: 500;
-`;
 
 export const LikeButton = styled.button`
   position: absolute;

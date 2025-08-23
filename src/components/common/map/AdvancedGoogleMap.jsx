@@ -1,6 +1,12 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import mapPinIcon from "../../../assets/icons/map-pin.svg";
 import currentLocationPinIcon from "../../../assets/icons/pin.svg";
 import locationIcon from "../../../assets/icons/Location.png";
@@ -100,74 +106,167 @@ const ControlButton = styled.button`
   }
 `;
 
+// 두 지점 간의 거리 계산 (Haversine 공식)
+const calculateDistance = (lat1, lng1, lat2, lng2) => {
+  const R = 6371; // 지구의 반지름 (km)
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 const AdvancedGoogleMap = ({
   onClick,
   center = "37.5665,126.9780",
   zoom = 15,
-  markers = [],
+  markers = [], // 사용자 정의 마커 (기본값: 빈 배열)
   onMarkerClick,
   onClusterClick,
+  onLocationUpdate, // 현재위치 업데이트 콜백
   inventoryPinIcon,
   size = "default",
   nearbyPin, // 내 주변 상품 핀 커스텀
   otherPin, // 기타 위치 상품 핀 커스텀
+  products = [], // 상품 데이터
+  userLocation = null, // 사용자 위치
+  showUserLocation = false, // 현재 위치 버튼 표시 여부
 }) => {
+  const navigate = useNavigate();
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [markerClusterer, setMarkerClusterer] = useState(null);
   const [currentMarkers, setCurrentMarkers] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentLocationMarker, setCurrentLocationMarker] = useState(null);
 
-  const defaultMarkers = useMemo(
-    () => [
-      {
-        id: 1,
-        position: { lat: 37.5665, lng: 126.978 },
-        title: "서울시청",
-        type: "other",
-        name: "서울 중앙시장",
-      },
-      {
-        id: 2,
-        position: { lat: 37.5645, lng: 126.976 },
-        title: "광화문",
-        type: "nearby",
-        name: "광화문 상점가",
-      },
-      {
-        id: 3,
-        position: { lat: 37.5685, lng: 126.98 },
-        title: "명동",
-        type: "other",
-        name: "명동 상점가",
-      },
-      {
-        id: 4,
-        position: { lat: 37.5625, lng: 126.974 },
-        title: "시청역",
-        type: "nearby",
-        name: "시청역 상점가",
-      },
-      {
-        id: 5,
-        position: { lat: 37.5705, lng: 126.982 },
-        title: "종로",
-        type: "other",
-        name: "종로 상점가",
-      },
-    ],
-    []
-  );
+  // useRef를 사용하여 최신 값 참조
+  const currentLocationRef = useRef(currentLocation);
+  const mapInstanceRef = useRef(map);
+  const currentLocationMarkerRef = useRef(currentLocationMarker);
 
-  const activeMarkers = useMemo(
-    () => (markers.length > 0 ? markers : defaultMarkers),
-    [markers, defaultMarkers]
-  );
+  // ref 값들을 최신 상태로 업데이트
+  useEffect(() => {
+    currentLocationRef.current = currentLocation;
+  }, [currentLocation]);
+
+  useEffect(() => {
+    mapInstanceRef.current = map;
+  }, [map]);
+
+  useEffect(() => {
+    currentLocationMarkerRef.current = currentLocationMarker;
+  }, [currentLocationMarker]);
+
+  // 하드코딩된 마커 제거 - 실제 상품 데이터만 사용
+
+  // 상품 데이터를 기반으로 마커 생성
+  const productMarkers = useMemo(() => {
+    if (!products || products.length === 0) return [];
+
+    // 상점별로 상품 그룹화
+    const storeGroups = {};
+
+    products.forEach((product) => {
+      // 상품의 위치 정보 (상점 위치 사용)
+      let productLat, productLng;
+
+      // 다양한 위치 정보 소스에서 좌표 추출
+      if (product.store && product.store.lat && product.store.lng) {
+        // store 객체에 직접 lat, lng가 있는 경우
+        productLat = product.store.lat;
+        productLng = product.store.lng;
+      } else if (product.lat && product.lng) {
+        // 상품 자체에 lat, lng가 있는 경우
+        productLat = product.lat;
+        productLng = product.lng;
+      } else {
+        return; // 위치 정보가 없는 상품은 제외
+      }
+
+      // 상점 위치를 키로 사용 (소수점 4자리까지 반올림하여 그룹화)
+      const storeKey = `${productLat.toFixed(4)}_${productLng.toFixed(4)}`;
+
+      if (!storeGroups[storeKey]) {
+        storeGroups[storeKey] = {
+          position: { lat: productLat, lng: productLng },
+          storeName: product.storeName || product.store?.name || "상점",
+          products: [],
+          distance: Infinity,
+        };
+      }
+
+      // 상점 그룹에 상품 추가
+      storeGroups[storeKey].products.push(product);
+
+      // 사용자 위치와의 거리 계산 (가장 가까운 상품의 거리 사용)
+      if (userLocation && userLocation.lat && userLocation.lng) {
+        const distance = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          productLat,
+          productLng
+        );
+        if (distance < storeGroups[storeKey].distance) {
+          storeGroups[storeKey].distance = distance;
+        }
+      }
+    });
+
+    // 상점별 마커 생성
+    return Object.values(storeGroups).map((storeGroup) => {
+      const radius = userLocation?.radius || 5;
+
+      // 상품들의 source를 확인하여 분류
+      const nearbySourceProducts = storeGroup.products.filter(
+        (product) => product.source === "nearby"
+      );
+      const allSourceProducts = storeGroup.products.filter(
+        (product) => product.source === "all"
+      );
+
+      // 상점에 "nearby" source 상품이 하나라도 있으면 "nearby"로 분류
+      const isNearby = nearbySourceProducts.length > 0;
+
+      return {
+        id: `store_${storeGroup.position.lat}_${storeGroup.position.lng}`,
+        position: storeGroup.position,
+        title: `${storeGroup.storeName} (${storeGroup.products.length}개 상품)`,
+        type: isNearby ? "nearby" : "other",
+        name: storeGroup.storeName,
+        storeGroup: storeGroup, // 상점 그룹 정보 저장
+        distance: storeGroup.distance,
+      };
+    });
+  }, [products, userLocation]);
+
+  const activeMarkers = useMemo(() => {
+    // 상품 마커가 있으면 사용
+    if (productMarkers.length > 0) {
+      return productMarkers;
+    }
+
+    // 상품 마커가 없고 사용자 정의 마커가 있으면 사용
+    if (markers.length > 0) {
+      return markers;
+    }
+
+    // 둘 다 없으면 빈 배열 반환 (마커 없음)
+    return [];
+  }, [productMarkers, markers]);
+
+  // activeMarkers 변경 감지 (디버깅용)
+  useEffect(() => {
+    // activeMarkers 변경 시 추가 처리 필요시 여기에 구현
+  }, [activeMarkers]);
 
   // 현재 위치 가져오기
-  const getCurrentLocation = () => {
+  const getCurrentLocation = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -175,14 +274,33 @@ const AdvancedGoogleMap = ({
           const location = { lat: latitude, lng: longitude };
           setCurrentLocation(location);
 
-          if (map) {
-            addCurrentLocationMarker(location, map);
-            map.setCenter(location);
-            map.setZoom(16);
+          // 부모 컴포넌트에 위치 업데이트 알림
+          if (onLocationUpdate) {
+            onLocationUpdate(location);
+          }
+
+          // map이 준비된 후에 마커 추가 및 지도 이동
+          if (mapInstanceRef.current) {
+            addCurrentLocationMarker(location, mapInstanceRef.current);
+            mapInstanceRef.current.setCenter(location);
+            mapInstanceRef.current.setZoom(16);
           }
         },
         (error) => {
-          console.log("현재 위치를 가져올 수 없습니다:", error.message);
+          // 사용자에게 권한 요청 안내
+          if (error.code === 1) {
+            alert(
+              "위치 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해주세요."
+            );
+          } else if (error.code === 2) {
+            alert("위치를 가져올 수 없습니다. 인터넷 연결을 확인해주세요.");
+          } else if (error.code === 3) {
+            alert("위치 요청 시간이 초과되었습니다. 다시 시도해주세요.");
+          } else {
+            alert(
+              "위치 서비스를 사용할 수 없습니다. 브라우저를 새로고침하거나 다시 시도해주세요."
+            );
+          }
         },
         {
           enableHighAccuracy: true,
@@ -190,43 +308,47 @@ const AdvancedGoogleMap = ({
           maximumAge: 60000,
         }
       );
-    } else {
-      console.log("Geolocation이 지원되지 않습니다");
     }
-  };
+  }, []); // 의존성 제거
 
-  const addCurrentLocationMarker = (location, mapInstance) => {
-    if (currentLocationMarker) {
-      currentLocationMarker.setMap(null);
-    }
+  const addCurrentLocationMarker = useCallback(
+    (location, mapInstance) => {
+      if (currentLocationMarkerRef.current) {
+        currentLocationMarkerRef.current.setMap(null);
+      }
 
-    const marker = new window.google.maps.Marker({
-      position: location,
-      map: mapInstance,
-      title: "현재 위치",
-      icon: {
-        url: currentLocationPinIcon,
-        scaledSize: new window.google.maps.Size(48, 48),
-        anchor: new window.google.maps.Point(24, 48),
-      },
-      zIndex: 1000,
-    });
+      const marker = new window.google.maps.Marker({
+        position: location,
+        map: mapInstance,
+        title: "현재 위치",
+        icon: {
+          url: currentLocationPinIcon,
+          scaledSize: new window.google.maps.Size(48, 48),
+          anchor: new window.google.maps.Point(24, 48),
+        },
+        zIndex: 1000,
+      });
 
-    setCurrentLocationMarker(marker);
-  };
+      setCurrentLocationMarker(marker);
+    },
+    [] // 의존성 제거
+  );
 
-  const moveToCurrentLocation = () => {
-    if (currentLocation && map) {
-      map.setCenter(currentLocation);
-      map.setZoom(16);
+  const moveToCurrentLocation = useCallback(() => {
+    if (currentLocationRef.current && mapInstanceRef.current) {
+      mapInstanceRef.current.setCenter(currentLocationRef.current);
+      mapInstanceRef.current.setZoom(16);
 
-      if (!currentLocationMarker) {
-        addCurrentLocationMarker(currentLocation, map);
+      if (!currentLocationMarkerRef.current) {
+        addCurrentLocationMarker(
+          currentLocationRef.current,
+          mapInstanceRef.current
+        );
       }
     } else {
       getCurrentLocation();
     }
-  };
+  }, []); // 의존성 제거
 
   const initializeMap = () => {
     if (!window.google || !window.google.maps) {
@@ -271,7 +393,6 @@ const AdvancedGoogleMap = ({
         });
       }
     } catch (error) {
-      console.error("구글 맵 초기화 오류:", error);
       setIsLoading(false);
     }
   };
@@ -318,9 +439,6 @@ const AdvancedGoogleMap = ({
     }
 
     return () => {
-      if (markerClusterer) {
-        markerClusterer.clearMarkers();
-      }
       if (map) {
         window.google.maps.event.clearInstanceListeners(map);
       }
@@ -335,77 +453,247 @@ const AdvancedGoogleMap = ({
     }
   }, [map, currentLocation]);
 
+  // 컴포넌트 마운트 시 현재 위치 요청 (showUserLocation이 true인 경우)
   useEffect(() => {
-    if (!map || activeMarkers.length === 0) return;
+    if (showUserLocation && !currentLocation) {
+      // 약간의 지연을 두어 사용자 제스처로 인식되도록 함
+      const timer = setTimeout(() => {
+        getCurrentLocation();
+      }, 100);
 
+      return () => clearTimeout(timer);
+    }
+  }, [showUserLocation, currentLocation]);
+
+  useEffect(() => {
+    if (!map || activeMarkers.length === 0) {
+      return;
+    }
+
+    // 기존 마커들 제거
     currentMarkers.forEach((marker) => marker.setMap(null));
 
     const newMarkers = [];
 
-    activeMarkers.forEach((markerData) => {
-      const chosenIconUrl =
-        markerData.type === "nearby"
-          ? nearbyPin || inventoryPinIcon || inventoryPinDefault
-          : otherPin || mapPinIcon;
+    activeMarkers.forEach((markerData, index) => {
+      // 거리에 따른 핀 색상 결정
+      let chosenIconUrl;
+      if (markerData.type === "nearby") {
+        // 주변 상품: 주황색 핀
+        chosenIconUrl = nearbyPin || inventoryPinIcon || inventoryPinDefault;
+      } else {
+        // 먼 거리 상품: 초록색 핀
+        chosenIconUrl = otherPin || mapPinIcon;
+      }
 
-      const marker = new window.google.maps.Marker({
-        position: markerData.position,
-        map: map,
-        title: markerData.title,
-        icon: {
+      // 같은 위치에 있는 마커들을 위해 약간의 오프셋 추가
+      const offset = index * 0.0001; // 각 마커마다 미세한 위치 차이
+      const offsetPosition = {
+        lat: markerData.position.lat + offset,
+        lng: markerData.position.lng + offset,
+      };
+
+      // 상점별로 그룹화된 마커인 경우 상품 개수 표시
+      let markerIcon;
+      if (markerData.storeGroup) {
+        // 상품 개수를 표시하는 커스텀 아이콘 생성
+        const productCount = markerData.storeGroup.products.length;
+        const iconSize = 40; // 아이콘 크기 증가
+
+        // 핀 색상 결정:
+        // - markerData.type === "nearby": 주변 상품 (주황색 #FF6B35)
+        // - markerData.type === "other": 먼 거리 상품 (초록색 #37CA79)
+        // 이는 API 호출 시 위도/경도 포함 여부에 따라 결정됨
+
+        markerIcon = {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+            <svg width="${iconSize}" height="${iconSize}" viewBox="0 0 ${iconSize} ${iconSize}" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- 핀 모양 -->
+              <!-- 주변 상품: 주황색(#FF6B35), 먼 거리 상품: 초록색(#37CA79) -->
+              <path d="M20 0C12.5 0 6 6.5 6 14.5C6 25 20 40 20 40S34 25 34 14.5C34 6.5 27.5 0 20 0Z" 
+                    fill="${
+                      markerData.type === "nearby" ? "#FF6B35" : "#37CA79"
+                    }"
+                    stroke="#FFFFFF" stroke-width="2"/>
+              
+              <!-- 상품 개수 원 -->
+              <circle cx="28" cy="12" r="10" fill="#FFFFFF" stroke="#333" stroke-width="1"/>
+              <text x="28" y="16" text-anchor="middle" fill="#333" font-size="12" font-weight="bold" font-family="Arial, sans-serif">
+                ${productCount > 99 ? "99+" : productCount}
+              </text>
+            </svg>
+          `)}`,
+          scaledSize: new window.google.maps.Size(iconSize, iconSize),
+          anchor: new window.google.maps.Point(20, 40),
+        };
+      } else {
+        // 기존 아이콘 사용
+        markerIcon = {
           url: chosenIconUrl,
           scaledSize: new window.google.maps.Size(32, 32),
           anchor: new window.google.maps.Point(16, 32),
-        },
+        };
+      }
+
+      const marker = new window.google.maps.Marker({
+        position: offsetPosition,
+        map: map,
+        title: markerData.title,
+        icon: markerIcon,
+        // 마커 가시성 보장
+        visible: true,
+        zIndex: 1000 + index, // 각 마커마다 다른 zIndex
       });
 
+      // 마커 클릭 이벤트
       if (onMarkerClick) {
         marker.addListener("click", () => {
           onMarkerClick(markerData);
+        });
+      } else {
+        // 기본 마커 클릭 이벤트 (상점 정보 표시)
+        marker.addListener("click", () => {
+          if (markerData.storeGroup) {
+            // 상점별로 그룹화된 상품들 표시
+            const productsList = markerData.storeGroup.products
+              .map((product) => {
+                const price = product.originalPrice || product.price;
+                const discountPrice =
+                  product.discountPrice || product.discount_price;
+                const priceText = price
+                  ? discountPrice && discountPrice < price
+                    ? `<del>${price.toLocaleString()}원</del> <strong style="color: #e74c3c;">${discountPrice.toLocaleString()}원</strong>`
+                    : `<strong>${price.toLocaleString()}원</strong>`
+                  : "가격 정보 없음";
+
+                return `
+                  <div style="border-bottom: 1px solid #eee; padding: 8px 0; cursor: pointer;" 
+                       data-product-id="${product.id}">
+                    <div style="font-weight: bold; margin-bottom: 4px;">${
+                      product.productName || product.name
+                    }</div>
+                    <div style="color: #666; font-size: 12px;">${priceText}</div>
+                  </div>
+                `;
+              })
+              .join("");
+
+            const infoWindow = new window.google.maps.InfoWindow({
+              content: `
+                <div style="padding: 15px; min-width: 250px; max-height: 300px; overflow-y: auto;">
+                  <h3 style="margin: 0 0 10px 0; font-size: 18px; color: #333; border-bottom: 2px solid #3498db; padding-bottom: 8px;">
+                    🏪 ${markerData.name}
+                  </h3>
+                  <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">
+                    <strong>📍 거리:</strong> ${
+                      markerData.distance
+                        ? markerData.distance.toFixed(1) + "km"
+                        : "알 수 없음"
+                    }
+                  </p>
+                  <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">
+                    <strong>📦 상품 수:</strong> ${
+                      markerData.storeGroup.products.length
+                    }개
+                  </p>
+                  <div style="margin-top: 15px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: #333;">상품 목록:</h4>
+                    ${productsList}
+                  </div>
+                </div>
+              `,
+            });
+
+            // InfoWindow가 열린 후 상품 클릭 이벤트 추가
+            infoWindow.addListener("domready", () => {
+              const productItems =
+                document.querySelectorAll("[data-product-id]");
+              productItems.forEach((item) => {
+                item.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  const productId = item.getAttribute("data-product-id");
+                  navigate(`/product/${productId}`);
+                  infoWindow.close();
+                });
+              });
+            });
+
+            infoWindow.open(map, marker);
+          } else if (markerData.product) {
+            // 개별 상품 정보 표시 (기존 로직)
+            const infoWindow = new window.google.maps.InfoWindow({
+              content: `
+                <div style="padding: 10px; min-width: 200px;">
+                  <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #333;">
+                    ${markerData.title}
+                  </h3>
+                  <p style="margin: 0 0 5px 0; font-size: 14px; color: #666;">
+                    <strong>상점:</strong> ${markerData.name}
+                  </p>
+                  <p style="margin: 0 0 5px 0; font-size: 14px; color: #666;">
+                    <strong>거리:</strong> ${
+                      markerData.distance
+                        ? markerData.distance.toFixed(1) + "km"
+                        : "알 수 없음"
+                    }
+                  </p>
+                  <p style="margin: 0 0 5px 0; font-size: 14px; color: #666;">
+                    <strong>가격:</strong> ${
+                      markerData.product.originalPrice
+                        ? markerData.product.originalPrice.toLocaleString() +
+                          "원"
+                        : "가격 정보 없음"
+                    }
+                  </p>
+                </div>
+              `,
+            });
+            infoWindow.open(map, marker);
+          }
         });
       }
 
       newMarkers.push(marker);
     });
 
-    setCurrentMarkers(newMarkers);
-
-    if (newMarkers.length > 0) {
-      const clusterer = new MarkerClusterer({
-        map: map,
-        markers: newMarkers,
-        gridSize: 100,
-        maxZoom: 16,
-        minimumClusterSize: 2,
-        renderer: {
-          render: ({ count, position }) => {
-            return new window.google.maps.Marker({
-              position,
-              icon: {
-                url:
-                  "data:image/svg+xml;charset=UTF-8," +
-                  encodeURIComponent(`
-                  <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="25" cy="25" r="25" fill="#37ca79" stroke="#2a9d5f" stroke-width="2"/>
-                    <text x="25" y="32" text-anchor="middle" fill="white" font-size="18" font-weight="bold" font-family="Arial, sans-serif">${count}</text>
-              `),
-                scaledSize: new window.google.maps.Size(50, 50),
-                anchor: new window.google.maps.Point(25, 25),
-              },
-            });
-          },
-        },
+    // 지도가 초기화된 후에만 범위 조정 (핀 클릭 시에는 조정하지 않음)
+    if (!map.getBounds()) {
+      // 모든 마커를 포함하는 지도 범위 설정
+      const bounds = new window.google.maps.LatLngBounds();
+      newMarkers.forEach((marker) => {
+        bounds.extend(marker.getPosition());
       });
 
-      setMarkerClusterer(clusterer);
-
-      if (onClusterClick) {
-        clusterer.addListener("clusterclick", (cluster) => {
-          onClusterClick(cluster);
-        });
+      // 사용자 위치도 범위에 포함
+      if (userLocation && userLocation.lat && userLocation.lng) {
+        bounds.extend({ lat: userLocation.lat, lng: userLocation.lng });
       }
+
+      // 지도 범위 조정 (패딩 추가)
+      map.fitBounds(bounds);
+
+      // 너무 확대되지 않도록 최대 줌 레벨 제한
+      const listener = window.google.maps.event.addListenerOnce(
+        map,
+        "bounds_changed",
+        () => {
+          if (map.getZoom() > 15) {
+            map.setZoom(15);
+          }
+        }
+      );
     }
-  }, [map, activeMarkers, nearbyPin, otherPin, inventoryPinIcon]);
+
+    // 마커 클러스터링 완전 제거 - 모든 마커를 개별적으로 표시
+    setCurrentMarkers(newMarkers);
+  }, [
+    map,
+    activeMarkers,
+    nearbyPin,
+    otherPin,
+    inventoryPinIcon,
+    onMarkerClick,
+  ]);
 
   return (
     <MapContainer $size={size}>
@@ -423,9 +711,16 @@ const AdvancedGoogleMap = ({
             <ControlButton onClick={handleZoomOut} title="축소">
               −
             </ControlButton>
-            <ControlButton onClick={moveToCurrentLocation} title="현재 위치">
-              <img src={locationIcon} alt="현재 위치" width={16} height={16} />
-            </ControlButton>
+            {showUserLocation && (
+              <ControlButton onClick={moveToCurrentLocation} title="현재 위치">
+                <img
+                  src={locationIcon}
+                  alt="현재 위치"
+                  width={16}
+                  height={16}
+                />
+              </ControlButton>
+            )}
           </MapControls>
         </>
       )}
