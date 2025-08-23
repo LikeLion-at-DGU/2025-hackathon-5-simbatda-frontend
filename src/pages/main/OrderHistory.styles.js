@@ -143,7 +143,6 @@ const ProgressStep = styled.div`
   background: #f9fafb;
   border-radius: 12px;
   padding: 20px;
-  min-width: 297px;
 `;
 
 const StepHeader = styled.div`
