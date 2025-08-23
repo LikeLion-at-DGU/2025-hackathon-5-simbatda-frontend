@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getSellerMe,
+  getSellerStore,
   getSellerProducts,
   createProduct,
   deleteProduct,
-  getSellerStore,
 } from "../../api/seller";
 import { logout, getCategories } from "../../api/auth";
 import Button from "../../components/common/button/Button";
@@ -166,42 +166,34 @@ function ProductRegister() {
   }, [products.length]);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const fetchUserAndStoreInfo = async () => {
       try {
-        const data = await getSellerMe();
-        setUserInfo(data);
+        const [userData, storeData] = await Promise.all([
+          getSellerMe(),
+          getSellerStore(),
+        ]);
+        console.log("Fetched user data:", userData);
+        console.log("Fetched store data:", storeData);
 
-        if (data.store) {
-          setIsOpen(data.store.is_open);
-        } else {
-          try {
-            const storeData = await getSellerStore();
-
-            if (storeData && storeData.length > 0) {
-              const store = storeData[0];
-
-              setUserInfo((prev) => ({
-                ...prev,
-                store: store,
-              }));
-
-              setIsOpen(store.is_open);
-            }
-          } catch (storeErr) {
-            console.error("상점 정보 가져오기 실패:", storeErr);
-          }
-        }
+        // 가게 정보를 userInfo에 포함
+        const userInfoWithStore = {
+          ...userData,
+          store: storeData,
+        };
+        setUserInfo(userInfoWithStore);
       } catch (err) {
-        console.error("Failed to fetch user info:", err);
+        console.error("Failed to fetch user/store info:", err);
         navigate("/signin-seller");
       }
     };
-    fetchUserInfo();
+    fetchUserAndStoreInfo();
   }, [navigate]);
 
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // localStorage에서 저장된 가게 상태 복원 (제거 - 서버에서만 상태를 가져옴)
 
   const handleLogout = async () => {
     try {
@@ -295,6 +287,29 @@ function ProductRegister() {
         return;
       }
 
+      // 디버깅을 위한 로그 추가
+      console.log("=== 상품 생성 요청 데이터 ===");
+      console.log("메뉴 이름:", menuName);
+      console.log("원 가격:", Number(basePrice || 0));
+      console.log("할인 가격:", Number(finalPrice || basePrice || 0));
+      console.log("설명:", description || "");
+      console.log(
+        "카테고리 ID:",
+        selectedCategories.length > 0
+          ? categories.find((cat) => cat.name === selectedCategories[0])?.id ||
+              1
+          : 1
+      );
+      console.log("수량:", Number(quantity || 1));
+      console.log("유통기한:", expiryDate.toISOString());
+      console.log("이미지 파일:", selectedImageFile);
+
+      // FormData 내용 확인
+      console.log("=== FormData 내용 ===");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
       const newProduct = await createProduct(formData);
 
       await fetchProducts();
@@ -367,10 +382,11 @@ function ProductRegister() {
       <Content>
         <OpenStatusSection>
           <Button
-            variant={isOpen ? "open" : "close"}
+            variant={isOpen === null ? "loading" : isOpen ? "open" : "close"}
             onClick={handleToggleOpenStatus}
+            disabled={isOpen === null}
           >
-            {isOpen ? "open" : "close"}
+            {isOpen === null ? "로딩 중..." : isOpen ? "open" : "close"}
           </Button>
           <OpenStatusText>영업상태 변경</OpenStatusText>
         </OpenStatusSection>
