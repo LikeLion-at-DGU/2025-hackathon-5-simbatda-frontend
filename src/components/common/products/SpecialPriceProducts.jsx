@@ -19,7 +19,7 @@ const SpecialPriceProducts = ({ products = [] }) => {
   }
 
   const handleMoreClick = () => {
-    navigate("/special-price-products");
+    navigate("/special-price");
   };
 
   const handleProductClick = (productId) => {
@@ -51,6 +51,7 @@ const SpecialPriceProducts = ({ products = [] }) => {
               productName={product.productName}
               originalPrice={product.originalPrice}
               discountPrice={product.discountPrice}
+              discountRate={product.discountRate}
               imageUrl={product.imageUrl}
               isLiked={product.isLiked}
               onLikeToggle={(isLiked) => handleLikeToggle(product.id, isLiked)}

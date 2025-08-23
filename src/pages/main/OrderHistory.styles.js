@@ -5,11 +5,11 @@ const Container = styled.div`
   background-color: #f8f9fa;
   padding: 0 25px;
   margin-top: 100px;
+  margin-bottom: 50px;
 `;
 
 const OrderList = styled.div`
   margin-top: 20px;
-  margin-bottom: 50px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -207,14 +207,25 @@ const StepSummary = styled.div`
 
 // 진행 바 관련 스타일
 const ProgressBar = styled.div`
+  width: 100%;
   margin-top: 20px;
   padding-top: 15px;
   border-top: 1px solid #e5e7eb;
 `;
 
 const ProgressSteps = styled.div`
+  width: 100%;
   display: flex;
   align-items: flex-start;
+  gap: 16px;
+  overflow-x: auto;
+`;
+
+const ProgressStepBar = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 16px;
   overflow-x: auto;
 `;
@@ -248,8 +259,8 @@ const StepLine = styled.div`
 
 // 픽업 정보 스타일
 const PickupInfo = styled.div`
-  margin: 10px 0;
-  padding: 15px;
+  margin-top: 10px;
+  padding: 15px 20px;
   background: #fefefe;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
@@ -258,8 +269,7 @@ const PickupInfo = styled.div`
 const PickupTime = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 6px;
+  color: #775C4A;
 `;
 
 const PickupMessage = styled.div`
@@ -304,5 +314,6 @@ export {
   StepLine,
   PickupInfo,
   PickupTime,
+  ProgressStepBar,
   PickupMessage,
 };

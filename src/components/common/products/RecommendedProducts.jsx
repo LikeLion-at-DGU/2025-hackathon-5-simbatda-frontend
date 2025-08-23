@@ -19,7 +19,7 @@ const RecommendedProducts = ({ products = [], name = "사용자" }) => {
   }
 
   const handleMoreClick = () => {
-    navigate("/recommended-products");
+    navigate("/recommended");
   };
 
   const handleProductClick = (productId) => {
@@ -51,6 +51,7 @@ const RecommendedProducts = ({ products = [], name = "사용자" }) => {
               productName={product.productName}
               originalPrice={product.originalPrice}
               discountPrice={product.discountPrice}
+              discountRate={product.discountRate}
               imageUrl={product.imageUrl}
               isLiked={product.isLiked}
               onLikeToggle={(isLiked) => handleLikeToggle(product.id, isLiked)}

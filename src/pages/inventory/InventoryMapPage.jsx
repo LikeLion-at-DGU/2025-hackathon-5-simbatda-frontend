@@ -124,7 +124,7 @@ const InventoryMapPage = () => {
 
   return (
     <PageContainer>
-      <Header userInfo={{ name: "재고 관리자" }} onLogout={() => {}} />
+      <Header userInfo={{ name: "재고 관리자" }} title={"재고 지도"} onLogout={() => {}} />
 
       <Content>
         <PageTitle>재고 지도</PageTitle>

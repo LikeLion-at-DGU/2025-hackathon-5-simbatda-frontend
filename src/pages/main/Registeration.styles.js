@@ -32,6 +32,7 @@ const ProductImage = styled.img`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   object-fit: cover;
   display: block;
+  aspect-ratio: 1 / 1;
 `;
 
 const StoreName = styled.h2`
@@ -614,6 +615,36 @@ const ModalNotice = styled.p`
   line-height: 1.5;
 `;
 
+const NoRecommendationText = styled.p`
+  font-size: 14px;
+  color: #775c4a;
+  font-weight: 500;
+  opacity: 0.5;
+  margin: 0;
+  margin-left: 20px;
+  line-height: 1.5;
+`;
+
+const NoRecommendationImage = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  opacity: 0.5;
+`;
+
+const NoRecommendationImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NoRecommendationContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 100px;
+`;
+
 export {
   Container,
   ProductImageSection,
@@ -626,6 +657,7 @@ export {
   RecommendedSection,
   SectionTitle,
   ProductsContainer,
+  NoRecommendationContainer,
   ReservationButton,
   ReservationBottomSheet,
   BottomSheetHeader,
@@ -680,4 +712,7 @@ export {
   CancelButton,
   ConfirmButton,
   ModalNotice,
+  NoRecommendationText,
+  NoRecommendationImage,
+  NoRecommendationImageContainer,
 };

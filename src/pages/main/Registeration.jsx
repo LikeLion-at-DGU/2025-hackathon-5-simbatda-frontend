@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { unifiedMockData, mockUtils } from "../../mocks/UnifiedMockData";
+import {
+  getProductDetail,
+  getStoreInfo,
+  getRecommendedProducts,
+  createReservation,
+} from "../../api/products";
 import ProductCard from "../../components/common/card/ProductCard";
 import BackHeader from "../../components/common/header/BackHeader";
 import like from "../../assets/icons/like/like.svg";
 import unlike from "../../assets/icons/like/unlike.svg";
+import character from "../../assets/images/logo3.svg";
 import {
   Container,
   ProductImageSection,
@@ -61,7 +67,6 @@ import {
   DiscountInfo,
   DiscountRate,
   DiscountPrice,
-  // 모달 컴포넌트들
   ModalOverlay,
   ConfirmModal,
   ModalContent,
@@ -71,6 +76,10 @@ import {
   CancelButton,
   ConfirmButton,
   ModalNotice,
+  NoRecommendationText,
+  NoRecommendationImage,
+  NoRecommendationContainer,
+  NoRecommendationImageContainer,
 } from "./Registeration.styles";
 
 const Registeration = () => {
@@ -78,6 +87,7 @@ const Registeration = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [store, setStore] = useState(null);
+  const [recommended, setRecommended] = useState([]);
 
   const [reservationBottomSheetOpen, setReservationBottomSheetOpen] =
     useState(false);
@@ -86,34 +96,103 @@ const Registeration = () => {
   const [confirmChecked, setConfirmChecked] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isReserving, setIsReserving] = useState(false);
 
   useEffect(() => {
-    if (productId) {
-      const productData = mockUtils.getProductById(parseInt(productId));
-      if (productData) {
-        setProduct(productData);
-        const storeData = mockUtils.getStoreById(productData.storeId);
-        setStore(storeData);
+    let mounted = true;
+    const load = async () => {
+      try {
+        if (!productId) return;
+        const detail = await getProductDetail(productId);
+        if (!mounted || !detail) return;
 
-        // 좋아요 상태 초기화
-        setIsLiked(mockUtils.isProductLiked(1, productData.id));
+        const storeId =
+          typeof detail.store === "number" ? detail.store : detail.store?.id;
+        const storeInfo = storeId ? await getStoreInfo(storeId) : null;
+
+        const expiry = detail.expiration_date
+          ? new Date(detail.expiration_date)
+          : null;
+        const now = new Date();
+        const diffMs = expiry
+          ? Math.max(0, expiry.getTime() - now.getTime())
+          : 0;
+        const remainingTime = {
+          days: Math.floor(diffMs / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diffMs / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((diffMs / (1000 * 60)) % 60),
+          seconds: Math.floor((diffMs / 1000) % 60),
+        };
+
+        setProduct({
+          id: detail.id,
+          name: detail.name,
+          description: detail.description || "",
+          originalPrice: detail.price,
+          discountPrice: detail.discount_price,
+          discountRate: detail.discount_rate ?? 0,
+          stock: detail.stock,
+          imageUrl: detail.image || "",
+          expiryDate: expiry ? expiry.toLocaleString() : "",
+          remainingTime,
+        });
+
+        const resolvedStoreName =
+          (storeInfo?.name && storeInfo.name.trim()) ||
+          (detail.store_name && String(detail.store_name).trim()) ||
+          (detail.store?.name && String(detail.store.name).trim()) ||
+          "상점";
+
+        setStore({
+          id: storeInfo?.id || storeId || 0,
+          name: resolvedStoreName,
+          address: storeInfo?.address || "",
+        });
+
+        setIsLiked(false);
+      } catch (e) {
+        if (!mounted) return;
+        setProduct(null);
+        setStore(null);
       }
-    }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
   }, [productId]);
 
-  // 바텀시트 열기/닫기 시 body 스크롤 제어
   useEffect(() => {
-    if (reservationBottomSheetOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    // 컴포넌트 언마운트 시 스크롤 복원
-    return () => {
-      document.body.style.overflow = "unset";
+    let mounted = true;
+    const loadRecommended = async () => {
+      try {
+        const list = await getRecommendedProducts();
+        if (!mounted) return;
+        const mapped = (Array.isArray(list) ? list : [])
+          .filter((p) => p?.id !== Number(productId))
+          .slice(0, 5)
+          .map((p) => ({
+            id: p.id,
+            storeName: p.store_name || p.store?.name || "상점",
+            productName: p.name,
+            originalPrice: p.price,
+            discountPrice: p.discount_price,
+            imageUrl: p.image || "",
+            isLiked: false,
+          }));
+        setRecommended(mapped);
+      } catch (_) {
+        if (!mounted) return;
+        setRecommended([]);
+      }
     };
-  }, [reservationBottomSheetOpen]);
+
+    loadRecommended();
+    return () => {
+      mounted = false;
+    };
+  }, [productId]);
 
   const handleReservationClick = () => {
     setReservationBottomSheetOpen(true);
@@ -130,17 +209,23 @@ const Registeration = () => {
     }
   };
 
-  const handleConfirmReservation = () => {
-    // TODO: 예약 API 연동
-    console.log("상품 예약 완료:", {
-      productId: product.id,
-      quantity: selectedQuantity,
-      totalPrice: product.discountPrice * selectedQuantity,
-    });
-    setShowConfirmModal(false);
-    setReservationBottomSheetOpen(false);
-    document.body.style.overflow = "unset";
-    // 예약 완료 후 처리 (예: 성공 메시지, 페이지 이동 등)
+  const handleConfirmReservation = async () => {
+    if (!product?.id) return;
+    try {
+      setIsReserving(true);
+      const result = await createReservation({
+        productId: product.id,
+        quantity: selectedQuantity,
+      });
+      alert("예약이 완료되었습니다.");
+      setShowConfirmModal(false);
+      setReservationBottomSheetOpen(false);
+      document.body.style.overflow = "unset";
+    } catch (e) {
+      alert("예약에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsReserving(false);
+    }
   };
 
   const handleCancelReservation = () => {
@@ -148,19 +233,17 @@ const Registeration = () => {
   };
 
   const handleQuantityChange = (newQuantity) => {
-    if (newQuantity >= 1 && newQuantity <= product.stock) {
+    if (newQuantity >= 1 && newQuantity <= (product?.stock || 1)) {
       setSelectedQuantity(newQuantity);
     }
   };
 
   const handleLikeToggle = (productId) => {
-    // TODO: 좋아요 API 연동
     setIsLiked(!isLiked);
-    console.log(`상품 ${productId} 좋아요 ${!isLiked ? "추가" : "제거"}`);
   };
 
   const handleStoreClick = () => {
-    navigate(`/store/${store.id}`);
+    if (store?.id) navigate(`/store/${store.id}`);
   };
 
   if (!product || !store) {
@@ -169,14 +252,12 @@ const Registeration = () => {
 
   return (
     <Container>
-      {/* 뒤로가기 헤더 */}
       <BackHeader title="상품 상세" />
 
-      {/* 상품 이미지 */}
       <ProductImageContainer>
         <ProductImageSection>
           <ProductImage
-            src="/src/assets/images/defaultImage.svg"
+            src={product.imageUrl || "/src/assets/images/defaultImage.svg"}
             alt={product.name}
           />
           <LikeButton onClick={() => handleLikeToggle(product.id)}>
@@ -185,29 +266,26 @@ const Registeration = () => {
         </ProductImageSection>
       </ProductImageContainer>
 
-      {/* 상점명 */}
-      <StoreName onClick={handleStoreClick}>{store.name} {" >"}</StoreName>
+      <StoreName onClick={handleStoreClick}>
+        {store.name} {" >"}
+      </StoreName>
 
-      {/* 상품명 */}
       <ProductName>{product.name}</ProductName>
 
-      {/* 상품 설명 */}
       <ProductDescription>{product.description}</ProductDescription>
 
-      {/* 가격 정보 */}
       <PriceSection>
         <OriginalPrice>
-          {product.originalPrice.toLocaleString()}원
+          {Number(product.originalPrice || 0).toLocaleString()}원
         </OriginalPrice>
         <DiscountInfo>
-          <DiscountRate>{product.discountRate}%</DiscountRate>
+          <DiscountRate>{Number(product.discountRate || 0)}%</DiscountRate>
           <DiscountPrice>
-            {product.discountPrice.toLocaleString()}원
+            {Number(product.discountPrice || 0).toLocaleString()}원
           </DiscountPrice>
         </DiscountInfo>
       </PriceSection>
 
-      {/* 남은 시간 */}
       <RemainingTimeSection>
         <RemainingTimeTitle>
           D-{product.remainingTime.days},{" "}
@@ -217,44 +295,45 @@ const Registeration = () => {
         </RemainingTimeTitle>
       </RemainingTimeSection>
 
-      {/* 개인 맞춤 추천상품 */}
-      <RecommendedSection>
-        <SectionTitle>
-          {userInfo?.name || "사용자"}님 취향과 비슷한 상품이에요!
-        </SectionTitle>
-        <ProductsContainer>
-          {mockUtils
-            .getRecommendedProducts()
-            .filter((p) => p.id !== product.id)
-            .slice(0, 5)
-            .map((recommendedProduct) => (
+      {recommended.length > 0 ? (
+        <RecommendedSection>
+          <SectionTitle>
+            {userInfo?.name || "사용자"}님 취향과 비슷한 상품이에요!
+          </SectionTitle>
+          <ProductsContainer>
+            {recommended.map((recommendedProduct) => (
               <ProductCard
                 key={recommendedProduct.id}
                 variant="compact"
-                storeName={
-                  mockUtils.getStoreById(recommendedProduct.storeId)?.name ||
-                  "상점"
-                }
-                productName={recommendedProduct.name}
+                storeName={recommendedProduct.storeName}
+                productName={recommendedProduct.productName}
                 originalPrice={recommendedProduct.originalPrice}
                 discountPrice={recommendedProduct.discountPrice}
                 imageUrl={recommendedProduct.imageUrl}
-                isLiked={mockUtils.isProductLiked(1, recommendedProduct.id)}
+                isLiked={recommendedProduct.isLiked}
                 onLikeToggle={() => {}}
                 onClick={() =>
                   navigate(`/registeration/${recommendedProduct.id}`)
                 }
               />
             ))}
-        </ProductsContainer>
-      </RecommendedSection>
+          </ProductsContainer>
+        </RecommendedSection>
+      ) : (
+        <NoRecommendationContainer>
+          <NoRecommendationText>
+            원하는 상품 찜하시면 재고를 추천해드려요!
+          </NoRecommendationText>
+          <NoRecommendationImageContainer>
+            <NoRecommendationImage src={character} alt="character" />
+          </NoRecommendationImageContainer>
+        </NoRecommendationContainer>
+      )}
 
-      {/* 예약하기 버튼 */}
       <ReservationButton onClick={handleReservationClick}>
         예약하기
       </ReservationButton>
 
-      {/* 예약 바텀시트 */}
       {reservationBottomSheetOpen && (
         <>
           <BottomSheetOverlay
@@ -269,7 +348,6 @@ const Registeration = () => {
               <CloseButton onClick={handleBottomSheetClose}>×</CloseButton>
             </BottomSheetHeader>
             <BottomSheetContent>
-              {/* 상품 정보 */}
               <ProductInfoSection>
                 <ProductDetails>
                   <StoreNameSmall onClick={handleStoreClick}>
@@ -293,7 +371,7 @@ const Registeration = () => {
                           onClick={() =>
                             handleQuantityChange(selectedQuantity + 1)
                           }
-                          disabled={selectedQuantity >= product.stock}
+                          disabled={selectedQuantity >= (product.stock || 0)}
                         >
                           +
                         </QuantityButton>
@@ -306,9 +384,7 @@ const Registeration = () => {
                 </ProductDetails>
               </ProductInfoSection>
 
-              {/* 매장 주소 */}
               <AddressSection>
-                {" "}
                 <AddressContainer>
                   <AddressTitle>매장 주소</AddressTitle>
                   <AddressCopyButton>주소 복사</AddressCopyButton>
@@ -316,19 +392,18 @@ const Registeration = () => {
                 <AddressText>{store.address}</AddressText>
               </AddressSection>
 
-              {/* 주문 금액 */}
               <PriceReservationSection>
                 <AddressTitle>주문 금액</AddressTitle>
                 <PriceDisplay>
                   <OriginalPriceDisplay>
-                    {product.originalPrice.toLocaleString()}원
+                    {Number(product.originalPrice || 0).toLocaleString()}원
                   </OriginalPriceDisplay>
                   <DiscountInfoDisplay>
                     <DiscountRateDisplay>
-                      {product.discountRate}% 할인
+                      {Number(product.discountRate || 0)}% 할인
                     </DiscountRateDisplay>
                     <DiscountPriceDisplay>
-                      {product.discountPrice.toLocaleString()}원
+                      {Number(product.discountPrice || 0).toLocaleString()}원
                     </DiscountPriceDisplay>
                   </DiscountInfoDisplay>
                 </PriceDisplay>
@@ -336,25 +411,24 @@ const Registeration = () => {
                   <AddressTitle>총 결제 금액</AddressTitle>
                   <TotalPriceValue>
                     {(
-                      product.discountPrice * selectedQuantity
+                      Number(product.discountPrice || 0) * selectedQuantity
                     ).toLocaleString()}
                     원
                   </TotalPriceValue>
                 </TotalPriceRow>
               </PriceReservationSection>
 
-              {/* 예약 안내 */}
               <ReservationNotice>
                 <NoticeText>
                   상품 예약이 수락되면, 30분 이내에 꼭 픽업해주세요!
                 </NoticeText>
               </ReservationNotice>
 
-              {/* 확인 체크박스 */}
               <ConfirmationSection>
                 <Checkbox
                   type="checkbox"
                   id="confirmReservation"
+                  checked={confirmChecked}
                   onChange={(e) => setConfirmChecked(e.target.checked)}
                 />
                 <CheckboxLabel htmlFor="confirmReservation">
@@ -362,8 +436,10 @@ const Registeration = () => {
                 </CheckboxLabel>
               </ConfirmationSection>
 
-              {/* 예약하기 버튼 */}
-              <ReserveButton onClick={handleReserve} disabled={!confirmChecked}>
+              <ReserveButton
+                onClick={handleReserve}
+                disabled={!confirmChecked || isReserving}
+              >
                 예약하기
               </ReserveButton>
             </BottomSheetContent>
@@ -371,7 +447,6 @@ const Registeration = () => {
         </>
       )}
 
-      {/* 예약 확인 모달 */}
       {showConfirmModal && (
         <>
           <ModalOverlay onClick={handleCancelReservation} />
@@ -383,9 +458,11 @@ const Registeration = () => {
                 <strong>{selectedQuantity}개</strong> 예약하시겠습니까?
               </ModalText>
               <ModalPriceInfo>
-                총 결제 금액:{" "}
+                총 결제 금액: {""}
                 <strong>
-                  {(product?.discountPrice * selectedQuantity).toLocaleString()}
+                  {(
+                    Number(product?.discountPrice || 0) * selectedQuantity
+                  ).toLocaleString()}
                   원
                 </strong>
               </ModalPriceInfo>
@@ -397,8 +474,11 @@ const Registeration = () => {
               <CancelButton onClick={handleCancelReservation}>
                 취소
               </CancelButton>
-              <ConfirmButton onClick={handleConfirmReservation}>
-                예약하기
+              <ConfirmButton
+                onClick={handleConfirmReservation}
+                disabled={isReserving}
+              >
+                {isReserving ? "처리 중..." : "예약하기"}
               </ConfirmButton>
             </ModalActions>
           </ConfirmModal>

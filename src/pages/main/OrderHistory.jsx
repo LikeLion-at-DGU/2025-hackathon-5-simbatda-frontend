@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/header/Header";
-import { mockUtils } from "../../mocks/UnifiedMockData";
+import { getReservations } from "../../api/reservations";
 import greencheck from "../../assets/icons/check.svg";
 import graycheck from "../../assets/icons/uncheck.svg";
 import empty from "../../assets/images/crying-character.svg";
@@ -40,7 +40,7 @@ import {
   StepLine,
   PickupInfo,
   PickupTime,
-  PickupMessage,
+  ProgressStepBar,
 } from "./OrderHistory.styles";
 
 function OrderHistory() {
@@ -52,22 +52,49 @@ function OrderHistory() {
     // 사용자 정보 설정
     setUserInfo({ name: "테스트 사용자" });
 
-    // 사용자 ID 1번의 주문 내역 가져오기
-    const userOrders = mockUtils.getOrdersByUser(1);
+    // 주문내역 API 호출
+    const fetchOrders = async () => {
+      try {
+        const reservations = await getReservations();
 
-    // 주문 상태별 우선순위 정렬 (진행중인 주문이 맨 위에 오도록)
-    const sortedOrders = userOrders.sort((a, b) => {
-      const statusPriority = {
-        pending: 1, // 주문확인 대기 (가장 높음)
-        processing: 2, // 상품 준비 중
-        completed: 3, // 픽업 완료
-        cancelled: 4, // 주문 취소 (가장 낮음)
-      };
+        // API 응답을 기존 형식에 맞게 변환
+        const mappedOrders = reservations.map((reservation) => ({
+          id: reservation.id,
+          status: reservation.status,
+          storeName: reservation.store.name,
+          productName: reservation.product.name,
+          quantity: reservation.quantity,
+          reservedAt: reservation.reserved_at,
+          createdAt: reservation.created_at,
+          cancelReason: reservation.cancel_reason,
+          storeLat: reservation.store.lat,
+          storeLng: reservation.store.lng,
+        }));
 
-      return statusPriority[a.status] - statusPriority[b.status];
-    });
+        // 주문 상태별 우선순위 정렬 (진행중인 주문이 맨 위에 오도록)
+        const sortedOrders = mappedOrders.sort((a, b) => {
+          const statusPriority = {
+            pending: 1, // 주문확인 대기 (가장 높음)
+            confirm: 2, // 주문 확인됨
+            ready: 3, // 상품 준비 완료
+            pickup: 4, // 픽업 완료
+            cancel: 5, // 주문 취소 (가장 낮음)
+          };
 
-    setOrders(sortedOrders);
+          return (
+            statusPriority[a.status?.toLowerCase()] -
+            statusPriority[b.status?.toLowerCase()]
+          );
+        });
+
+        setOrders(sortedOrders);
+      } catch (error) {
+        console.error("주문내역 조회 오류:", error);
+        setOrders([]);
+      }
+    };
+
+    fetchOrders();
   }, []);
 
   const handleLogout = () => {
@@ -75,14 +102,19 @@ function OrderHistory() {
   };
 
   const getStatusText = (status) => {
-    switch (status) {
+    // 상태값을 대문자로 정규화
+    const normalizedStatus = status?.toLowerCase();
+
+    switch (normalizedStatus) {
       case "pending":
         return "주문확인 대기";
-      case "processing":
-        return "상품 준비 중";
-      case "completed":
+      case "confirm":
+        return "주문 확인됨";
+      case "ready":
+        return "상품 준비 완료";
+      case "pickup":
         return "픽업 완료";
-      case "cancelled":
+      case "cancel":
         return "주문 취소";
       default:
         return "알 수 없음";
@@ -90,51 +122,101 @@ function OrderHistory() {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    // 상태값을 소문자로 정규화
+    const normalizedStatus = status?.toLowerCase();
+
+    switch (normalizedStatus) {
       case "pending":
-        return "#f59e0b";
-      case "processing":
-        return "#37ca79";
-      case "completed":
-        return "#775c4a";
-      case "cancelled":
-        return "#ef4444";
+        return "#f59e0b"; // 주황색 - 주문확인 대기
+      case "confirm":
+        return "#3b82f6"; // 파란색 - 주문 확인됨
+      case "ready":
+        return "#37ca79"; // 초록색 - 상품 준비 완료
+      case "pickup":
+        return "#775c4a"; // 갈색 - 픽업 완료
+      case "cancel":
+        return "#ef4444"; // 빨간색 - 주문 취소
       default:
-        return "#6b7280";
+        return "#6b7280"; // 회색 - 알 수 없음
     }
   };
 
-  const getProgressSteps = (status) => {
-    const steps = [
-      { name: "주문 확인", status: "pending" },
-      { name: "상품 준비", status: "processing" },
-      { name: "픽업 완료", status: "completed" },
-    ];
-
-    return steps.map((step) => {
-      if (step.status === status) {
-        return { ...step, isCurrent: true };
-      } else if (
-        (step.status === "pending" && status === "processing") ||
-        (step.status === "pending" && status === "completed") ||
-        (step.status === "processing" && status === "completed")
-      ) {
-        return { ...step, isCompleted: true };
-      } else {
-        return { ...step, isPending: true };
-      }
-    });
-  };
-
+  // 날짜 포맷팅 함수
   const formatDate = (dateString) => {
+    if (!dateString) return "";
     const date = new Date(dateString);
     return `${date.getFullYear()}년 ${
       date.getMonth() + 1
-    }월 ${date.getDate()}일`;
+    }월 ${date.getDate()}일 ${date
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+  };
+
+  const getProgressSteps = (status) => {
+    // 상태값을 소문자로 정규화
+    const normalizedStatus = status?.toLowerCase();
+
+    const steps = [
+      { name: "주문 확인", status: "pending" },
+      { name: "상품 준비", status: "ready" },
+      { name: "픽업 완료", status: "pickup" },
+    ];
+
+    return steps.map((step) => {
+      if (step.status === "pending") {
+        // 주문 확인 단계
+        if (normalizedStatus === "pending") {
+          return {
+            ...step,
+            isCurrent: false,
+            isCompleted: false,
+            isPending: true,
+          };
+        } else if (["confirm", "ready", "pickup"].includes(normalizedStatus)) {
+          return {
+            ...step,
+            isCompleted: true,
+            isCurrent: false,
+            isPending: false,
+          };
+        } else {
+          return {
+            ...step,
+            isPending: true,
+            isCurrent: false,
+            isCompleted: false,
+          };
+        }
+      } else if (step.status === "ready") {
+        // 상품 준비 단계
+        if (normalizedStatus === "ready") {
+          return { ...step, isCurrent: true, isCompleted: false };
+        } else if (normalizedStatus === "pickup") {
+          return { ...step, isCompleted: true, isCurrent: false };
+        } else if (["pending", "confirm"].includes(normalizedStatus)) {
+          return { ...step, isPending: true, isCurrent: false };
+        } else {
+          return { ...step, isPending: true, isCurrent: false };
+        }
+      } else if (step.status === "pickup") {
+        // 픽업 완료 단계
+        if (normalizedStatus === "pickup") {
+          return { ...step, isCurrent: true, isCompleted: false };
+        } else if (["pending", "confirm", "ready"].includes(normalizedStatus)) {
+          return { ...step, isPending: true, isCurrent: false };
+        } else {
+          return { ...step, isPending: true, isCurrent: false };
+        }
+      }
+
+      return { ...step, isPending: true, isCurrent: false };
+    });
   };
 
   const formatPrice = (price) => {
-    return price.toLocaleString() + "원";
+    if (price === undefined || price === null) return "0원";
+    return Number(price).toLocaleString() + "원";
   };
 
   if (orders.length === 0) {
@@ -159,7 +241,10 @@ function OrderHistory() {
 
       {/* 진행중인 주문 카드 */}
       {orders.filter(
-        (order) => order.status === "pending" || order.status === "processing"
+        (order) =>
+          order.status?.toLowerCase() === "pending" ||
+          order.status?.toLowerCase() === "confirm" ||
+          order.status?.toLowerCase() === "ready"
       ).length > 0 && (
         <OrderItem>
           <OrderHeader>
@@ -174,13 +259,11 @@ function OrderHistory() {
                 {orders
                   .filter(
                     (order) =>
-                      order.status === "pending" ||
-                      order.status === "processing"
+                      order.status?.toLowerCase() === "pending" ||
+                      order.status?.toLowerCase() === "confirm" ||
+                      order.status?.toLowerCase() === "ready"
                   )
                   .map((order) => {
-                    const orderWithDetails = mockUtils.getOrderWithDetails(
-                      order.id
-                    );
                     const progressSteps = getProgressSteps(order.status);
 
                     return (
@@ -192,62 +275,59 @@ function OrderHistory() {
                         style={{ cursor: "pointer" }}
                       >
                         <StepHeader>
-                          <StepStoreName>
-                            {orderWithDetails?.storeName}
-                          </StepStoreName>
+                          <StepStoreName>{order.storeName}</StepStoreName>
                           <StepStatus color={getStatusColor(order.status)}>
                             {getStatusText(order.status)}
                           </StepStatus>
                         </StepHeader>
 
                         <StepProducts>
-                          {orderWithDetails?.items?.map((item, index) => {
-                            return (
-                              <StepProduct key={index}>
-                                <OrderProductImage
-                                  src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
-                                  alt={item.productName}
-                                />
-                                <StepProductInfo>
-                                  <StepProductName>
-                                    {item.productName}
-                                  </StepProductName>
-                                  <StepProductQuantity>
-                                    {item.quantity}개 ×{" "}
-                                    {formatPrice(item.unitPrice)}
-                                  </StepProductQuantity>
-                                </StepProductInfo>
-                              </StepProduct>
-                            );
-                          })}
+                          <StepProduct>
+                            <OrderProductImage
+                              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                              alt={order.productName}
+                            />
+                            <StepProductInfo>
+                              <StepProductName>
+                                {order.productName}
+                              </StepProductName>
+                              <StepProductQuantity>
+                                {order.quantity}개
+                              </StepProductQuantity>
+                            </StepProductInfo>
+                          </StepProduct>
                         </StepProducts>
 
                         <StepSummary>
                           <div>주문일: {formatDate(order.createdAt)}</div>
-                          <div>최종 결제: {formatPrice(order.finalAmount)}</div>
                         </StepSummary>
-                        {/* 각 주문별 픽업 정보 */}
-                        {order.pickupTime && (
+
+                        {/* 픽업 시간 정보 */}
+                        {order.reservedAt ? (
                           <PickupInfo>
                             <PickupTime>
-                              {formatDate(order.pickupTime)}{" "}
-                              {new Date(order.pickupTime).getHours() >= 12
+                              {formatDate(order.reservedAt)}{" "}
+                              {new Date(order.reservedAt).getHours() >= 12
                                 ? "오후"
                                 : "오전"}{" "}
-                              {new Date(order.pickupTime).getHours() > 12
-                                ? new Date(order.pickupTime).getHours() - 12
-                                : new Date(order.pickupTime).getHours()}
+                              {new Date(order.reservedAt).getHours() > 12
+                                ? new Date(order.reservedAt).getHours() - 12
+                                : new Date(order.reservedAt).getHours()}
                               :
                               {String(
-                                new Date(order.pickupTime).getMinutes()
+                                new Date(order.reservedAt).getMinutes()
                               ).padStart(2, "0")}{" "}
                               픽업
                             </PickupTime>
-                            <PickupMessage>{order.pickupMessage}</PickupMessage>
+                          </PickupInfo>
+                        ) : (
+                          <PickupInfo>
+                            <PickupTime>주문 수락 시 30분 이내 픽업 해야합니다.</PickupTime>
                           </PickupInfo>
                         )}
+
                         <ProgressBar>
-                          <ProgressSteps>
+                          <ProgressStepBar>
                             {progressSteps.map((step, index) => (
                               <ProgressStepItem key={index}>
                                 <img
@@ -268,7 +348,7 @@ function OrderHistory() {
                                 )}
                               </ProgressStepItem>
                             ))}
-                          </ProgressSteps>
+                          </ProgressStepBar>
                         </ProgressBar>
                       </ProgressStep>
                     );
@@ -282,10 +362,8 @@ function OrderHistory() {
       {/* 완료된 주문 카드들 */}
       <OrderList>
         {orders
-          .filter((order) => order.status === "completed")
+          .filter((order) => order.status?.toLowerCase() === "pickup")
           .map((order) => {
-            const orderWithDetails = mockUtils.getOrderWithDetails(order.id);
-
             return (
               <OrderItem
                 key={order.id}
@@ -302,33 +380,71 @@ function OrderHistory() {
                 </OrderHeader>
 
                 <OrderDetails>
-                  {orderWithDetails?.items?.map((item, index) => {
-                    return (
-                      <OrderProduct key={index}>
-                        <OrderProductImage
-                          src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
-                          alt={item.productName}
-                        />
-                        <OrderProductInfo>
-                          <OrderProductName>
-                            {item.productName}
-                          </OrderProductName>
-                          <OrderProductQuantity>
-                            {item.quantity}개 × {formatPrice(item.unitPrice)}
-                          </OrderProductQuantity>
-                        </OrderProductInfo>
-                      </OrderProduct>
-                    );
-                  })}
+                  <OrderProduct>
+                    <OrderProductImage
+                      src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                      alt={order.productName}
+                    />
+                    <OrderProductInfo>
+                      <OrderProductName>{order.productName}</OrderProductName>
+                      <OrderProductQuantity>
+                        {order.quantity}개
+                      </OrderProductQuantity>
+                    </OrderProductInfo>
+                  </OrderProduct>
 
                   <OrderSummary>
-                    <div>상점: {orderWithDetails?.storeName}</div>
-                    <div>주소: {orderWithDetails?.storeAddress}</div>
-                    <div>정가: {formatPrice(order.totalAmount)}</div>
-                    <div>할인: -{formatPrice(order.discountAmount)}</div>
-                    <div style={{ fontWeight: "bold", fontSize: "16px" }}>
-                      최종 결제: {formatPrice(order.finalAmount)}
-                    </div>
+                    <div>상점: {order.storeName}</div>
+                    <div>주문일: {formatDate(order.createdAt)}</div>
+                  </OrderSummary>
+                </OrderDetails>
+              </OrderItem>
+            );
+          })}
+      </OrderList>
+
+      {/* 취소된 주문 카드들 */}
+      <OrderList>
+        {orders
+          .filter((order) => order.status?.toLowerCase() === "cancel")
+          .map((order) => {
+            return (
+              <OrderItem
+                key={order.id}
+                onClick={() => navigate(`/customer-order-detail/${order.id}`)}
+                style={{ cursor: "pointer" }}
+              >
+                <OrderHeader>
+                  <OrderInfo>
+                    <OrderDate>{formatDate(order.createdAt)}</OrderDate>
+                    <OrderStatus color={getStatusColor(order.status)}>
+                      {getStatusText(order.status)}
+                    </OrderStatus>
+                  </OrderInfo>
+                </OrderHeader>
+
+                <OrderDetails>
+                  <OrderProduct>
+                    <OrderProductImage
+                      src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                      alt={order.productName}
+                    />
+                    <OrderProductInfo>
+                      <OrderProductName>{order.productName}</OrderProductName>
+                      <OrderProductQuantity>
+                        {order.quantity}개
+                      </OrderProductQuantity>
+                    </OrderProductInfo>
+                  </OrderProduct>
+
+                  <OrderSummary>
+                    <div>상점: {order.storeName}</div>
+                    <div>주문일: {formatDate(order.createdAt)}</div>
+                    {order.cancelReason && (
+                      <div style={{ color: "#ef4444" }}>
+                        취소 사유: {order.cancelReason}
+                      </div>
+                    )}
                   </OrderSummary>
                 </OrderDetails>
               </OrderItem>

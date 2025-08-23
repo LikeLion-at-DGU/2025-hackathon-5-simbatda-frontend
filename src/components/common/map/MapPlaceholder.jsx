@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const PlaceholderContainer = styled.div`
-  width: 328px;
+  width: 100%;
   height: 328px;
   border-radius: 15px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);

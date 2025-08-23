@@ -4,9 +4,10 @@ import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import mapPinIcon from "../../../assets/icons/map-pin.svg";
 import currentLocationPinIcon from "../../../assets/icons/pin.svg";
 import locationIcon from "../../../assets/icons/Location.png";
+import inventoryPinDefault from "../../../assets/icons/inventory-pin.svg";
 
 const MapContainer = styled.div`
-  width: ${(props) => (props.$size === "full" ? "100%" : "328px")};
+  width: 100%;
   height: ${(props) => (props.$size === "full" ? "100%" : "328px")};
   border-radius: ${(props) => (props.$size === "full" ? "0" : "15px")};
   margin: ${(props) => (props.$size === "full" ? "0" : "20px auto")};
@@ -108,6 +109,8 @@ const AdvancedGoogleMap = ({
   onClusterClick,
   inventoryPinIcon,
   size = "default",
+  nearbyPin, // 내 주변 상품 핀 커스텀
+  otherPin, // 기타 위치 상품 핀 커스텀
 }) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
@@ -123,35 +126,35 @@ const AdvancedGoogleMap = ({
         id: 1,
         position: { lat: 37.5665, lng: 126.978 },
         title: "서울시청",
-        type: "store",
+        type: "other",
         name: "서울 중앙시장",
       },
       {
         id: 2,
         position: { lat: 37.5645, lng: 126.976 },
         title: "광화문",
-        type: "store",
+        type: "nearby",
         name: "광화문 상점가",
       },
       {
         id: 3,
         position: { lat: 37.5685, lng: 126.98 },
         title: "명동",
-        type: "store",
+        type: "other",
         name: "명동 상점가",
       },
       {
         id: 4,
         position: { lat: 37.5625, lng: 126.974 },
         title: "시청역",
-        type: "store",
+        type: "nearby",
         name: "시청역 상점가",
       },
       {
         id: 5,
         position: { lat: 37.5705, lng: 126.982 },
         title: "종로",
-        type: "store",
+        type: "other",
         name: "종로 상점가",
       },
     ],
@@ -340,12 +343,17 @@ const AdvancedGoogleMap = ({
     const newMarkers = [];
 
     activeMarkers.forEach((markerData) => {
+      const chosenIconUrl =
+        markerData.type === "nearby"
+          ? nearbyPin || inventoryPinIcon || inventoryPinDefault
+          : otherPin || mapPinIcon;
+
       const marker = new window.google.maps.Marker({
         position: markerData.position,
         map: map,
         title: markerData.title,
         icon: {
-          url: inventoryPinIcon || mapPinIcon,
+          url: chosenIconUrl,
           scaledSize: new window.google.maps.Size(32, 32),
           anchor: new window.google.maps.Point(16, 32),
         },
@@ -397,7 +405,7 @@ const AdvancedGoogleMap = ({
         });
       }
     }
-  }, [map, activeMarkers]);
+  }, [map, activeMarkers, nearbyPin, otherPin, inventoryPinIcon]);
 
   return (
     <MapContainer $size={size}>
