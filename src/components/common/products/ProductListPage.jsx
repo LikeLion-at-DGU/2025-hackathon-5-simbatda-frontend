@@ -4,6 +4,8 @@ import Header from "../header/Header";
 import SearchBar from "../searchbar/SearchBar";
 import CategoryChips from "../chips/CategoryChips";
 import ProductCard from "../card/ProductCard";
+import { toggleWishlist } from "../../../api/products";
+import { getConsumerMe } from "../../../api/auth";
 import empty from "../../../assets/images/crying-character.svg";
 import {
   PageContainer,
@@ -50,9 +52,23 @@ const ProductListPage = ({
     };
   }, []);
 
-  // 초기 데이터 로딩 
+  // 사용자 정보 가져오기
   useEffect(() => {
-    setUserInfo({ name: "테스트 사용자" });
+    const fetchUserInfo = async () => {
+      try {
+        const userData = await getConsumerMe();
+        setUserInfo({ name: userData.name });
+      } catch (error) {
+        console.error("사용자 정보 조회 오류:", error);
+        setUserInfo({ name: "사용자" });
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  // 초기 데이터 로딩
+  useEffect(() => {
 
     if (!getProducts || typeof getProducts !== "function") {
       setProducts([]);
@@ -137,6 +153,30 @@ const ProductListPage = ({
     setFilteredProducts(sorted);
   }, [searchTerm, selectedCategory, products, sortBy]);
 
+  const handleProductClick = (productId) => {
+    navigate(`/registeration/${productId}`);
+  };
+
+  const handleProductLikeToggle = async (productId, isLiked) => {
+    try {
+      // 실제 찜 등록/해제 API 호출
+      await toggleWishlist(productId, isLiked);
+
+      // 상품 목록에서 해당 상품의 찜 상태 업데이트
+      const updatedProducts = products.map((product) => {
+        if (product.id === productId) {
+          return { ...product, isLiked: !isLiked };
+        }
+        return product;
+      });
+
+      setProducts(updatedProducts);
+      setFilteredProducts(updatedProducts);
+    } catch (error) {
+      console.error("ProductListPage 찜 토글 실패:", error);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     navigate("/signin");
@@ -148,14 +188,6 @@ const ProductListPage = ({
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
-  };
-
-  const handleProductClick = (productId) => {
-    navigate(`/registeration/${productId}`);
-  };
-
-  const handleProductLikeToggle = (productId, isLiked) => {
-    // TODO: 좋아요 API 연동
   };
 
   const getSortButtonText = (sortType) => {
@@ -239,6 +271,7 @@ const ProductListPage = ({
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
+                id={product.id}
                 variant="list"
                 storeName={product.storeName}
                 storeId={product.storeId}
