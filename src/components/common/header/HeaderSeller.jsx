@@ -65,7 +65,13 @@ const HeaderSeller = ({ userInfo, onLogout }) => {
             <img src={starsquirrelIcon} alt="프로필" width={28} height={28} />
           </ProfileAvatar>
           <ProfileInfo>
-            <Nickname>{userInfo?.storeName || "로딩 중..."}님</Nickname>
+            <Nickname>
+              {userInfo?.store_name
+                ? `${userInfo.store_name}님`
+                : userInfo?.username
+                ? `${userInfo.username}님`
+                : "로딩 중..."}
+            </Nickname>
             <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
           </ProfileInfo>
         </DrawerHeader>

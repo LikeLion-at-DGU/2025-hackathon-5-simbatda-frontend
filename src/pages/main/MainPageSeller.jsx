@@ -85,6 +85,8 @@ function MainPageSeller() {
           getSellerMe(),
           getSellerStore(),
         ]);
+        console.log("Fetched user data:", userData);
+        console.log("Fetched store data:", storeData);
         setUserInfo(userData);
         setStoreInfo(storeData);
       } catch (err) {
