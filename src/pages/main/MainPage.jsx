@@ -9,7 +9,14 @@ import RecommendedProducts from "../../components/common/products/RecommendedPro
 import SpecialPriceProducts from "../../components/common/products/SpecialPriceProducts";
 import BottomSheet from "../../components/common/bottomsheet/BottomSheet";
 import { apiRequest } from "../../api/client";
-import { unifiedMockData, mockUtils } from "../../mocks/UnifiedMockData";
+import { 
+  getRecommendedProducts, 
+  getSpecialPriceProducts, 
+  getNearbyProducts,
+  getProductsByCategory,
+  getStoreInfo,
+  getCategories,
+} from "../../api/products";
 import { PageContainer, Content } from "./MainPage.styles";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -21,39 +28,215 @@ function MainPage() {
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
   const [selectedLocationInfo, setSelectedLocationInfo] = useState(null);
   const [locationProducts, setLocationProducts] = useState([]);
+  const [userLocation, setUserLocation] = useState({
+    lat: 37.498095, // 기본값 (강남역 근처)
+    lng: 127.02761,
+    radius: 5
+  });
+  const [loading, setLoading] = useState(true);
+  const [categoryNameToId, setCategoryNameToId] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [allNearbyProducts, setAllNearbyProducts] = useState([]);
+  const [filteredNearbyProducts, setFilteredNearbyProducts] = useState([]);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  // 카테고리 이름 → ID 매핑 로드
   useEffect(() => {
-    // TODO: API 연결 X - mock 데이터 사용
-    setUserInfo({ name: "테스트 사용자" });
-
-    // 추천상품 데이터 (통합 목데이터 사용)
-    const recommended = mockUtils.getRecommendedProducts();
-    setRecommendedProducts(
-      recommended.map((product) => ({
-        id: product.id,
-        storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
-        productName: product.name,
-        originalPrice: product.originalPrice,
-        discountPrice: product.discountPrice,
-        isLiked: mockUtils.isProductLiked(1, product.id),
-      }))
-    );
-
-    // 특가상품 데이터 (통합 목데이터 사용)
-    const specialPrice = mockUtils.getSpecialPriceProducts();
-    setSpecialPriceProducts(
-      specialPrice.map((product) => ({
-        id: product.id,
-        storeName: mockUtils.getStoreById(product.storeId)?.name || "상점",
-        productName: product.name,
-        originalPrice: product.originalPrice,
-        discountPrice: product.discountPrice,
-        isLiked: mockUtils.isProductLiked(1, product.id),
-      }))
-    );
+    let mounted = true;
+    (async () => {
+      try {
+        const list = await getCategories();
+        if (!mounted) return;
+        const map = {};
+        (list || []).forEach((c) => {
+          if (c?.name && c?.id != null) map[c.name] = c.id;
+        });
+        setCategoryNameToId(map);
+      } catch (_) {}
+    })();
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  // 사용자 현재 위치 가져오기
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            radius: 5
+          };
+          setUserLocation(newLocation);
+        },
+        () => {},
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    }
+  }, []);
+
+  // 위치가 변경되면 상품 데이터 다시 가져오기
+  useEffect(() => {
+    if (userLocation.lat && userLocation.lng) {
+      fetchProductsData();
+    }
+  }, [userLocation]);
+
+  // 상품 데이터 가져오기
+  const fetchProductsData = async () => {
+    try {
+      setLoading(true);
+      
+      // 추천상품 데이터: 소비자 추천 API 사용
+      const rec = await getRecommendedProducts();
+      const mappedRec = await Promise.all(
+        (rec || []).map(async (product) => {
+          try {
+            const storeId = product.store_id ?? product.store?.id;
+            const storeInfo = storeId ? await getStoreInfo(storeId) : null;
+            const resolvedStoreName =
+              (storeInfo?.name && storeInfo.name.trim()) ||
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          } catch (_) {
+            const resolvedStoreName =
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          }
+        })
+      );
+      setRecommendedProducts(mappedRec);
+
+      // 특가상품 데이터
+      const specialPrice = await getSpecialPriceProducts(
+        userLocation.lat, 
+        userLocation.lng, 
+        userLocation.radius
+      );
+      
+      const mappedSpecialPrice = await Promise.all(
+        (specialPrice || []).map(async (product) => {
+          try {
+            const storeId = product.store_id ?? product.store?.id;
+            const storeInfo = storeId ? await getStoreInfo(storeId) : null;
+            const resolvedStoreName =
+              (storeInfo?.name && storeInfo.name.trim()) ||
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          } catch (_) {
+            const resolvedStoreName =
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          }
+        })
+      );
+      setSpecialPriceProducts(mappedSpecialPrice);
+
+      // 근처 상품 데이터 가져오기 (검색용)
+      const nearbyData = await getNearbyProducts({
+        lat: userLocation.lat,
+        lng: userLocation.lng,
+        radius: userLocation.radius,
+      });
+
+      const mappedNearby = await Promise.all(
+        (nearbyData || []).map(async (product) => {
+          try {
+            const storeId = product.store_id ?? product.store?.id;
+            const storeInfo = storeId ? await getStoreInfo(storeId) : null;
+            const resolvedStoreName =
+              (storeInfo?.name && storeInfo.name.trim()) ||
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+              categoryName: product.category_name,
+            };
+          } catch (_) {
+            const resolvedStoreName =
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+              categoryName: product.category_name,
+            };
+          }
+        })
+      );
+
+      setAllNearbyProducts(mappedNearby);
+      setFilteredNearbyProducts(mappedNearby);
+
+    } catch (error) {
+      setRecommendedProducts([]);
+      setSpecialPriceProducts([]);
+      setAllNearbyProducts([]);
+      setFilteredNearbyProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -61,38 +244,31 @@ function MainPage() {
   };
 
   const handleSearch = (searchTerm) => {
-    // 검색 결과 상품 데이터
-    const searchResults = [
-      {
-        id: 201,
-        storeName: "검색결과 상점",
-        productName: `${searchTerm} 관련 상품 1`,
-        originalPrice: 8000,
-        discountPrice: 6000,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 202,
-        storeName: "검색결과 상점",
-        productName: `${searchTerm} 관련 상품 2`,
-        originalPrice: 5000,
-        discountPrice: 4000,
-        imageUrl: "",
-        isLiked: true,
-      },
-      {
-        id: 203,
-        storeName: "검색결과 상점",
-        productName: `${searchTerm} 관련 상품 3`,
-        originalPrice: 12000,
-        discountPrice: 9000,
-        imageUrl: "",
-        isLiked: false,
-      },
-    ];
+    setSearchTerm(searchTerm);
+    
+    if (!searchTerm.trim()) {
+      setFilteredNearbyProducts(allNearbyProducts);
+      return;
+    }
 
-    setLocationProducts(searchResults);
+    // 클라이언트 사이드 필터링
+    const filtered = allNearbyProducts.filter(
+      (product) =>
+        (product.productName || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (product.storeName || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        (product.categoryName || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+    );
+
+    setFilteredNearbyProducts(filtered);
+    
+    // 검색 결과를 BottomSheet에 표시
+    setLocationProducts(filtered);
     setSelectedLocationInfo({
       name: "검색상품",
       type: "search",
@@ -101,77 +277,144 @@ function MainPage() {
     setBottomSheetOpen(true);
   };
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
+  const handleCategoryChange = (categoryName) => {
+    setSelectedCategory(categoryName);
     
-    // 카테고리별 상품 데이터
-    const categoryProducts = [
-      {
-        id: 301,
-        storeName: `${category} 상점`,
-        productName: `${category} 상품 1`,
-        originalPrice: 10000,
-        discountPrice: 7000,
-        imageUrl: "",
-        isLiked: false,
-      },
-      {
-        id: 302,
-        storeName: `${category} 상점`,
-        productName: `${category} 상품 2`,
-        originalPrice: 8000,
-        discountPrice: 6000,
-        imageUrl: "",
-        isLiked: true,
-      },
-      {
-        id: 303,
-        storeName: `${category} 상점`,
-        productName: `${category} 상품 3`,
-        originalPrice: 15000,
-        discountPrice: 12000,
-        imageUrl: "",
-        isLiked: false,
-      },
-    ];
+    let filtered;
+    if (categoryName === "전체") {
+      filtered = allNearbyProducts;
+    } else {
+      // 클라이언트 사이드 카테고리 필터링
+      filtered = allNearbyProducts.filter(
+        (product) => product.categoryName === categoryName
+      );
+    }
 
-    setLocationProducts(categoryProducts);
-    setSelectedLocationInfo({ name: category, type: "category" });
+    setFilteredNearbyProducts(filtered);
+    
+    // 카테고리 결과를 BottomSheet에 표시
+    setLocationProducts(filtered);
+    setSelectedLocationInfo({ name: categoryName, type: "category" });
     setBottomSheetOpen(true);
   };
 
-  // 지도 클릭 시 바텀시트 열기
-  const handleMapClick = (event) => {
-    // 구글 맵 클릭 이벤트에서 좌표 추출
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
+  const handleMapClick = async (event) => {
+    try {
+      const lat = event.latLng.lat();
+      const lng = event.latLng.lng();
 
-    // 실제로는 지도 핀 클릭 시 호출됨
-    setSelectedLocationInfo({
-      name: "주변 상품",
-      type: "nearby",
-      query: `위치: ${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-    });
+      const nearbyProducts = await getNearbyProducts({ lat, lng, radius: 2 });
 
-    // 상품 데이터 설정
-    setLocationProducts(getRandomProducts());
-    setBottomSheetOpen(true);
+      const mappedNearbyProducts = await Promise.all(
+        (nearbyProducts || []).map(async (product) => {
+          try {
+            const storeId = product.store_id ?? product.store?.id;
+            const storeInfo = storeId ? await getStoreInfo(storeId) : null;
+            const resolvedStoreName =
+              (storeInfo?.name && storeInfo.name.trim()) ||
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          } catch (_) {
+            const resolvedStoreName =
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          }
+        })
+      );
+
+      setLocationProducts(mappedNearbyProducts);
+      setSelectedLocationInfo({
+        name: "주변 상품",
+        type: "nearby",
+        query: `위치: ${lat.toFixed(6)}, ${lng.toFixed(6)}`,
+      });
+      setBottomSheetOpen(true);
+    } catch (_) {
+      setLocationProducts([]);
+      setSelectedLocationInfo({ name: "주변 상품", type: "nearby", query: "오류" });
+      setBottomSheetOpen(true);
+    }
   };
 
-  // 마커 클릭 시 바텀시트 열기
-  const handleMarkerClick = (markerData) => {
-    setSelectedLocationInfo({
-      name: markerData.name,
-      type: "store",
-      query: markerData.title,
-    });
+  const handleMarkerClick = async (markerData) => {
+    try {
+      setSelectedLocationInfo({
+        name: markerData.name,
+        type: "store",
+        query: markerData.title,
+      });
 
-    // 상품 데이터 설정
-    setLocationProducts(getRandomProducts());
-    setBottomSheetOpen(true);
+      const nearbyProducts = await getNearbyProducts({
+        lat: markerData.position.lat,
+        lng: markerData.position.lng,
+        radius: 1,
+      });
+
+      const mappedNearbyProducts = await Promise.all(
+        (nearbyProducts || []).map(async (product) => {
+          try {
+            const storeId = product.store_id ?? product.store?.id;
+            const storeInfo = storeId ? await getStoreInfo(storeId) : null;
+            const resolvedStoreName =
+              (storeInfo?.name && storeInfo.name.trim()) ||
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          } catch (_) {
+            const resolvedStoreName =
+              (product.store_name && String(product.store_name).trim()) ||
+              (product.store?.name && String(product.store.name).trim()) ||
+              "상점";
+            return {
+              id: product.id,
+              storeName: resolvedStoreName,
+              productName: product.name,
+              originalPrice: product.price,
+              discountPrice: product.discount_price,
+              imageUrl: product.image || "",
+              isLiked: false,
+            };
+          }
+        })
+      );
+
+      setLocationProducts(mappedNearbyProducts);
+      setBottomSheetOpen(true);
+    } catch (_) {
+      setLocationProducts([]);
+      setBottomSheetOpen(true);
+    }
   };
 
-  // 클러스터 클릭 시 해당 영역으로 줌인
   const handleClusterClick = (cluster) => {
     const map = cluster.map;
     const bounds = new window.google.maps.LatLngBounds();
@@ -181,36 +424,6 @@ function MainPage() {
     });
 
     map.fitBounds(bounds);
-  };
-
-  // 랜덤 상품 데이터 생성 함수
-  const getRandomProducts = () => {
-    const productTemplates = [
-      { name: "크로아상", price: 4000, originalPrice: 6000 },
-      { name: "아메리카노", price: 3000, originalPrice: 4500 },
-      { name: "신선 채소 세트", price: 6000, originalPrice: 8000 },
-      { name: "도넛 6개 세트", price: 9000, originalPrice: 12000 },
-      { name: "치킨 샌드위치", price: 3500, originalPrice: 5000 },
-      { name: "딸기 스무디", price: 5000, originalPrice: 7000 },
-      { name: "딸기 500g", price: 8000, originalPrice: 12000 },
-      { name: "돼지고기 300g", price: 6000, originalPrice: 8000 },
-      { name: "고등어 1마리", price: 3500, originalPrice: 5000 },
-      { name: "후라이드 치킨", price: 15000, originalPrice: 18000 },
-      { name: "페퍼로니 피자", price: 20000, originalPrice: 25000 },
-    ];
-
-    return productTemplates
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 5)
-      .map((template, index) => ({
-        id: 200 + index,
-        storeName: "주변 상점",
-        productName: template.name,
-        originalPrice: template.originalPrice,
-        discountPrice: template.price,
-        imageUrl: "",
-        isLiked: Math.random() > 0.5,
-      }));
   };
 
   const handleBottomSheetClose = () => {
@@ -227,12 +440,36 @@ function MainPage() {
     // TODO: 좋아요 API 연동
   };
 
+  if (loading) {
+    return (
+      <PageContainer>
+        <Header userInfo={userInfo} onLogout={handleLogout} />
+        <Content>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+            fontSize: '18px',
+            color: '#666'
+          }}>
+            상품을 불러오는 중...
+          </div>
+        </Content>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer>
       <Header userInfo={userInfo} onLogout={handleLogout} />
 
       <Content>
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar 
+          onSearch={handleSearch} 
+          onChange={setSearchTerm}
+          value={searchTerm}
+        />
         <CategoryChips
           onCategoryChange={handleCategoryChange}
           initialCategory={selectedCategory}
