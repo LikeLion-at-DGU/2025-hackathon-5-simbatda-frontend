@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/common/header/Header";
 import ProductCard from "../../components/common/card/ProductCard";
-import { mockUtils } from "../../mocks/UnifiedMockData";
+import { getStoreInfo, getStoreProducts } from "../../api/products";
 import {
   PageContainer,
   Content,
@@ -31,15 +31,57 @@ const StoreDetail = () => {
   useEffect(() => {
     setUserInfo({ name: "테스트 사용자" });
 
-    // 상점 정보 가져오기
-    const storeData = mockUtils.getStoreById(parseInt(storeId));
-    if (storeData) {
-      setStore(storeData);
+    let mounted = true;
+    const load = async () => {
+      try {
+        if (!storeId) return;
+        console.log("[StoreDetail] storeId:", storeId);
+        const info = await getStoreInfo(storeId);
+        console.log("[StoreDetail] getStoreInfo response:", info);
+        if (!mounted) return;
+        setStore({
+          id: info?.id,
+          name: info?.store_name || info?.name || "상점",
+          isOpen: Boolean(info?.is_open),
+          businessHours: info?.opening_time || "",
+          phone: info?.phone || "",
+          address: info?.address || "",
+        });
 
-      // 해당 상점의 상품들 가져오기
-      const products = mockUtils.getProductsByStore(parseInt(storeId));
-      setStoreProducts(products);
-    }
+        const products = await getStoreProducts(storeId);
+        console.log(
+          "[StoreDetail] getStoreProducts length:",
+          Array.isArray(products) ? products.length : "(not array)",
+          "sample:",
+          Array.isArray(products) && products.length > 0 ? products[0] : null
+        );
+        if (!mounted) return;
+        const mapped = (Array.isArray(products) ? products : []).map((p) => ({
+          id: p.id,
+          storeName: info?.store_name || info?.name || "상점",
+          productName: p.name,
+          originalPrice: p.price,
+          discountPrice: p.discount_price,
+          imageUrl: p.image || "",
+          isLiked: false,
+          expiryTime: p.expiration_date
+            ? new Date(p.expiration_date).getTime()
+            : undefined,
+          stock: p.stock,
+        }));
+        setStoreProducts(mapped);
+      } catch (e) {
+        console.log("[StoreDetail] load error:", e);
+        if (!mounted) return;
+        setStore(null);
+        setStoreProducts([]);
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
   }, [storeId]);
 
   const handleLogout = () => {
@@ -82,7 +124,7 @@ const StoreDetail = () => {
           </StoreDetailItem>
           <StoreDetailItem>
             <StoreDetailLabel>가게번호</StoreDetailLabel>
-            <StoreDetailValue>{store.phone}</StoreDetailValue>
+            <StoreDetailValue>{store.phone || "-"}</StoreDetailValue>
           </StoreDetailItem>
           <StoreDetailItem>
             <StoreDetailLabel>매장주소</StoreDetailLabel>
@@ -90,36 +132,34 @@ const StoreDetail = () => {
           </StoreDetailItem>
         </StoreHeader>
 
-          <StoreProductsTitle>{store.name}에 등록된 재고들</StoreProductsTitle>
+        <StoreProductsTitle>{store.name}에 등록된 재고들</StoreProductsTitle>
 
-          {storeProducts.length > 0 ? (
-            <ProductGrid>
-              {storeProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  variant="list"
-                  storeName={store.name}
-                  productName={product.name}
-                  originalPrice={product.originalPrice}
-                  discountPrice={product.discountPrice}
-                  imageUrl={product.images?.[0] || ""}
-                  isLiked={mockUtils.isProductLiked(1, product.id)}
-                  expiryTime={
-                    Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000
-                  }
-                  stock={product.stock}
-                  onClick={() => handleProductClick(product.id)}
-                  onLikeToggle={() =>
-                    handleProductLikeToggle(product.id, product.isLiked)
-                  }
-                />
-              ))}
-            </ProductGrid>
-          ) : (
-            <EmptyState>
-              <EmptyText>등록된 상품이 없습니다.</EmptyText>
-            </EmptyState>
-          )}
+        {storeProducts.length > 0 ? (
+          <ProductGrid>
+            {storeProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                variant="list"
+                storeName={store.name}
+                productName={product.productName}
+                originalPrice={product.originalPrice}
+                discountPrice={product.discountPrice}
+                imageUrl={product.imageUrl}
+                isLiked={product.isLiked}
+                expiryTime={product.expiryTime}
+                stock={product.stock}
+                onClick={() => handleProductClick(product.id)}
+                onLikeToggle={() =>
+                  handleProductLikeToggle(product.id, product.isLiked)
+                }
+              />
+            ))}
+          </ProductGrid>
+        ) : (
+          <EmptyState>
+            <EmptyText>등록된 상품이 없습니다.</EmptyText>
+          </EmptyState>
+        )}
       </Content>
     </PageContainer>
   );
