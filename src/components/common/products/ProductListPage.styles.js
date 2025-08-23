@@ -108,12 +108,14 @@ export const EmptyState = styled.div`
   justify-content: center;
   padding: 60px 20px;
   text-align: center;
+  margin-top: 82px;
 `;
 
 export const EmptyText = styled.p`
   color: #6b7280;
   font-size: 16px;
   margin: 0;
+  margin-top: 10px;
 `;
 
 export const DescriptionText = styled.p`

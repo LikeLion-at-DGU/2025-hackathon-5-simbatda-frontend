@@ -43,6 +43,7 @@ const ProductCard = ({
   categoryName,
   originalPrice,
   discountPrice,
+  discountRate: discountRateProp,
   imageUrl,
   defaultImage: customDefaultImage = defaultImage,
   isLiked = false,
@@ -56,19 +57,27 @@ const ProductCard = ({
 }) => {
   const [liked, setLiked] = useState(isLiked);
 
-  // 할인율 자동 계산
   const discountRate = useMemo(() => {
-    if (originalPrice <= discountPrice) return 0;
-    const rate = Math.round(
-      ((originalPrice - discountPrice) / originalPrice) * 100
-    );
-    return rate > 0 ? rate : 0;
-  }, [originalPrice, discountPrice]);
+    if (discountRateProp !== undefined && discountRateProp !== null) {
+      return Number(discountRateProp) || 0;
+    }
+    if (
+      originalPrice > 0 &&
+      discountPrice >= 0 &&
+      originalPrice > discountPrice
+    ) {
+      const rate = Math.round(
+        ((originalPrice - discountPrice) / originalPrice) * 100
+      );
+      return rate > 0 ? rate : 0;
+    }
+    return 0;
+  }, [discountRateProp, originalPrice, discountPrice]);
 
-  // 할인 여부
-  const hasDiscount = discountRate > 0;
+  const hasDiscount =
+    originalPrice > 0 && discountPrice > 0 && originalPrice > discountPrice;
 
-  const discountPriceText = discountPrice.toLocaleString();
+  const discountPriceText = Number(discountPrice || 0).toLocaleString();
 
   const displayImage = imageUrl || customDefaultImage;
 
@@ -85,7 +94,8 @@ const ProductCard = ({
     onStoreClick(storeId);
   };
 
-  // 유통기한 계산
+  const displayStoreName = (storeName || "").trim() || "상점";
+
   const getExpiryText = (expiryTime) => {
     if (!expiryTime) return "";
     const now = Date.now();
@@ -124,13 +134,15 @@ const ProductCard = ({
               onClick={onStoreClick ? handleStoreClick : undefined}
               style={onStoreClick ? { cursor: "pointer" } : {}}
             >
-              {storeName}
+              {displayStoreName}
             </StoreName>
             <ProductName>{productName}</ProductName>
             <PriceSection>
               <p>{discountPriceText}원</p>
-              {hasDiscount ? (
+              {hasDiscount && discountRate > 0 ? (
                 <DiscountRate>{discountRate}% 할인</DiscountRate>
+              ) : hasDiscount ? (
+                <DiscountRate>할인</DiscountRate>
               ) : (
                 ""
               )}
@@ -154,13 +166,15 @@ const ProductCard = ({
               onClick={onStoreClick ? handleStoreClick : undefined}
               style={onStoreClick ? { cursor: "pointer" } : {}}
             >
-              {storeName}
+              {displayStoreName}
             </StoreName>
             <ProductCardPriceSection>
-              {hasDiscount ? (
+              {hasDiscount && discountRate > 0 ? (
                 <ProductCardDiscountRate>
                   {discountRate}%
                 </ProductCardDiscountRate>
+              ) : hasDiscount ? (
+                <ProductCardDiscountRate>할인</ProductCardDiscountRate>
               ) : (
                 ""
               )}
@@ -188,7 +202,7 @@ const ProductCard = ({
                   onClick={onStoreClick ? handleStoreClick : undefined}
                   style={onStoreClick ? { cursor: "pointer" } : {}}
                 >
-                  {storeName}
+                  {displayStoreName}
                 </StoreName>
                 <ProductName2>{productName}</ProductName2>
                 {stock !== undefined && (
@@ -199,7 +213,7 @@ const ProductCard = ({
                 <ListCardPriceSection>
                   {hasDiscount && (
                     <ListCardOriginalPrice>
-                      {originalPrice.toLocaleString()}원
+                      {Number(originalPrice || 0).toLocaleString()}원
                     </ListCardOriginalPrice>
                   )}
                   <div
@@ -209,11 +223,13 @@ const ProductCard = ({
                       gap: "5px",
                     }}
                   >
-                    {hasDiscount && (
+                    {hasDiscount && discountRate > 0 ? (
                       <ListCardDiscountRate>
                         {discountRate}%
                       </ListCardDiscountRate>
-                    )}
+                    ) : hasDiscount ? (
+                      <ListCardDiscountRate>할인</ListCardDiscountRate>
+                    ) : null}
                     <ListCardDiscountPrice>
                       {discountPriceText}원
                     </ListCardDiscountPrice>

@@ -4,6 +4,7 @@ import Header from "../header/Header";
 import SearchBar from "../searchbar/SearchBar";
 import CategoryChips from "../chips/CategoryChips";
 import ProductCard from "../card/ProductCard";
+import empty from "../../../assets/images/crying-character.svg";
 import {
   PageContainer,
   Content,
@@ -49,54 +50,85 @@ const ProductListPage = ({
     };
   }, []);
 
-  // 초기 데이터 로딩
+  // 초기 데이터 로딩 
   useEffect(() => {
     setUserInfo({ name: "테스트 사용자" });
 
-    // 상품 데이터 가져오기
-    if (getProducts && typeof getProducts === "function") {
-      const productData = getProducts();
-      setProducts(productData);
-      setFilteredProducts(productData);
-    }
-  }, [getProducts]); // getProducts만 의존성으로 설정
-
-  // 검색어나 카테고리가 변경될 때만 필터링 재실행
-  useEffect(() => {
-    // products가 비어있으면 필터링하지 않음
-    if (!products || products.length === 0) {
+    if (!getProducts || typeof getProducts !== "function") {
+      setProducts([]);
+      setFilteredProducts([]);
       return;
     }
 
-    let filtered = products;
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const result = await getProducts();
+        if (!isMounted) return;
+        const normalized = Array.isArray(result) ? result : [];
+        setProducts(normalized);
+        setFilteredProducts(normalized);
+      } catch (_) {
+        if (!isMounted) return;
+        setProducts([]);
+        setFilteredProducts([]);
+      }
+    };
 
-    // 검색어 필터링
+    const maybe = getProducts();
+    if (maybe && typeof maybe.then === "function") {
+      // 비동기 소스인 경우: 한 번만 호출되도록 load 사용
+      load();
+    } else {
+      const normalized = Array.isArray(maybe) ? maybe : [];
+      setProducts(normalized);
+      setFilteredProducts(normalized);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [getProducts]);
+
+  // 검색/카테고리/정렬
+  useEffect(() => {
+    if (!Array.isArray(products) || products.length === 0) {
+      return;
+    }
+
+    let filtered = Array.isArray(products) ? products : [];
+
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (product) =>
-          product.productName
+          (product.productName || "")
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          product.storeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+          (product.storeName || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          (product.categoryName || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
 
-    // 카테고리 필터링
     if (selectedCategory !== "전체") {
       filtered = filtered.filter(
         (product) => product.categoryName === selectedCategory
       );
     }
 
-    // 정렬 적용
     let sorted = [...filtered];
     switch (sortBy) {
       case "price-low":
-        sorted.sort((a, b) => a.discountPrice - b.discountPrice);
+        sorted.sort(
+          (a, b) =>
+            (a.discountPrice ?? Infinity) - (b.discountPrice ?? Infinity)
+        );
         break;
       case "expiry-close":
-        sorted.sort((a, b) => a.expiryTime - b.expiryTime);
+        sorted.sort((a, b) => (a.expiryTime || 0) - (b.expiryTime || 0));
         break;
       default:
         break;
@@ -146,12 +178,22 @@ const ProductListPage = ({
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  if (products.length === 0) {
+  if (!Array.isArray(products) || products.length === 0) {
     return (
       <PageContainer>
         <Header userInfo={userInfo} onLogout={handleLogout} title={title} />
         <EmptyState>
-          <EmptyText>상품이 없습니다.</EmptyText>
+          <img src={empty} alt="empty" />
+          {title === "추천 상품" ? (
+            <>
+              <EmptyText>주변 추천 상품이 없습니다.</EmptyText>
+              <EmptyText>
+                원하는 상품 찜을 하시면 재고를 추천해드려요!
+              </EmptyText>
+            </>
+          ) : (
+            <EmptyText>주변 특가 상품이 없습니다.</EmptyText>
+          )}
         </EmptyState>
       </PageContainer>
     );
@@ -204,6 +246,7 @@ const ProductListPage = ({
                 categoryName={showCategory ? product.categoryName : undefined}
                 originalPrice={product.originalPrice}
                 discountPrice={product.discountPrice}
+                discountRate={product.discountRate}
                 imageUrl={product.imageUrl}
                 isLiked={product.isLiked}
                 expiryTime={showExpiry ? product.expiryTime : undefined}

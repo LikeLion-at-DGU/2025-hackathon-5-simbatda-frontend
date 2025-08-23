@@ -13,6 +13,8 @@ const CardContainer = styled.div`
 const CardImage = styled.img`
   width: 60px;
   height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
 `;
 
 const CardContent = styled.div`
@@ -86,6 +88,8 @@ const ProductCardContainer = styled.div`
 const ProductCardImage = styled.img`
   width: 130px;
   height: 130px;
+  object-fit: cover;
+  border-radius: 10px;
 `;
 
 const ProductCardContent = styled.div`
