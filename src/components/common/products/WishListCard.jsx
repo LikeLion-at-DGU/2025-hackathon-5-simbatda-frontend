@@ -4,7 +4,6 @@ import unlikeIcon from "../../../assets/icons/like/unlike.svg";
 import defaultImage from "../../../assets/images/defaultImage.svg";
 import {
   CardContainer,
-  DistanceBadge,
   LikeButton,
   LikeIcon,
   CardContent,
@@ -19,7 +18,6 @@ import {
 
 const WishListCard = ({
   id,
-  distance = "300m",
   storeName,
   productName,
   category,
@@ -51,7 +49,6 @@ const WishListCard = ({
 
   return (
     <CardContainer onClick={onClick}>
-      <DistanceBadge>{distance}</DistanceBadge>
       <LikeButton
         onClick={handleLikeClick}
         aria-label={liked ? "찜 취소" : "찜하기"}
