@@ -156,13 +156,14 @@ function ProductRegister() {
 
     window.addEventListener("focus", handleFocus);
 
-    const interval = setInterval(fetchProducts, 9000);
+    if (products.length > 0) {
+      console.log("새로운 상품 추가 감지, 재고 정보 업데이트");
+    }
 
     return () => {
       window.removeEventListener("focus", handleFocus);
-      clearInterval(interval);
     };
-  }, []);
+  }, [products.length]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -286,6 +287,7 @@ function ProductRegister() {
       );
       formData.append("stock", Number(quantity || 1));
       formData.append("expiration_date", expiryDate.toISOString());
+      formData.append("is_active", true);
       if (selectedImageFile) {
         formData.append("image", selectedImageFile);
       } else {
@@ -378,30 +380,16 @@ function ProductRegister() {
             주문 현황
           </SectionTitle>
           <SectionTitle className="active">상품 등록</SectionTitle>
-          <Button
-            variant="accept"
-            onClick={() => fetchProducts()}
-            style={{
-              fontSize: "12px",
-              width: "200px",
-              padding: "6px 12px",
-              marginLeft: "auto",
-              minWidth: "auto",
-              whiteSpace: "nowrap",
-            }}
-          >
-            재고 새로고침
-          </Button>
         </SectionTitleWrapper>
 
         {isLoading ? (
           <EmptyMessage>상품 목록을 불러오는 중입니다...</EmptyMessage>
-        ) : products.filter((p) => p.stock > 0).length === 0 ? (
+        ) : products.filter((p) => p.stock > 0 && p.is_active).length === 0 ? (
           <EmptyMessage>아직 등록된 메뉴가 없습니다.</EmptyMessage>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {products
-              .filter((p) => p.stock > 0)
+              .filter((p) => p.stock > 0 && p.is_active)
               .map((p) => (
                 <ProductCard
                   key={p.id}

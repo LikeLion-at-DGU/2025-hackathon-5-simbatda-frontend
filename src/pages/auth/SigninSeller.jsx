@@ -114,7 +114,7 @@ function SigninSeller() {
   return (
     <LoginPageContainer>
       <MainContent>
-        <Title>로그인</Title>
+        <Title>판매자 로그인</Title>
 
         <PictureSection>
           <SquirrelContainer>
