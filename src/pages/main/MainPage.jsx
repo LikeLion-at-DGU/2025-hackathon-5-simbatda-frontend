@@ -81,7 +81,33 @@ function MainPage() {
           setUserLocation(newLocation);
         },
         (error) => {
-          // 위치 조회 실패 시 기본값 유지
+          // 위치 권한이 거부된 경우
+          if (error.code === error.PERMISSION_DENIED) {
+            // 권한이 거부된 경우 자동으로 다시 요청
+            setTimeout(() => {
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    const newLocation = {
+                      lat: position.coords.latitude,
+                      lng: position.coords.longitude,
+                      radius: 5
+                    };
+                    setUserLocation(newLocation);
+                  },
+                  (retryError) => {
+                    // 두 번째 시도도 실패하면 아무것도 하지 않음
+                    console.log("위치 권한 재요청 실패");
+                  },
+                  {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                  }
+                );
+              }
+            }, 1000); // 1초 후 다시 시도
+          }
         },
         {
           enableHighAccuracy: true,
@@ -124,26 +150,22 @@ function MainPage() {
 
   // 위치가 변경되면 상품 데이터 다시 가져오기
   useEffect(() => {
-    if (userLocation.lat && userLocation.lng) {
-      fetchProductsData();
-    }
+    // userLocation이 설정되지 않았어도 fetchProductsData 호출
+    fetchProductsData();
   }, [userLocation]);
 
   // 상품 데이터 가져오기
   const fetchProductsData = useCallback(async () => {
-          // 사용자 위치가 설정되지 않았으면 함수 실행하지 않음
-      if (!userLocation.lat || !userLocation.lng) {
-        return;
-      }
 
     try {
       setLoading(true);
       
       // 현재 위치 정보를 함수 내에서 가져오기 (최신 값 보장)
+      // userLocation이 없으면 기본 좌표 사용
       const currentLocation = {
-        lat: userLocation.lat,
-        lng: userLocation.lng,
-        radius: userLocation.radius,
+        lat: userLocation.lat || 37.5665,
+        lng: userLocation.lng || 126.9780,
+        radius: userLocation.radius || 5,
       };
       
       // 찜 목록 가져오기
@@ -158,7 +180,7 @@ function MainPage() {
       const wishlistProductIds = new Set(wishlistProducts.map(p => p.id));
       
       // 추천상품 데이터: 소비자 추천 API 사용 (위치 기반)
-      const rec = await getRecommendedProducts(userLocation.lat, userLocation.lng);
+      const rec = await getRecommendedProducts(currentLocation.lat, currentLocation.lng);
       const mappedRec = await Promise.all(
         (rec || []).map(async (product) => {
           try {
@@ -342,10 +364,14 @@ function MainPage() {
           seenIds.add(product.id);
           
           // 사용자 위치와 상품 위치의 실제 거리 계산
-          if (product.store && product.store.lat && product.store.lng && userLocation.lat && userLocation.lng) {
+          // userLocation이 없으면 기본 좌표 사용
+          const currentLat = userLocation.lat || 37.5665;
+          const currentLng = userLocation.lng || 126.9780;
+          
+          if (product.store && product.store.lat && product.store.lng) {
             const distance = Math.sqrt(
-              Math.pow(product.store.lat - userLocation.lat, 2) + 
-              Math.pow(product.store.lng - userLocation.lng, 2)
+              Math.pow(product.store.lat - currentLat, 2) + 
+              Math.pow(product.store.lng - currentLng, 2)
             );
             
             productsWithDistance.push({
@@ -454,10 +480,6 @@ function MainPage() {
   };
 
   const handleMapClick = async (event) => {
-    // 사용자 위치가 설정되지 않았으면 함수 실행하지 않음
-    if (!userLocation.lat || !userLocation.lng) {
-      return;
-    }
 
     try {
       const lat = event.latLng.lat();
@@ -518,10 +540,6 @@ function MainPage() {
   };
 
   const handleMarkerClick = async (markerData) => {
-    // 사용자 위치가 설정되지 않았으면 함수 실행하지 않음
-    if (!userLocation.lat || !userLocation.lng) {
-      return;
-    }
 
     try {
       setSelectedLocationInfo({
