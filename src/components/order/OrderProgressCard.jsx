@@ -97,8 +97,9 @@ export default function OrderProgressCard({
     const hour = date.getHours();
     const ampm = hour >= 12 ? "오후" : "오전";
     const displayHour = hour >= 12 ? hour - 12 : hour;
+    const minute = String(date.getMinutes()).padStart(2, "0");
 
-    return `${ampm} ${displayHour}시`;
+    return `${ampm} ${displayHour}시 ${minute}분`;
   };
 
   const isStatusClickable =

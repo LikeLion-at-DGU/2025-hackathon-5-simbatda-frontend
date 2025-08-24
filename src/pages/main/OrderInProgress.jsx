@@ -192,25 +192,32 @@ export default function OrderInProgress() {
               >
                 {{
                   id: order.id,
-                  createdAt: new Date(order.created_at).toLocaleString(
-                    "ko-KR",
-                    {
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    }
-                  ),
+                  createdAt: (() => {
+                    const date = new Date(order.created_at);
+                    const month = String(date.getMonth() + 1).padStart(2, "0");
+                    const day = String(date.getDate()).padStart(2, "0");
+                    const hour = date.getHours();
+                    const ampm = hour >= 12 ? "오후" : "오전";
+                    const displayHour = hour >= 12 ? hour - 12 : hour;
+                    const minute = String(date.getMinutes()).padStart(2, "0");
+                    return `${month}.${day}. ${ampm} ${displayHour}시 ${minute}분`;
+                  })(),
                   orderNumber: `B${order.id.toString().padStart(5, "0")}`,
                   itemSummary: `${order.product?.name || "상품명 없음"} ${
                     order.quantity
                   }개`,
                   pickupTime: order.reserved_at
-                    ? new Date(order.reserved_at).toLocaleString("ko-KR", {
-                        hour: "2-digit",
-                        hour12: true,
-                      }) + " 픽업"
+                    ? (() => {
+                        const date = new Date(order.reserved_at);
+                        const hour = date.getHours();
+                        const ampm = hour >= 12 ? "오후" : "오전";
+                        const displayHour = hour >= 12 ? hour - 12 : hour;
+                        const minute = String(date.getMinutes()).padStart(
+                          2,
+                          "0"
+                        );
+                        return `${ampm} ${displayHour}시 ${minute}분 픽업`;
+                      })()
                     : "픽업 시간 미정",
                   steps: getOrderSteps(order.status),
                 }}

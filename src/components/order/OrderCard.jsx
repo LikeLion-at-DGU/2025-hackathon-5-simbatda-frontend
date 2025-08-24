@@ -47,8 +47,9 @@ const OrderCard = ({
     const hour = date.getHours();
     const ampm = hour >= 12 ? "오후" : "오전";
     const displayHour = hour >= 12 ? hour - 12 : hour;
+    const minute = String(date.getMinutes()).padStart(2, "0");
 
-    return `${ampm} ${displayHour}시 픽업`;
+    return `${ampm} ${displayHour}시 ${minute}분 픽업`;
   };
 
   const formatActionTime = (dateString) => {
