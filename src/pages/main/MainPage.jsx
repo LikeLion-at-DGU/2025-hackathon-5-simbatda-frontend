@@ -19,7 +19,7 @@ import {
   getWishlistProducts,
 } from "../../api/products";
 import { PageContainer, Content } from "./MainPage.styles";
-import { useAuth } from "../../hooks/useAuth";
+
 import { getConsumerMe } from "../../api/auth";
 
 function MainPage() {
@@ -42,7 +42,7 @@ function MainPage() {
   const [allNearbyProducts, setAllNearbyProducts] = useState([]); // 지도용 전체 상품
   const [filteredNearbyProducts, setFilteredNearbyProducts] = useState([]);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+
 
   // 카테고리 이름 → ID 매핑 로드
   useEffect(() => {
@@ -734,15 +734,12 @@ function MainPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/signin");
-  };
+
 
   if (loading) {
     return (
       <PageContainer>
-        <Header userInfo={userInfo} onLogout={handleLogout} />
+        <Header userInfo={userInfo} />
         <Content>
           <div style={{
             display: 'flex',
@@ -761,7 +758,7 @@ function MainPage() {
 
   return (
     <PageContainer>
-      <Header userInfo={userInfo} onLogout={handleLogout} />
+              <Header userInfo={userInfo} />
 
       <Content>
         <SearchBar 

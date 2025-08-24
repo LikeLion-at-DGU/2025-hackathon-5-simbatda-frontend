@@ -121,10 +121,6 @@ function OrderHistory() {
     fetchUserInfo();
   }, []);
 
-  const handleLogout = () => {
-    navigate("/signin");
-  };
-
   const getStatusText = (status) => {
     // 상태값을 대문자로 정규화
     const normalizedStatus = status?.toLowerCase();
@@ -246,7 +242,7 @@ function OrderHistory() {
   if (orders.length === 0) {
     return (
       <Container>
-        <Header userInfo={userInfo} onLogout={handleLogout} title="주문 내역" />
+        <Header userInfo={userInfo} title="주문 내역" />
         <EmptyState>
           <img
             src={empty}
@@ -261,7 +257,7 @@ function OrderHistory() {
 
   return (
     <Container>
-      <Header userInfo={userInfo} onLogout={handleLogout} title="주문 내역" />
+      <Header userInfo={userInfo} title="주문 내역" />
 
       {/* 진행중인 주문 카드 */}
       {orders.filter(

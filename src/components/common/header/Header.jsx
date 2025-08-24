@@ -25,7 +25,7 @@ import {
   LogoutButton,
 } from "./Header.styles";
 
-const Header = ({ userInfo, onLogout, title }) => {
+const Header = ({ userInfo, title }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
   const navigate = useNavigate();
