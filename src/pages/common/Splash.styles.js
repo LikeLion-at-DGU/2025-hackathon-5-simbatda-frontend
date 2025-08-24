@@ -138,40 +138,6 @@ export const PageContainer = styled.section`
     }
   }
 
-  sectiontitle {
-    color: #fff;
-    font-family: Pretendard;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    line-height: 1.3;
-    margin-top: 8px;
-    font-size: 20px;
-    max-width: 360px;
-    animation: ${fadeUp} 420ms ease-out 220ms both;
-  }
-  @media (min-width: 538px) {
-    sectiontitle {
-      font-size: 28px;
-    }
-  }
-
-  content {
-    color: #fff;
-    font-family: Pretendard;
-    font-weight: 400;
-    line-height: 1.5;
-    margin-top: 6px;
-    opacity: 0.92;
-    font-size: 13px;
-    max-width: 420px;
-    animation: ${fadeUp} 420ms ease-out 320ms both;
-  }
-  @media (min-width: 421px) {
-    content {
-      font-size: 16px;
-    }
-  }
-
   .falling-acorn {
     position: absolute;
     left: -28px;
@@ -240,5 +206,36 @@ export const PageContainer = styled.section`
     header {
       row-gap: 24px;
     }
+  }
+`;
+
+export const SectionTitle = styled.div`
+  color: #fff;
+  font-family: Pretendard;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 8px;
+  font-size: 20px;
+  max-width: 360px;
+  animation: ${fadeUp} 420ms ease-out 220ms both;
+
+  @media (min-width: 538px) {
+    font-size: 28px;
+  }
+`;
+
+export const Content = styled.div`
+  color: #fff;
+  font-family: Pretendard;
+  font-weight: 400;
+  line-height: 1.5;
+  margin-top: 6px;
+  opacity: 0.92;
+  font-size: 13px;
+  max-width: 420px;
+  animation: ${fadeUp} 420ms ease-out 320ms both;
+
+  @media (min-width: 421px) {
+    font-size: 16px;
   }
 `;

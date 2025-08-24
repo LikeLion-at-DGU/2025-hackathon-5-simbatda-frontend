@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { PageContainer } from "./Splash.styles";
+import { PageContainer, SectionTitle, Content } from "./Splash.styles";
 import acorn1 from "../../assets/images/acorn1.svg";
 import textLogoWhite from "../../assets/images/text-logo-white.svg";
 import acorns from "../../assets/images/acorns.svg";
@@ -63,8 +63,8 @@ const Splash = () => {
           <img className="logo-acorn" src={acorn1} alt="도토리" />
         </div>
 
-        <sectiontitle>동네 남는 재고, 도토리를 콕!</sectiontitle>
-        <content>우리 동네 숨은 도토리를 찾는 재미</content>
+        <SectionTitle>동네 남는 재고, 도토리를 콕!</SectionTitle>
+        <Content>우리 동네 숨은 도토리를 찾는 재미</Content>
       </header>
 
       <img className="falling-acorn" src={acorns} alt="" aria-hidden="true" />
