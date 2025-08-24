@@ -191,6 +191,15 @@ const Registeration = () => {
     let mounted = true;
     const loadRecommended = async () => {
       try {
+        // 찜 목록 가져오기
+        let wishlistProducts = [];
+        try {
+          wishlistProducts = await getWishlistProducts();
+        } catch (error) {
+          wishlistProducts = [];
+        }
+        const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
+
         const list = await getRecommendedProducts();
         if (!mounted) return;
         const mapped = (Array.isArray(list) ? list : [])
@@ -203,7 +212,7 @@ const Registeration = () => {
             originalPrice: p.price,
             discountPrice: p.discount_price,
             imageUrl: p.image || "",
-            isLiked: false,
+            isLiked: wishlistProductIds.has(p.id),
           }));
         setRecommended(mapped);
       } catch (_) {
@@ -245,6 +254,9 @@ const Registeration = () => {
       setShowConfirmModal(false);
       setReservationBottomSheetOpen(false);
       document.body.style.overflow = "unset";
+
+      // 예약 완료 후 페이지 새로고침하여 재고 상태 업데이트
+      window.location.reload();
     } catch (e) {
       alert("예약에 실패했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
@@ -264,6 +276,34 @@ const Registeration = () => {
 
   const handleStoreClick = () => {
     if (store?.id) navigate(`/store/${store.id}`);
+  };
+
+  // 추천상품 찜 토글 처리
+  const handleRecommendedProductLikeToggle = async (productId, isLiked) => {
+    try {
+      await toggleWishlist(productId, isLiked);
+
+      // 찜 목록 다시 가져오기
+      let wishlistProducts = [];
+      try {
+        wishlistProducts = await getWishlistProducts();
+      } catch (error) {
+        wishlistProducts = [];
+      }
+      const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
+
+      // 추천상품 목록 업데이트
+      const updatedRecommended = recommended.map((product) => {
+        if (product.id === productId) {
+          return { ...product, isLiked: wishlistProductIds.has(product.id) };
+        }
+        return product;
+      });
+
+      setRecommended(updatedRecommended);
+    } catch (error) {
+      console.error("추천상품 찜 토글 실패:", error);
+    }
   };
 
   if (!product || !store) {
@@ -331,7 +371,12 @@ const Registeration = () => {
                 discountPrice={recommendedProduct.discountPrice}
                 imageUrl={recommendedProduct.imageUrl}
                 isLiked={recommendedProduct.isLiked}
-                onLikeToggle={() => {}}
+                onLikeToggle={(isLiked) =>
+                  handleRecommendedProductLikeToggle(
+                    recommendedProduct.id,
+                    isLiked
+                  )
+                }
                 onClick={() =>
                   navigate(`/registeration/${recommendedProduct.id}`)
                 }
