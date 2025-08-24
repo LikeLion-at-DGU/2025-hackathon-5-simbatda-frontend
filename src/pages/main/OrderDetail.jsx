@@ -70,10 +70,14 @@ export default function OrderDetail() {
             hour12: true,
           }),
           pickupTime: orderData.pickup_time
-            ? new Date(orderData.pickup_time).toLocaleString("ko-KR", {
-                hour: "2-digit",
-                hour12: true,
-              }) + " 픽업"
+            ? (() => {
+                const date = new Date(orderData.pickup_time);
+                const hour = date.getHours();
+                const ampm = hour >= 12 ? "오후" : "오전";
+                const displayHour = hour >= 12 ? hour - 12 : hour;
+                const minute = String(date.getMinutes()).padStart(2, "0");
+                return `${ampm} ${displayHour}시 ${minute}분 픽업`;
+              })()
             : "픽업 시간 미정",
           items: [
             {
@@ -107,7 +111,28 @@ export default function OrderDetail() {
 
   const formatPickupTime = (pickupTime) => {
     if (!pickupTime) return "";
-    return pickupTime;
+
+    // 이미 포맷된 문자열인 경우 그대로 반환
+    if (typeof pickupTime === "string" && pickupTime.includes("시")) {
+      return pickupTime;
+    }
+
+    try {
+      const date = new Date(pickupTime);
+      if (isNaN(date.getTime())) {
+        return pickupTime;
+      }
+
+      const hour = date.getHours();
+      const ampm = hour >= 12 ? "오후" : "오전";
+      const displayHour = hour >= 12 ? hour - 12 : hour;
+      const minute = String(date.getMinutes()).padStart(2, "0");
+
+      return `${ampm} ${displayHour}시 ${minute}분 픽업`;
+    } catch (error) {
+      console.error("Error formatting pickup time:", error);
+      return pickupTime;
+    }
   };
 
   const getStatusText = (status) => {

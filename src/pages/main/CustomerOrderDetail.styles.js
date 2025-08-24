@@ -7,6 +7,7 @@ export const PageContainer = styled.div`
 
 export const Content = styled.div`
   padding: 20px;
+  padding-top: 80px;
   max-width: 800px;
   margin: 0 auto;
 `;
