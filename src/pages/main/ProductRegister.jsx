@@ -12,8 +12,6 @@ import Button from "../../components/common/button/Button";
 import {
   PageContainer,
   Content,
-  OpenStatusSection,
-  OpenStatusText,
   SectionTitle,
   SectionTitleWrapper,
   EmptyMessage,
@@ -47,13 +45,13 @@ import {
 
 import HeaderSeller from "../../components/common/header/HeaderSeller";
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
-import { useStoreStatus } from "../../hooks/useStoreStatus";
+
 import closeIcon from "../../assets/icons/x.svg";
 import ProductCard from "../../components/product/ProductCard";
 
 function ProductRegister() {
   const navigate = useNavigate();
-  const { isOpen, setIsOpen, handleToggleOpenStatus } = useStoreStatus();
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -380,17 +378,6 @@ function ProductRegister() {
     <PageContainer>
       <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
       <Content>
-        <OpenStatusSection>
-          <Button
-            variant={isOpen === null ? "loading" : isOpen ? "open" : "close"}
-            onClick={handleToggleOpenStatus}
-            disabled={isOpen === null}
-          >
-            {isOpen === null ? "로딩 중..." : isOpen ? "open" : "close"}
-          </Button>
-          <OpenStatusText>영업상태 변경</OpenStatusText>
-        </OpenStatusSection>
-
         <SectionTitleWrapper>
           <SectionTitle onClick={() => navigate("/mainpage-seller")}>
             주문 현황

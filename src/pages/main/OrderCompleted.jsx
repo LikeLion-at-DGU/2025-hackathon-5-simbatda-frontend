@@ -8,12 +8,10 @@ import {
 import { logout } from "../../api/auth";
 import CompletedCard from "../../components/order/CompletedCard";
 import Button from "../../components/common/button/Button";
-import { useStoreStatus } from "../../hooks/useStoreStatus";
+
 import {
   PageContainer,
   Content,
-  OpenStatusSection,
-  OpenStatusText,
   SectionTitleWrapper,
   SectionTitle,
   StatusButtons,
@@ -26,7 +24,7 @@ import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 export default function OrderCompleted() {
   const navigate = useNavigate();
-  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
+
   const [userInfo, setUserInfo] = useState(null);
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +58,6 @@ export default function OrderCompleted() {
         product_name: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
         price: order.product?.total_price || order.total_price || 0,
-        // 할인 정보 추가 (백엔드 필드명과 일치)
         discount_price: order.product?.discount_price || null,
         discount_rate: order.product?.discount_rate || null,
         created_at: order.created_at,
@@ -171,16 +168,6 @@ export default function OrderCompleted() {
       <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
 
       <Content>
-        <OpenStatusSection>
-          <Button
-            variant={isOpen ? "open" : "close"}
-            onClick={handleToggleOpenStatus}
-          >
-            {isOpen ? "open" : "close"}
-          </Button>
-          <OpenStatusText>영업상태 변경</OpenStatusText>
-        </OpenStatusSection>
-
         <SectionTitleWrapper>
           <SectionTitle className="active">주문 현황</SectionTitle>
           <SectionTitle onClick={() => navigate("/product-register")}>

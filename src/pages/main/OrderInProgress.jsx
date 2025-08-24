@@ -9,12 +9,10 @@ import {
 import { logout } from "../../api/auth";
 import OrderProgressCard from "../../components/order/OrderProgressCard";
 import Button from "../../components/common/button/Button";
-import { useStoreStatus } from "../../hooks/useStoreStatus";
+
 import {
   PageContainer,
   Content,
-  OpenStatusSection,
-  OpenStatusText,
   SectionTitleWrapper,
   SectionTitle,
   StatusButtons,
@@ -25,7 +23,7 @@ import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 export default function OrderInProgress() {
   const navigate = useNavigate();
-  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -151,16 +149,6 @@ export default function OrderInProgress() {
       <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
 
       <Content>
-        <OpenStatusSection>
-          <Button
-            variant={isOpen ? "open" : "close"}
-            onClick={handleToggleOpenStatus}
-          >
-            {isOpen ? "open" : "close"}
-          </Button>
-          <OpenStatusText>영업상태 변경</OpenStatusText>
-        </OpenStatusSection>
-
         <SectionTitleWrapper>
           <SectionTitle className="active">주문 현황</SectionTitle>
           <SectionTitle onClick={() => navigate("/product-register")}>

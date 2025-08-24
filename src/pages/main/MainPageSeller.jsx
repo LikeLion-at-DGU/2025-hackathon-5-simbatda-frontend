@@ -13,8 +13,6 @@ import OrderCard from "../../components/order/OrderCard";
 import {
   PageContainer,
   Content,
-  OpenStatusSection,
-  OpenStatusText,
   SectionTitle,
   SectionTitleWrapper,
   StatusButtons,
@@ -34,14 +32,13 @@ import {
 } from "./MainPageSeller.styles";
 
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
-import { useStoreStatus } from "../../hooks/useStoreStatus";
 
 import ImportantIcon from "../../assets/icons/Important.svg";
 import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 function MainPageSeller() {
   const navigate = useNavigate();
-  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
+
   const [userInfo, setUserInfo] = useState(null);
   const [storeInfo, setStoreInfo] = useState(null);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -290,16 +287,6 @@ function MainPageSeller() {
       <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
 
       <Content>
-        <OpenStatusSection>
-          <Button
-            variant={isOpen ? "open" : "close"}
-            onClick={handleToggleOpenStatus}
-          >
-            {isOpen ? "open" : "close"}
-          </Button>
-          <OpenStatusText>영업상태 변경</OpenStatusText>
-        </OpenStatusSection>
-
         <SectionTitleWrapper>
           <SectionTitle className="active">주문 현황</SectionTitle>
           <SectionTitle onClick={handleAddMenu}>상품 등록</SectionTitle>

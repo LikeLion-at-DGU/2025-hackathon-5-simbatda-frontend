@@ -1,24 +1,48 @@
 import { useState, useEffect } from "react";
-import { toggleStoreStatus } from "../api/seller";
+import { toggleStoreStatus, getSellerStore } from "../api/seller";
 
-const STORE_STATUS_KEY = "store_open_status";
+let globalIsOpen = false;
+let globalListeners = new Set();
+
+const updateGlobalState = (newState) => {
+  globalIsOpen = newState;
+  globalListeners.forEach((listener) => listener(newState));
+};
 
 export const useStoreStatus = () => {
-  const [isOpen, setIsOpen] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORE_STATUS_KEY);
-      return saved !== null ? JSON.parse(saved) : null;
-    } catch (error) {
-      console.error("localStorage 파싱 오류:", error);
-      return null;
-    }
-  });
+  const [isOpen, setIsOpen] = useState(globalIsOpen);
 
   useEffect(() => {
-    if (isOpen !== null) {
-      localStorage.setItem(STORE_STATUS_KEY, JSON.stringify(isOpen));
+    const listener = (newState) => {
+      setIsOpen(newState);
+    };
+
+    globalListeners.add(listener);
+
+    return () => {
+      globalListeners.delete(listener);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchStoreStatus = async () => {
+      try {
+        const storeData = await getSellerStore();
+        if (storeData && storeData.length > 0) {
+          const store = storeData[0];
+          if (typeof store.is_open === "boolean") {
+            updateGlobalState(store.is_open);
+          }
+        }
+      } catch (error) {
+        console.error("상점 상태 가져오기 실패:", error);
+      }
+    };
+
+    if (globalIsOpen === false && globalListeners.size === 1) {
+      fetchStoreStatus();
     }
-  }, [isOpen]);
+  }, []);
 
   const handleToggleOpenStatus = async () => {
     try {
@@ -29,11 +53,9 @@ export const useStoreStatus = () => {
       console.log("API 응답:", result);
 
       if (result && typeof result.is_open === "boolean") {
-        setIsOpen(result.is_open);
+        updateGlobalState(result.is_open);
         alert(
-          `영업 상태가 ${
-            result.is_open ? "영업중" : "마감"
-          }으로 변경되었습니다.`
+          `영업 상태가 ${result.is_open ? "open" : "close"}으로 변경되었습니다.`
         );
         console.log("영업 상태 업데이트 완료:", result.is_open);
         return { success: true };
