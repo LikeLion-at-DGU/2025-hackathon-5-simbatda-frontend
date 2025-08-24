@@ -2,12 +2,17 @@ import styled from "styled-components";
 
 const Container = styled.div`
   padding: 0;
-  padding-top: 60px; 
   margin: 0 auto;
-  background-color: #ffffff;
-  min-height: 100vh;
+  background-color: #f5f5f5;
   max-width: 100vw;
   overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+`;
+
+const Content = styled.div`
+  max-width: 1200px;
+  width: 100%;
 `;
 
 const ProductImageContainer = styled.div`
@@ -715,5 +720,6 @@ export {
   ModalNotice,
   NoRecommendationText,
   NoRecommendationImage,
+  Content,
   NoRecommendationImageContainer,
 };

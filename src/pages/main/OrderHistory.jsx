@@ -44,6 +44,7 @@ import {
   ProgressStepBar,
   ExpireDate,
 } from "./OrderHistory.styles";
+import { Content } from "./MainPage.styles";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
@@ -234,11 +235,6 @@ function OrderHistory() {
     });
   };
 
-  const formatPrice = (price) => {
-    if (price === undefined || price === null) return "0원";
-    return Number(price).toLocaleString() + "원";
-  };
-
   if (orders.length === 0) {
     return (
       <Container>
@@ -259,252 +255,254 @@ function OrderHistory() {
     <Container>
       <Header userInfo={userInfo} title="주문 내역" />
 
-      {/* 진행중인 주문 카드 */}
-      {orders.filter(
-        (order) =>
-          order.status?.toLowerCase() === "pending" ||
-          order.status?.toLowerCase() === "confirm" ||
-          order.status?.toLowerCase() === "ready"
-      ).length > 0 && (
-        <OrderItem>
-          <OrderHeader>
-            <OrderInfo>
-              <OrderDate>진행중인 주문</OrderDate>
-            </OrderInfo>
-          </OrderHeader>
+      <Content>
+        {/* 진행중인 주문 카드 */}
+        {orders.filter(
+          (order) =>
+            order.status?.toLowerCase() === "pending" ||
+            order.status?.toLowerCase() === "confirm" ||
+            order.status?.toLowerCase() === "ready"
+        ).length > 0 && (
+          <OrderItem>
+            <OrderHeader>
+              <OrderInfo>
+                <OrderDate>진행중인 주문</OrderDate>
+              </OrderInfo>
+            </OrderHeader>
 
-          <OrderDetails>
-            <ProgressSection>
-              <ProgressSteps>
-                {orders
-                  .filter(
-                    (order) =>
-                      order.status?.toLowerCase() === "pending" ||
-                      order.status?.toLowerCase() === "confirm" ||
-                      order.status?.toLowerCase() === "ready"
-                  )
-                  .map((order) => {
-                    const progressSteps = getProgressSteps(order.status);
+            <OrderDetails>
+              <ProgressSection>
+                <ProgressSteps>
+                  {orders
+                    .filter(
+                      (order) =>
+                        order.status?.toLowerCase() === "pending" ||
+                        order.status?.toLowerCase() === "confirm" ||
+                        order.status?.toLowerCase() === "ready"
+                    )
+                    .map((order) => {
+                      const progressSteps = getProgressSteps(order.status);
 
-                    return (
-                      <ProgressStep
-                        key={order.id}
-                        onClick={() =>
-                          navigate(`/customer-order-detail/${order.id}`)
-                        }
-                        style={{ cursor: "pointer" }}
-                      >
-                        {/* 유통기한 */}
-                        {order.expireDate && (
-                          <ExpireDate>
-                            유통기한: {formatDate(order.expireDate)}
-                          </ExpireDate>
-                        )}
-                        <StepHeader>
-                          <StepStoreName>{order.storeName}</StepStoreName>
-                          <StepStatus color={getStatusColor(order.status)}>
-                            {getStatusText(order.status)}
-                          </StepStatus>
-                        </StepHeader>
-
-                        <StepProducts>
-                          <StepProduct>
-                            <OrderProductImage
-                              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
-                              alt={order.productName}
-                            />
-                            <StepProductInfo>
-                              <StepProductName>
-                                {order.productName}
-                              </StepProductName>
-                              <StepProductQuantity>
-                                {order.quantity}개
-                              </StepProductQuantity>
-                            </StepProductInfo>
-                          </StepProduct>
-                        </StepProducts>
-
-                        <StepSummary>
-                          <div>주문일: {formatDate(order.createdAt)}</div>
-                          {/* 최종 결제 금액 표시 */}
-                          {order.totalPrice && (
-                            <div
-                              style={{ color: "#37CA79", fontWeight: "600" }}
-                            >
-                              최종 결제 금액:{" "}
-                              {order.totalPrice.toLocaleString()}원
-                            </div>
+                      return (
+                        <ProgressStep
+                          key={order.id}
+                          onClick={() =>
+                            navigate(`/customer-order-detail/${order.id}`)
+                          }
+                          style={{ cursor: "pointer" }}
+                        >
+                          {/* 유통기한 */}
+                          {order.expireDate && (
+                            <ExpireDate>
+                              유통기한: {formatDate(order.expireDate)}
+                            </ExpireDate>
                           )}
-                        </StepSummary>
+                          <StepHeader>
+                            <StepStoreName>{order.storeName}</StepStoreName>
+                            <StepStatus color={getStatusColor(order.status)}>
+                              {getStatusText(order.status)}
+                            </StepStatus>
+                          </StepHeader>
 
-                        {/* 픽업 시간 정보 - pickupTime 우선, 없으면 reservedAt 사용 */}
-                        {order.pickupTime || order.reservedAt ? (
-                          <PickupInfo>
-                            <PickupTime>
-                              {(() => {
-                                const time =
-                                  order.pickupTime || order.reservedAt;
-                                const date = new Date(time);
-                                const year = date.getFullYear();
-                                const month = date.getMonth() + 1;
-                                const day = date.getDate();
-                                const hour = date.getHours();
-                                const ampm = hour >= 12 ? "오후" : "오전";
-                                const displayHour =
-                                  hour >= 12 ? hour - 12 : hour;
-                                const minute = String(
-                                  date.getMinutes()
-                                ).padStart(2, "0");
-                                return `${year}년 ${month}월 ${day}일 ${ampm} ${displayHour}시 ${minute}분 픽업`;
-                              })()}
-                            </PickupTime>
-                          </PickupInfo>
-                        ) : (
-                          <PickupInfo>
-                            <PickupTime>
-                              주문 수락 시 30분 이내 픽업 해야합니다.
-                            </PickupTime>
-                          </PickupInfo>
-                        )}
+                          <StepProducts>
+                            <StepProduct>
+                              <OrderProductImage
+                                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                                alt={order.productName}
+                              />
+                              <StepProductInfo>
+                                <StepProductName>
+                                  {order.productName}
+                                </StepProductName>
+                                <StepProductQuantity>
+                                  {order.quantity}개
+                                </StepProductQuantity>
+                              </StepProductInfo>
+                            </StepProduct>
+                          </StepProducts>
 
-                        <ProgressBar>
-                          <ProgressStepBar>
-                            {progressSteps.map((step, index) => (
-                              <ProgressStepItem key={index}>
-                                <img
-                                  src={
-                                    step.isCompleted
-                                      ? greencheck
-                                      : step.isCurrent
-                                      ? greencheck
-                                      : graycheck
-                                  }
-                                  alt={step.name}
-                                  width="25"
-                                  height="25"
-                                />
-                                <StepLabel>{step.name}</StepLabel>
-                                {index < progressSteps.length - 1 && (
-                                  <StepLine $isCompleted={step.isCompleted} />
-                                )}
-                              </ProgressStepItem>
-                            ))}
-                          </ProgressStepBar>
-                        </ProgressBar>
-                      </ProgressStep>
-                    );
-                  })}
-              </ProgressSteps>
-            </ProgressSection>
-          </OrderDetails>
-        </OrderItem>
-      )}
+                          <StepSummary>
+                            <div>주문일: {formatDate(order.createdAt)}</div>
+                            {/* 최종 결제 금액 표시 */}
+                            {order.totalPrice && (
+                              <div
+                                style={{ color: "#37CA79", fontWeight: "600" }}
+                              >
+                                최종 결제 금액:{" "}
+                                {order.totalPrice.toLocaleString()}원
+                              </div>
+                            )}
+                          </StepSummary>
 
-      {/* 완료된 주문 카드들 */}
-      <OrderList>
-        {orders
-          .filter((order) => order.status?.toLowerCase() === "pickup")
-          .map((order) => {
-            return (
-              <OrderItem
-                key={order.id}
-                onClick={() => navigate(`/customer-order-detail/${order.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <OrderHeader>
-                  <OrderInfo>
-                    <OrderDate>{formatDate(order.createdAt)}</OrderDate>
-                    <OrderStatus color={getStatusColor(order.status)}>
-                      {getStatusText(order.status)}
-                    </OrderStatus>
-                  </OrderInfo>
-                </OrderHeader>
+                          {/* 픽업 시간 정보 - pickupTime 우선, 없으면 reservedAt 사용 */}
+                          {order.pickupTime || order.reservedAt ? (
+                            <PickupInfo>
+                              <PickupTime>
+                                {(() => {
+                                  const time =
+                                    order.pickupTime || order.reservedAt;
+                                  const date = new Date(time);
+                                  const year = date.getFullYear();
+                                  const month = date.getMonth() + 1;
+                                  const day = date.getDate();
+                                  const hour = date.getHours();
+                                  const ampm = hour >= 12 ? "오후" : "오전";
+                                  const displayHour =
+                                    hour >= 12 ? hour - 12 : hour;
+                                  const minute = String(
+                                    date.getMinutes()
+                                  ).padStart(2, "0");
+                                  return `${year}년 ${month}월 ${day}일 ${ampm} ${displayHour}시 ${minute}분 픽업`;
+                                })()}
+                              </PickupTime>
+                            </PickupInfo>
+                          ) : (
+                            <PickupInfo>
+                              <PickupTime>
+                                주문 수락 시 30분 이내 픽업 해야합니다.
+                              </PickupTime>
+                            </PickupInfo>
+                          )}
 
-                <OrderDetails>
-                  <OrderProduct>
-                    <OrderProductImage
-                      src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
-                      alt={order.productName}
-                    />
-                    <OrderProductInfo>
-                      <OrderProductName>{order.productName}</OrderProductName>
-                      <OrderProductQuantity>
-                        {order.quantity}개
-                      </OrderProductQuantity>
-                    </OrderProductInfo>
-                  </OrderProduct>
+                          <ProgressBar>
+                            <ProgressStepBar>
+                              {progressSteps.map((step, index) => (
+                                <ProgressStepItem key={index}>
+                                  <img
+                                    src={
+                                      step.isCompleted
+                                        ? greencheck
+                                        : step.isCurrent
+                                        ? greencheck
+                                        : graycheck
+                                    }
+                                    alt={step.name}
+                                    width="25"
+                                    height="25"
+                                  />
+                                  <StepLabel>{step.name}</StepLabel>
+                                  {index < progressSteps.length - 1 && (
+                                    <StepLine $isCompleted={step.isCompleted} />
+                                  )}
+                                </ProgressStepItem>
+                              ))}
+                            </ProgressStepBar>
+                          </ProgressBar>
+                        </ProgressStep>
+                      );
+                    })}
+                </ProgressSteps>
+              </ProgressSection>
+            </OrderDetails>
+          </OrderItem>
+        )}
 
-                  <OrderSummary>
-                    {/* 유통기한을 상점명 위에 빨간 글씨로 표시 */}
-                    {order.expireDate && (
-                      <div style={{ color: "#ef4444", fontWeight: "600" }}>
-                        유통기한: {formatDate(order.expireDate)}
-                      </div>
-                    )}
-                    <div>상점: {order.storeName}</div>
-                    <div>주문일: {formatDate(order.createdAt)}</div>
-                    {/* 최종 결제 금액 표시 */}
-                    {order.totalPrice && (
-                      <div style={{ color: "#37CA79", fontWeight: "600" }}>
-                        최종 결제 금액: {order.totalPrice.toLocaleString()}원
-                      </div>
-                    )}
-                  </OrderSummary>
-                </OrderDetails>
-              </OrderItem>
-            );
-          })}
-      </OrderList>
+        {/* 완료된 주문 카드들 */}
+        <OrderList>
+          {orders
+            .filter((order) => order.status?.toLowerCase() === "pickup")
+            .map((order) => {
+              return (
+                <OrderItem
+                  key={order.id}
+                  onClick={() => navigate(`/customer-order-detail/${order.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <OrderHeader>
+                    <OrderInfo>
+                      <OrderDate>{formatDate(order.createdAt)}</OrderDate>
+                      <OrderStatus color={getStatusColor(order.status)}>
+                        {getStatusText(order.status)}
+                      </OrderStatus>
+                    </OrderInfo>
+                  </OrderHeader>
 
-      {/* 취소된 주문 카드들 */}
-      <OrderList>
-        {orders
-          .filter((order) => order.status?.toLowerCase() === "cancel")
-          .map((order) => {
-            return (
-              <OrderItem
-                key={order.id}
-                onClick={() => navigate(`/customer-order-detail/${order.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <OrderHeader>
-                  <OrderInfo>
-                    <OrderDate>{formatDate(order.createdAt)}</OrderDate>
-                    <OrderStatus color={getStatusColor(order.status)}>
-                      {getStatusText(order.status)}
-                    </OrderStatus>
-                  </OrderInfo>
-                </OrderHeader>
+                  <OrderDetails>
+                    <OrderProduct>
+                      <OrderProductImage
+                        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                        alt={order.productName}
+                      />
+                      <OrderProductInfo>
+                        <OrderProductName>{order.productName}</OrderProductName>
+                        <OrderProductQuantity>
+                          {order.quantity}개
+                        </OrderProductQuantity>
+                      </OrderProductInfo>
+                    </OrderProduct>
 
-                <OrderDetails>
-                  <OrderProduct>
-                    <OrderProductImage
-                      src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
-                      alt={order.productName}
-                    />
-                    <OrderProductInfo>
-                      <OrderProductName>{order.productName}</OrderProductName>
-                      <OrderProductQuantity>
-                        {order.quantity}개
-                      </OrderProductQuantity>
-                    </OrderProductInfo>
-                  </OrderProduct>
+                    <OrderSummary>
+                      {/* 유통기한을 상점명 위에 빨간 글씨로 표시 */}
+                      {order.expireDate && (
+                        <div style={{ color: "#ef4444", fontWeight: "600" }}>
+                          유통기한: {formatDate(order.expireDate)}
+                        </div>
+                      )}
+                      <div>상점: {order.storeName}</div>
+                      <div>주문일: {formatDate(order.createdAt)}</div>
+                      {/* 최종 결제 금액 표시 */}
+                      {order.totalPrice && (
+                        <div style={{ color: "#37CA79", fontWeight: "600" }}>
+                          최종 결제 금액: {order.totalPrice.toLocaleString()}원
+                        </div>
+                      )}
+                    </OrderSummary>
+                  </OrderDetails>
+                </OrderItem>
+              );
+            })}
+        </OrderList>
 
-                  <OrderSummary>
-                    <div>상점: {order.storeName}</div>
-                    <div>주문일: {formatDate(order.createdAt)}</div>
-                    {/* 취소된 주문에서는 유통기한과 결제 금액 표시하지 않음 */}
-                    {order.cancelReason && (
-                      <div style={{ color: "#ef4444" }}>
-                        취소 사유: {order.cancelReason}
-                      </div>
-                    )}
-                  </OrderSummary>
-                </OrderDetails>
-              </OrderItem>
-            );
-          })}
-      </OrderList>
+        {/* 취소된 주문 카드들 */}
+        <OrderList>
+          {orders
+            .filter((order) => order.status?.toLowerCase() === "cancel")
+            .map((order) => {
+              return (
+                <OrderItem
+                  key={order.id}
+                  onClick={() => navigate(`/customer-order-detail/${order.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <OrderHeader>
+                    <OrderInfo>
+                      <OrderDate>{formatDate(order.createdAt)}</OrderDate>
+                      <OrderStatus color={getStatusColor(order.status)}>
+                        {getStatusText(order.status)}
+                      </OrderStatus>
+                    </OrderInfo>
+                  </OrderHeader>
+
+                  <OrderDetails>
+                    <OrderProduct>
+                      <OrderProductImage
+                        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                        alt={order.productName}
+                      />
+                      <OrderProductInfo>
+                        <OrderProductName>{order.productName}</OrderProductName>
+                        <OrderProductQuantity>
+                          {order.quantity}개
+                        </OrderProductQuantity>
+                      </OrderProductInfo>
+                    </OrderProduct>
+
+                    <OrderSummary>
+                      <div>상점: {order.storeName}</div>
+                      <div>주문일: {formatDate(order.createdAt)}</div>
+                      {/* 취소된 주문에서는 유통기한과 결제 금액 표시하지 않음 */}
+                      {order.cancelReason && (
+                        <div style={{ color: "#ef4444" }}>
+                          취소 사유: {order.cancelReason}
+                        </div>
+                      )}
+                    </OrderSummary>
+                  </OrderDetails>
+                </OrderItem>
+              );
+            })}
+        </OrderList>
+      </Content>
     </Container>
   );
 }
