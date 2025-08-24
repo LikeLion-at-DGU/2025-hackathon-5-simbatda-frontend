@@ -4,8 +4,9 @@ const SearchBarContainer = styled.div`
   display: flex;
   align-items: center;
   border-radius: 10px;
-  border: 1px solid #775c4a;
+  border: 2px solid rgba(119, 92, 74, 0.4);
   padding: 14px 16px;
+  background-color: #f5f5f5;
 `;
 
 const SearchIcon = styled.div`
