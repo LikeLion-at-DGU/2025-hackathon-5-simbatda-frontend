@@ -61,7 +61,9 @@ export default function OrderDetail() {
         } catch (productErr) {}
 
         const transformedOrder = {
-          orderNumber: `B${orderData.id.toString().padStart(5, "0")}`,
+          orderNumber:
+            orderData.reservation_code ||
+            `B${orderData.id.toString().padStart(5, "0")}`,
           createdAt: new Date(orderData.created_at).toLocaleString("ko-KR", {
             month: "2-digit",
             day: "2-digit",

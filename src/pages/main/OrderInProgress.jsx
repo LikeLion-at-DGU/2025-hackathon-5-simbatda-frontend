@@ -54,6 +54,7 @@ export default function OrderInProgress() {
 
       const transformedOrders = inProgressOrders.map((order) => ({
         id: order.id,
+        reservation_code: order.reservation_code,
         reservation_number: `B${order.id.toString().padStart(5, "0")}`,
         product_name: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
@@ -183,6 +184,7 @@ export default function OrderInProgress() {
               >
                 {{
                   id: order.id,
+                  reservation_code: order.reservation_code,
                   createdAt: (() => {
                     const date = new Date(order.created_at);
                     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -197,7 +199,7 @@ export default function OrderInProgress() {
                   itemSummary: `${order.product?.name || "상품명 없음"} ${
                     order.quantity
                   }개`,
-                  // 가격 정보 추가
+
                   totalPrice: order.price,
                   discount_price: order.discount_price,
                   discount_rate: order.discount_rate,
