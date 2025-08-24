@@ -20,7 +20,6 @@ const WishList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -43,7 +42,6 @@ const WishList = () => {
 
         const wishlistData = await getWishlistProducts();
 
-        // API 응답을 컴포넌트에서 사용할 형식으로 변환
         const mappedWishlistItems = wishlistData.map((item) => ({
           id: item.id,
           storeName: item.store_name || item.store?.name || "상점",
@@ -52,7 +50,7 @@ const WishList = () => {
           imageUrl: item.image,
           originalPrice: item.price,
           discountPrice: item.discount_price,
-          isLiked: true, // 찜 목록에 있는 상품이므로 항상 true
+          isLiked: true,
         }));
 
         setWishListItems(mappedWishlistItems);
@@ -70,10 +68,8 @@ const WishList = () => {
 
   const handleLikeToggle = async (productId, isLiked) => {
     try {
-      // API 호출하여 찜 상태 변경
       await toggleWishlist(productId, !isLiked);
 
-      // 찜 해제된 경우 목록에서 제거
       if (!isLiked) {
         setWishListItems((prev) =>
           prev.filter((item) => item.id !== productId)
@@ -83,7 +79,6 @@ const WishList = () => {
       console.log(`상품 ${productId} 찜 ${isLiked ? "추가" : "제거"} 완료`);
     } catch (error) {
       console.error("찜 상태 변경 오류:", error);
-      // 에러 발생 시 사용자에게 알림 (필요시 토스트 메시지 추가)
     }
   };
 
