@@ -191,7 +191,7 @@ export default function OrderDetail() {
             <OrderInfoValue>{order.reserver}</OrderInfoValue>
           </OrderInfoItem>
           <OrderInfoItem>
-            <OrderInfoLabel>예약자 번호</OrderInfoLabel>
+            <OrderInfoLabel>예약자 전화번호</OrderInfoLabel>
             <OrderInfoValue>{order.phone}</OrderInfoValue>
           </OrderInfoItem>
         </OrderInfoSection>
