@@ -32,6 +32,7 @@ const HeaderTitle = styled.h1`
   flex: 1;
   text-align: center;
   font-family: Pretendard;
+  margin-right: 15px;
 `;
 
 const HamburgerButton = styled.button`
