@@ -66,10 +66,13 @@ const HeaderSeller = ({ userInfo, onLogout }) => {
         <RightSection>
           <OpenStatusSection>
             <Button
-              variant={isOpen ? "open" : "close"}
+              variant={
+                isOpen === null ? "secondary" : isOpen ? "open" : "close"
+              }
               onClick={handleToggleOpenStatus}
+              disabled={isOpen === null}
             >
-              {isOpen ? "open" : "close"}
+              {isOpen === null ? "로딩 중..." : isOpen ? "open" : "close"}
             </Button>
             <OpenStatusText>영업상태변경</OpenStatusText>
           </OpenStatusSection>

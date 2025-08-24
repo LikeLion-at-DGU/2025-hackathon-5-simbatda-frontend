@@ -131,11 +131,18 @@ export async function toggleStoreStatus() {
 }
 
 export async function getSellerStore() {
+  console.log("getSellerStore API 호출 시작");
+
   const res = await apiRequest("/stores/", { auth: true });
   if (!res.ok) {
     throw new Error("Failed to fetch store info");
   }
-  return res.json();
+
+  const data = await res.json();
+  console.log("getSellerStore API 응답 데이터:", data);
+  console.log("getSellerStore - is_open 값:", data?.[0]?.is_open);
+
+  return data;
 }
 
 export async function getProductById(productId) {
