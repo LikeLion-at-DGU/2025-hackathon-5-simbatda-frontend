@@ -120,15 +120,37 @@ const OrderCard = ({
           <InfoValue>{order.reservationCode || order.id}</InfoValue>
         </InfoRow>
 
-        {/* 주문 취소가 아닌 경우에만 유통기한과 결제 금액 표시 */}
         {order.status !== "cancel" && (
           <>
-            <InfoRow>
-              <InfoLabel>최종 결제 금액</InfoLabel>
-              <InfoValue style={{ color: "#37CA79", fontWeight: "600" }}>
-                {order.totalPrice?.toLocaleString() || "0"}원
-              </InfoValue>
-            </InfoRow>
+            {order.discount_price &&
+              order.discount_price < order.totalPrice && (
+                <>
+                  <InfoRow>
+                    <InfoLabel>원가</InfoLabel>
+                    <InfoValue
+                      style={{ textDecoration: "line-through", color: "#999" }}
+                    >
+                      {order.totalPrice?.toLocaleString() || "0"}원
+                    </InfoValue>
+                  </InfoRow>
+                  <InfoRow>
+                    <InfoLabel>할인가</InfoLabel>
+                    <InfoValue style={{ color: "#E74C3C", fontWeight: "600" }}>
+                      {order.discount_price?.toLocaleString() || "0"}원
+                    </InfoValue>
+                  </InfoRow>
+                </>
+              )}
+
+            {(!order.discount_price ||
+              order.discount_price >= order.totalPrice) && (
+              <InfoRow>
+                <InfoLabel>결제 금액</InfoLabel>
+                <InfoValue style={{ color: "#37CA79", fontWeight: "600" }}>
+                  {order.totalPrice?.toLocaleString() || "0"}원
+                </InfoValue>
+              </InfoRow>
+            )}
             <InfoRow>
               <InfoLabel>유통기한</InfoLabel>
               <InfoValue>

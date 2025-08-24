@@ -60,6 +60,9 @@ export default function OrderInProgress() {
         product_name: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
         price: order.product?.total_price || order.total_price || 0,
+        // 할인 정보 추가 (백엔드 필드명과 일치)
+        discount_price: order.product?.discount_price || null,
+        discount_rate: order.product?.discount_rate || null,
         created_at: order.created_at,
         pickup_time: order.reserved_at || order.created_at,
         status: order.status,
@@ -206,6 +209,10 @@ export default function OrderInProgress() {
                   itemSummary: `${order.product?.name || "상품명 없음"} ${
                     order.quantity
                   }개`,
+                  // 가격 정보 추가
+                  totalPrice: order.price,
+                  discount_price: order.discount_price,
+                  discount_rate: order.discount_rate,
                   pickupTime:
                     order.pickup_time || order.reserved_at
                       ? (() => {

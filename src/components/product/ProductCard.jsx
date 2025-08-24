@@ -45,6 +45,7 @@ export default function ProductCard({ product, categories, onDelete }) {
     ? new Date(product.expiration_date)
     : null;
   const productPrice = product.price || 0;
+  const discountPrice = product.discount_price || null;
 
   const productCategory =
     categories?.find((cat) => cat.id === product.category)?.name || "기타";
@@ -109,7 +110,7 @@ export default function ProductCard({ product, categories, onDelete }) {
           </div>
 
           <FooterRow>
-            <Price>{productPrice.toLocaleString()}원</Price>
+            <Price>{(discountPrice || productPrice).toLocaleString()}원</Price>
           </FooterRow>
         </RightColumn>
       </CardBody>

@@ -106,6 +106,9 @@ function MainPageSeller() {
         productName: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
         totalPrice: order.product?.total_price || order.total_price || 0,
+        // 할인 정보 추가 (백엔드 필드명과 일치)
+        discount_price: order.product?.discount_price || null,
+        discount_rate: order.product?.discount_rate || null,
         createdAt: order.created_at,
         pickupTime: order.pickup_time || order.reserved_at || order.created_at,
         expireDate: order.product?.expire_date,
