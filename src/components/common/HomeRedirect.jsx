@@ -21,7 +21,7 @@ const HomeRedirect = () => {
         navigate("/splash");
       }
     };
-    //
+
     redirectUser();
   }, [navigate]);
 
