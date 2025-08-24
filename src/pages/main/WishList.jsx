@@ -20,7 +20,6 @@ const WishList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {

@@ -58,12 +58,17 @@ export const PageContainer = styled.section`
 
   @media (max-width: 768px) {
     align-items: flex-start;
-    padding-top: 15vh;
+    padding-top: 120px;
   }
 
   @media (max-width: 480px) {
     align-items: flex-start;
-    padding-top: 20vh;
+    padding-top: 80px;
+  }
+
+  @media (max-width: 360px) {
+    align-items: flex-start;
+    padding-top: 60px;
   }
 
   header {
@@ -208,6 +213,13 @@ export const PageContainer = styled.section`
   @media (min-width: 639px) {
     .squirrel {
       width: 460px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    header {
+      row-gap: 12px;
+      margin-top: 0;
     }
   }
 
