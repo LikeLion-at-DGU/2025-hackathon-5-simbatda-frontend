@@ -223,6 +223,13 @@ export const PageContainer = styled.section`
     }
   }
 
+  @media (max-width: 480px) {
+    header {
+      row-gap: 12px;
+      margin-top: 0;
+    }
+  }
+
   @media (min-width: 560px) {
     header {
       row-gap: 20px;
