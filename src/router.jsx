@@ -4,7 +4,7 @@ import Signin from "./pages/auth/Signin.jsx";
 import SigninSeller from "./pages/auth/SigninSeller.jsx";
 import Signup from "./pages/auth/Signup.jsx";
 import SignupSeller from "./pages/auth/SignupSeller.jsx";
-import TestPage from "./pages/common/TestPage.jsx";
+
 import MainPage from "./pages/main/MainPage.jsx";
 import MainPageSeller from "./pages/main/MainPageSeller.jsx";
 import OrderInProgress from "./pages/main/OrderInProgress.jsx";
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
           </ConsumerProtectedRoute>
         ),
       },
-      { path: "test", element: <TestPage /> },
+
       { path: "signin", element: <Signin /> },
       { path: "signin-seller", element: <SigninSeller /> },
       { path: "signup", element: <Signup /> },

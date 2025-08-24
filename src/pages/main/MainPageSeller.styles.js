@@ -7,6 +7,9 @@ export const PageContainer = styled.div`
   padding-top: 65px;
   background: #f5f5f5;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export const Header = styled.header`
@@ -26,6 +29,8 @@ export const Content = styled.main`
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 120px);
+  max-width: 1200px;
+  width: 100%;
 `;
 
 export const OpenStatusSection = styled.div`
