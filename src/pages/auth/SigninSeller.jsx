@@ -155,7 +155,7 @@ function SigninSeller() {
         <SignupSection>
           <SignupText>
             아직 심봤다 회원이 아니신가요?{" "}
-            <Link to="/signup">바로회원가입하기</Link>
+            <Link to="/signup-seller">바로회원가입하기</Link>
           </SignupText>
         </SignupSection>
       </MainContent>
