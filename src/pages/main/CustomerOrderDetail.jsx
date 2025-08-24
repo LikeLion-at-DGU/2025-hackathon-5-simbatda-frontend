@@ -43,16 +43,14 @@ const CustomerOrderDetail = () => {
       try {
         const orderData = await getReservationDetail(orderId);
 
-        // 사용자 정보 설정
         if (orderData.consumer) {
           setUserInfo({ name: orderData.consumer.name });
         }
 
-        // 주문 정보 변환
         const transformedOrder = {
           id: orderData.id,
           orderNumber: `B${orderData.id.toString().padStart(5, "0")}`,
-          createdAt: orderData.created_at, // 원본 날짜 문자열 유지
+          createdAt: orderData.created_at, 
           status: orderData.status,
           items: [
             {
@@ -83,17 +81,11 @@ const CustomerOrderDetail = () => {
         setOrderDetails(transformedOrder);
       } catch (error) {
         console.error("주문 상세 정보 조회 오류:", error);
-        // 에러 처리
       }
     };
 
     fetchOrderDetail();
   }, [orderId]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    navigate("/signin");
-  };
 
   const formatDate = (timestamp) => {
     if (!timestamp) return "날짜 정보 없음";
@@ -101,7 +93,6 @@ const CustomerOrderDetail = () => {
     try {
       const date = new Date(timestamp);
 
-      // 날짜가 유효한지 확인
       if (isNaN(date.getTime())) {
         console.error("유효하지 않은 날짜:", timestamp);
         return "날짜 정보 오류";
@@ -132,7 +123,6 @@ const CustomerOrderDetail = () => {
     try {
       const date = new Date(pickupTime);
 
-      // 날짜가 유효한지 확인
       if (isNaN(date.getTime())) {
         console.error("유효하지 않은 픽업 시간:", pickupTime);
         return "픽업 시간 정보 오류";
@@ -189,7 +179,6 @@ const CustomerOrderDetail = () => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    // TODO: 복사 완료 토스트 메시지 표시
   };
 
   if (!order || !orderDetails) {

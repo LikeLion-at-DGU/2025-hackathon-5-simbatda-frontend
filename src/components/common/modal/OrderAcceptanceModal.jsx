@@ -20,7 +20,6 @@ const OrderAcceptanceModal = () => {
 
   const store = acceptedOrder.storeName || "상점";
 
-  // 모달 타입에 따라 다른 내용 표시
   const getModalContent = () => {
     if (modalType === "rejected") {
       return {
@@ -38,7 +37,6 @@ const OrderAcceptanceModal = () => {
       };
     }
 
-    // 기본값: 주문수락
     return {
       title: "주문수락",
       message: `${store} 사장님이 주문 요청을 수락했습니다!`,

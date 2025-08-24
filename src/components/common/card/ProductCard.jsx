@@ -53,12 +53,11 @@ const ProductCard = ({
   className = "",
   expiryTime,
   stock,
-  id, // productId 추가
+  id, 
   ...props
 }) => {
   const [liked, setLiked] = useState(isLiked);
 
-  // isLiked prop이 변경될 때 내부 상태 동기화
   useEffect(() => {
     setLiked(isLiked);
   }, [isLiked, id]);
@@ -91,7 +90,6 @@ const ProductCard = ({
     e.stopPropagation();
     const newLikedState = !liked;
     setLiked(newLikedState);
-    // productId와 새로운 좋아요 상태를 전달
     onLikeToggle?.(id, newLikedState);
   };
 
