@@ -40,8 +40,9 @@ const HeaderSeller = ({ userInfo, onLogout }) => {
   }, [drawerOpen]);
 
   const handleLogout = () => {
-    onLogout?.();
     setDrawerOpen(false);
+    navigate("/splash");
+    // Splash 화면에서 자동으로 로그인 페이지로 이동하므로 onLogout은 호출하지 않음
   };
 
   return (

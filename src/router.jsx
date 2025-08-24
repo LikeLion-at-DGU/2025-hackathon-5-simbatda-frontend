@@ -33,11 +33,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: (
-          <ConsumerProtectedRoute>
-            <MainPage />
-          </ConsumerProtectedRoute>
-        ),
+        element: <Splash />,
       },
       {
         path: "mainpage",
