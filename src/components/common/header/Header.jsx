@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import menuIcon from "../../../assets/icons/menu.png";
-import starsquirrelIcon from "../../../assets/icons/starsquirrel.png";
+import starsquirrelIcon from "../../../assets/icons/starsquirrel.svg";
 import LocationIcon from "../../../assets/icons/Location.png";
 import DiscountIcon from "../../../assets/icons/Discount.png";
 import GoodQualityIcon from "../../../assets/icons/GoodQuality.png";
