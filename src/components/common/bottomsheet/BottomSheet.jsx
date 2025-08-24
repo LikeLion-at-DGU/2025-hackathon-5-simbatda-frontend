@@ -19,6 +19,7 @@ const BottomSheet = ({
   products = [],
   onProductClick,
   onProductLikeToggle,
+  location,
 }) => {
   const overlayRef = useRef(null);
   const containerRef = useRef(null);
@@ -65,7 +66,19 @@ const BottomSheet = ({
       />
       <BottomSheetContainer ref={containerRef} $isOpen={isOpen}>
         <BottomSheetHeader>
-          <HeaderTitle>재고 목록</HeaderTitle>
+          <HeaderTitle>
+            {location?.type === "search"
+              ? "검색 결과"
+              : location?.type === "category"
+              ? `${location.name} 상품`
+              : location?.type === "nearby"
+              ? "주변 상품"
+              : location?.type === "store"
+              ? `${location.name} 상품`
+              : location?.type === "cluster"
+              ? `${location.query}`
+              : "재고 목록"}
+          </HeaderTitle>
           <CloseButton onClick={onClose}>×</CloseButton>
         </BottomSheetHeader>
 
