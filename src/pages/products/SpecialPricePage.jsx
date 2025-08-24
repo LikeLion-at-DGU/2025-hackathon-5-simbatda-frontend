@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ProductListPage from "../../components/common/products/ProductListPage";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import {
   getSpecialPriceProducts,
   getStoreInfo,
@@ -7,6 +8,9 @@ import {
 } from "../../api/products";
 
 const SpecialPricePage = () => {
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+
   const getProducts = async () => {
     let lat = 37.498095;
     let lng = 127.02761;
@@ -90,10 +94,31 @@ const SpecialPricePage = () => {
     return mapped;
   };
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const fetchedProducts = await getProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("특가 상품 조회 오류:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner text="특가 상품을 불러오는 중..." />;
+  }
+
   return (
     <ProductListPage
       title="특가 상품"
-      getProducts={getProducts}
+      products={products}
       showExpiry={true}
       showCategory={false}
       description="30% 이상 할인 상품입니다!"

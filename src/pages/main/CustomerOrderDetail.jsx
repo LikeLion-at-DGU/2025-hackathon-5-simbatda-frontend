@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BackHeader from "../../components/common/header/BackHeader";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { getReservationDetail } from "../../api/reservations";
 import {
   PageContainer,
@@ -37,10 +38,12 @@ const CustomerOrderDetail = () => {
   const [order, setOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrderDetail = async () => {
       try {
+        setLoading(true);
         const orderData = await getReservationDetail(orderId);
 
         if (orderData.consumer) {
@@ -49,8 +52,8 @@ const CustomerOrderDetail = () => {
 
         const transformedOrder = {
           id: orderData.id,
-          orderNumber: `B${orderData.id.toString().padStart(5, "0")}`,
-          createdAt: orderData.created_at, 
+          orderNumber: orderData.reservation_code,
+          createdAt: orderData.created_at,
           status: orderData.status,
           items: [
             {
@@ -81,6 +84,8 @@ const CustomerOrderDetail = () => {
         setOrderDetails(transformedOrder);
       } catch (error) {
         console.error("주문 상세 정보 조회 오류:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -181,6 +186,17 @@ const CustomerOrderDetail = () => {
     navigator.clipboard.writeText(text);
   };
 
+  if (loading) {
+    return (
+      <PageContainer>
+        <BackHeader title="주문 상세" />
+        <Content>
+          <LoadingSpinner text="주문 정보를 불러오는 중..." />
+        </Content>
+      </PageContainer>
+    );
+  }
+
   if (!order || !orderDetails) {
     return (
       <PageContainer>
@@ -210,9 +226,7 @@ const CustomerOrderDetail = () => {
         {/* 예약번호 */}
         <OrderNumber>
           <OrderNumberLabel>예약번호</OrderNumberLabel>
-          <OrderNumberValue>
-            B{String(order.id).padStart(5, "0")}
-          </OrderNumberValue>
+          <OrderNumberValue>{order.orderNumber}</OrderNumberValue>
         </OrderNumber>
 
         {/* 주문 정보 */}
