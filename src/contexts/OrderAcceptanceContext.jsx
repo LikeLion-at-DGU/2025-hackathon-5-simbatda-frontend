@@ -62,6 +62,12 @@ export const OrderAcceptanceProvider = ({ children }) => {
 
   // 주문 알림 체크 함수 (수락/거절 모두 처리)
   const checkOrderAcceptance = async () => {
+    // 로그인하지 않은 경우 알림 조회하지 않음
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      return;
+    }
+
     // 판매자인 경우 알림 조회하지 않음
     const userRole = getUserRole();
     if (userRole === "seller") {
@@ -151,7 +157,12 @@ export const OrderAcceptanceProvider = ({ children }) => {
 
     // 초기 체크
     checkLoginAndLocation();
-    checkOrderAcceptance();
+
+    // 로그인된 상태에서만 알림 체크
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      checkOrderAcceptance();
+    }
 
     // 페이지가 활성화되거나 포커스될 때만 체크
     const handleVisibilityChange = () => {
