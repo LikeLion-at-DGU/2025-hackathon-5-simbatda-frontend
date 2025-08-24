@@ -60,7 +60,7 @@ const StoreDetail = () => {
           name: info?.store_name || info?.name || "상점",
           isOpen: Boolean(info?.is_open),
           businessHours: info?.opening_time || "",
-          phone: info?.phone || "",
+          phone: info?.seller?.phone || "",
           address: info?.address || "",
         });
 
@@ -97,6 +97,7 @@ const StoreDetail = () => {
         setStoreProducts(mapped);
       } catch (e) {
         if (!mounted) return;
+        console.error("Store Detail Load Error:", e); // 디버깅용
         setStore(null);
         setStoreProducts([]);
       }
