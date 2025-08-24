@@ -164,7 +164,7 @@ export default function OrderDetail() {
       <BackHeader title="주문 상세" />
 
       <Content>
-        {order.status !== "pickup" && (
+        {order.status !== "pickup" && order.status !== "cancel" && (
           <PickupStatus>
             <PickupStatusText>
               {formatPickupTime(order.pickupTime)}
