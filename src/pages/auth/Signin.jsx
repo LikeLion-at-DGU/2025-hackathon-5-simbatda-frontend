@@ -114,7 +114,7 @@ function Signin() {
   return (
     <LoginPageContainer>
       <MainContent>
-        <Title>로그인</Title>
+        <Title>소비자 로그인</Title>
 
         <PictureSection>
           <SquirrelContainer>

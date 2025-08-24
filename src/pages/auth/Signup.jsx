@@ -155,7 +155,7 @@ function Signup() {
   return (
     <LoginPageContainer>
       <MainContent>
-        <Title>회원가입</Title>
+        <Title>소비자 회원가입</Title>
 
         <PictureSection>
           <SquirrelContainer>
