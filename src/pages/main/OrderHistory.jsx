@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/common/header/Header";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { getReservations } from "../../api/reservations";
 import { getConsumerMe } from "../../api/auth";
 import greencheck from "../../assets/icons/check.svg";
@@ -49,11 +50,14 @@ import { Content } from "./MainPage.styles";
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
+  const [imageLoadingStates, setImageLoadingStates] = useState({});
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        setLoading(true);
         const reservations = await getReservations();
 
         const mappedOrders = reservations.map((reservation) => ({
@@ -71,7 +75,9 @@ function OrderHistory() {
           storeLng: reservation.store.lng,
           pickupTime: reservation.pickup_time,
           totalPrice: reservation.product.total_price,
-          productImage: reservation.product.image,
+          productImage: reservation.product.image
+            ? `https://yeonhee.shop${reservation.product.image}`
+            : null,
           expireDate: reservation.product.expire_date,
         }));
 
@@ -98,6 +104,8 @@ function OrderHistory() {
       } catch (error) {
         console.error("주문내역 조회 오류:", error);
         setOrders([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -151,6 +159,14 @@ function OrderHistory() {
       default:
         return "#6b7280"; // 회색 - 알 수 없음
     }
+  };
+
+  const handleImageLoad = (orderId) => {
+    setImageLoadingStates((prev) => ({ ...prev, [orderId]: false }));
+  };
+
+  const handleImageError = (orderId) => {
+    setImageLoadingStates((prev) => ({ ...prev, [orderId]: true }));
   };
 
   const formatDate = (dateString) => {
@@ -220,6 +236,17 @@ function OrderHistory() {
       return { ...step, isPending: true, isCurrent: false };
     });
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <Header userInfo={userInfo} title="주문 내역" />
+        <Content>
+          <LoadingSpinner text="주문 내역을 불러오는 중..." />
+        </Content>
+      </Container>
+    );
+  }
 
   if (orders.length === 0) {
     return (
@@ -293,8 +320,20 @@ function OrderHistory() {
                           <StepProducts>
                             <StepProduct>
                               <OrderProductImage
-                                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                                src={
+                                  order.productImage ||
+                                  "/src/assets/images/defaultImage.svg"
+                                }
                                 alt={order.productName}
+                                onLoad={() => handleImageLoad(order.id)}
+                                onError={() => handleImageError(order.id)}
+                                style={{
+                                  objectFit: "cover",
+                                  opacity: imageLoadingStates[order.id]
+                                    ? 0.5
+                                    : 1,
+                                  transition: "opacity 0.3s ease",
+                                }}
                               />
                               <StepProductInfo>
                                 <StepProductName>
@@ -309,6 +348,7 @@ function OrderHistory() {
 
                           <StepSummary>
                             <div>주문일: {formatDate(order.createdAt)}</div>
+                            <div>예약번호: {order.reservationCode}</div>
                             {/* 최종 결제 금액 표시 */}
                             {order.totalPrice && (
                               <div
@@ -406,8 +446,18 @@ function OrderHistory() {
                   <OrderDetails>
                     <OrderProduct>
                       <OrderProductImage
-                        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                        src={
+                          order.productImage ||
+                          "/src/assets/images/defaultImage.svg"
+                        }
                         alt={order.productName}
+                        onLoad={() => handleImageLoad(order.id)}
+                        onError={() => handleImageError(order.id)}
+                        style={{
+                          objectFit: "cover",
+                          opacity: imageLoadingStates[order.id] ? 0.5 : 1,
+                          transition: "opacity 0.3s ease",
+                        }}
                       />
                       <OrderProductInfo>
                         <OrderProductName>{order.productName}</OrderProductName>
@@ -424,6 +474,7 @@ function OrderHistory() {
                           유통기한: {formatDate(order.expireDate)}
                         </div>
                       )}
+                      <div>예약번호: {order.reservationCode}</div>
                       <div>상점: {order.storeName}</div>
                       <div>주문일: {formatDate(order.createdAt)}</div>
                       {/* 최종 결제 금액 표시 */}
@@ -462,8 +513,18 @@ function OrderHistory() {
                   <OrderDetails>
                     <OrderProduct>
                       <OrderProductImage
-                        src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAyMEMyNC40NzcgMjAgMjAgMjQuNDc3IDIwIDMwQzIwIDM1LjUyMyAyNC40NzcgNDAgMzAgNDBDMzUuNTIzIDQwIDQwIDM1LjUyMyA0MCAzMEM0MCAyNC40NzcgMzAgMjBaIiBmaWxsPSIjOENBM0FGIi8+Cjwvc3ZnPgo="
+                        src={
+                          order.productImage ||
+                          "/src/assets/images/defaultImage.svg"
+                        }
                         alt={order.productName}
+                        onLoad={() => handleImageLoad(order.id)}
+                        onError={() => handleImageError(order.id)}
+                        style={{
+                          objectFit: "cover",
+                          opacity: imageLoadingStates[order.id] ? 0.5 : 1,
+                          transition: "opacity 0.3s ease",
+                        }}
                       />
                       <OrderProductInfo>
                         <OrderProductName>{order.productName}</OrderProductName>
@@ -474,6 +535,7 @@ function OrderHistory() {
                     </OrderProduct>
 
                     <OrderSummary>
+                      <div>예약번호: {order.reservationCode}</div>
                       <div>상점: {order.storeName}</div>
                       <div>주문일: {formatDate(order.createdAt)}</div>
                       {/* 취소된 주문에서는 유통기한과 결제 금액 표시하지 않음 */}

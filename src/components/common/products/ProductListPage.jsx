@@ -24,6 +24,7 @@ import {
 const ProductListPage = ({
   title,
   getProducts,
+  products: initialProducts,
   showExpiry = true,
   showCategory = true,
   description,
@@ -67,6 +68,14 @@ const ProductListPage = ({
   }, []);
 
   useEffect(() => {
+    // initialProducts가 있으면 그것을 사용
+    if (initialProducts && Array.isArray(initialProducts)) {
+      setProducts(initialProducts);
+      setFilteredProducts(initialProducts);
+      return;
+    }
+
+    // initialProducts가 없고 getProducts가 함수인 경우에만 호출
     if (!getProducts || typeof getProducts !== "function") {
       setProducts([]);
       setFilteredProducts([]);
@@ -100,7 +109,7 @@ const ProductListPage = ({
     return () => {
       isMounted = false;
     };
-  }, [getProducts]);
+  }, [getProducts, initialProducts]);
 
   useEffect(() => {
     if (!Array.isArray(products) || products.length === 0) {
@@ -170,11 +179,6 @@ const ProductListPage = ({
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    navigate("/signin");
-  };
-
   const handleSearch = (searchTerm) => {
     setSearchTerm(searchTerm);
   };
@@ -206,7 +210,7 @@ const ProductListPage = ({
   if (!Array.isArray(products) || products.length === 0) {
     return (
       <PageContainer>
-        <Header userInfo={userInfo} onLogout={handleLogout} title={title} />
+        <Header userInfo={userInfo} title={title} />
         <EmptyState>
           <img src={empty} alt="empty" />
           {title === "추천 상품" ? (
@@ -216,8 +220,13 @@ const ProductListPage = ({
                 원하는 상품 찜을 하시면 재고를 추천해드려요!
               </EmptyText>
             </>
+          ) : title === "특가 상품" ? (
+            <>
+              <EmptyText>주변 특가 상품이 없습니다.</EmptyText>
+              <EmptyText>할인 상품이 준비되면 알려드릴게요!</EmptyText>
+            </>
           ) : (
-            <EmptyText>주변 특가 상품이 없습니다.</EmptyText>
+            <EmptyText>상품이 없습니다.</EmptyText>
           )}
         </EmptyState>
       </PageContainer>
@@ -226,7 +235,7 @@ const ProductListPage = ({
 
   return (
     <PageContainer>
-      <Header userInfo={userInfo} onLogout={handleLogout} title={title} />
+      <Header userInfo={userInfo} title={title} />
 
       <Content>
         <SearchBar onSearch={handleSearch} onChange={handleSearch} />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import ProductListPage from "../../components/common/products/ProductListPage";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import {
   getRecommendedProducts,
   getStoreInfo,
@@ -8,6 +9,8 @@ import {
 
 const RecommendedPage = () => {
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
 
   const requestUserLocation = useCallback(() => {
     if (navigator.geolocation) {
@@ -28,6 +31,28 @@ const RecommendedPage = () => {
   useEffect(() => {
     requestUserLocation();
   }, [requestUserLocation]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const fetchedProducts = await getProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("추천 상품 조회 오류:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userLocation.lat && userLocation.lng) {
+      fetchProducts();
+    } else {
+      // 위치 정보가 없어도 기본 추천 상품 조회
+      fetchProducts();
+    }
+  }, [userLocation]);
 
   const getProducts = async () => {
     let wishlistProducts = [];
@@ -95,10 +120,14 @@ const RecommendedPage = () => {
     return mapped;
   };
 
+  if (loading) {
+    return <LoadingSpinner text="추천 상품을 불러오는 중..." />;
+  }
+
   return (
     <ProductListPage
       title="추천 상품"
-      getProducts={getProducts}
+      products={products}
       showExpiry={true}
       showCategory={false}
       description="이런 상품은 어떠세요?"
