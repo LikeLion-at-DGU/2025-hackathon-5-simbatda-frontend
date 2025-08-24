@@ -7,8 +7,10 @@ const Header = styled.header`
   padding: 16px 30px;
   background-color: #f5f5f5;
   border-bottom: 1px solid #e5e7eb;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   margin: 0 -25px;
 `;
