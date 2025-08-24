@@ -21,6 +21,7 @@ import RecommendedPage from "./pages/products/RecommendedPage.jsx";
 import StoreDetail from "./pages/store/StoreDetail.jsx";
 import InventoryMapPage from "./pages/inventory/InventoryMapPage.jsx";
 import Splash from "./pages/common/Splash.jsx";
+import HomeRedirect from "./components/common/HomeRedirect.jsx";
 import WishList from "./pages/main/WishList.jsx";
 import ProtectedRoute from "./components/common/ProtectedRoute.jsx";
 import SellerProtectedRoute from "./components/common/SellerProtectedRoute.jsx";
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <Splash />,
+        element: <HomeRedirect />,
       },
       {
         path: "mainpage",

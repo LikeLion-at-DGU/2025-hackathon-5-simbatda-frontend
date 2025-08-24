@@ -56,6 +56,21 @@ export const PageContainer = styled.section`
     animation: ${pageFadeOut} 900ms cubic-bezier(0.2, 0.5, 0.5, 0.5) forwards;
   }
 
+  @media (max-width: 768px) {
+    align-items: flex-start;
+    padding-top: 120px;
+  }
+
+  @media (max-width: 480px) {
+    align-items: flex-start;
+    padding-top: 80px;
+  }
+
+  @media (max-width: 360px) {
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+
   header {
     width: 100%;
     max-width: 600px;
@@ -198,6 +213,20 @@ export const PageContainer = styled.section`
   @media (min-width: 639px) {
     .squirrel {
       width: 460px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    header {
+      row-gap: 12px;
+      margin-top: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    header {
+      row-gap: 12px;
+      margin-top: 0;
     }
   }
 
