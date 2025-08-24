@@ -61,7 +61,7 @@ export default function OrderCompleted() {
         quantity: order.quantity || 1,
         price: order.product?.total_price || order.total_price || 0,
         created_at: order.created_at,
-        pickup_time: order.reserved_at || order.created_at,
+        pickup_time: order.pickup_time || order.reserved_at || order.created_at,
         status: order.status,
         consumer: order.consumer,
         product: order.product,
@@ -121,20 +121,27 @@ export default function OrderCompleted() {
 
     acc[date].push({
       id: order.id,
-      createdAt: new Date(order.created_at).toLocaleString("ko-KR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      }),
+      createdAt: (() => {
+        const date = new Date(order.created_at);
+        const hour = date.getHours();
+        const ampm = hour >= 12 ? "오후" : "오전";
+        const displayHour = hour >= 12 ? hour - 12 : hour;
+        const minute = String(date.getMinutes()).padStart(2, "0");
+        return `${ampm} ${displayHour}시 ${minute}분`;
+      })(),
       originalCreatedAt: order.created_at,
       orderNumber:
         order.reservation_number || `B${order.id.toString().padStart(5, "0")}`,
       itemSummary: `${order.product_name || "상품명 없음"} ${order.quantity}개`,
       pickupTime: order.pickup_time
-        ? new Date(order.pickup_time).toLocaleString("ko-KR", {
-            hour: "2-digit",
-            hour12: true,
-          }) + " 픽업"
+        ? (() => {
+            const date = new Date(order.pickup_time);
+            const hour = date.getHours();
+            const ampm = hour >= 12 ? "오후" : "오전";
+            const displayHour = hour >= 12 ? hour - 12 : hour;
+            const minute = String(date.getMinutes()).padStart(2, "0");
+            return `${ampm} ${displayHour}시 ${minute}분 픽업`;
+          })()
         : "픽업 시간 미정",
       currentStock: currentStock,
     });

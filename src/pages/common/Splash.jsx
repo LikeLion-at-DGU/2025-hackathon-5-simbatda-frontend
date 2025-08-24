@@ -1,25 +1,59 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PageContainer } from "./Splash.styles";
 import acorn1 from "../../assets/images/acorn1.svg";
 import textLogoWhite from "../../assets/images/text-logo-white.svg";
 import acorns from "../../assets/images/acorns.svg";
 import splashSquirrel from "../../assets/images/splashsquirrel.svg";
+import { getStoredTokens } from "../../api/client";
+
 const SHOW_MS = 4000;
 const FADE_MS = 900;
+
 const Splash = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     const fadeTimer = setTimeout(() => setLeaving(true), SHOW_MS);
-    const navTimer = setTimeout(() => navigate("/signin"), SHOW_MS + FADE_MS);
+
+    const navTimer = setTimeout(() => {
+      if (location.pathname === "/splash") {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userInfo");
+        navigate("/signin");
+      } else {
+        const { accessToken } = getStoredTokens();
+        if (accessToken) {
+          try {
+            const userInfo = localStorage.getItem("userInfo");
+            if (userInfo) {
+              const parsedUser = JSON.parse(userInfo);
+              if (parsedUser.role === "seller") {
+                navigate("/mainpage-seller");
+              } else {
+                navigate("/mainpage");
+              }
+            } else {
+              navigate("/mainpage");
+            }
+          } catch (error) {
+            console.error("Error parsing user info:", error);
+            navigate("/mainpage");
+          }
+        } else {
+          navigate("/signin");
+        }
+      }
+    }, SHOW_MS + FADE_MS);
 
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(navTimer);
     };
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   return (
     <PageContainer className={leaving ? "leaving" : ""}>
