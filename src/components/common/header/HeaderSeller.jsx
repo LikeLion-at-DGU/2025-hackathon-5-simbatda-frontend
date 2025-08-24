@@ -48,7 +48,12 @@ const HeaderSeller = ({ userInfo, onLogout }) => {
     <>
       <HeaderContainer>
         <Brand>
-          <BrandLogo src={textLogo} alt="심봤다" />
+          <BrandLogo
+            src={textLogo}
+            alt="심봤다"
+            onClick={() => navigate("/mainpage-seller")}
+            style={{ cursor: "pointer" }}
+          />
         </Brand>
         <HamburgerButton
           aria-label="메뉴 열기"
