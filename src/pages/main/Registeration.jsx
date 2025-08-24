@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   getProductDetail,
@@ -90,6 +90,23 @@ const Registeration = () => {
   const [product, setProduct] = useState(null);
   const [store, setStore] = useState(null);
   const [recommended, setRecommended] = useState([]);
+  const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
+
+  const requestUserLocation = useCallback(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("위치 정보를 가져올 수 없습니다:", error);
+        }
+      );
+    }
+  }, []);
 
   const [reservationBottomSheetOpen, setReservationBottomSheetOpen] =
     useState(false);
@@ -112,6 +129,11 @@ const Registeration = () => {
       console.error("찜 토글 실패:", error);
     }
   };
+
+  // 사용자 위치 요청
+  useEffect(() => {
+    requestUserLocation();
+  }, [requestUserLocation]);
 
   useEffect(() => {
     let mounted = true;
@@ -200,7 +222,11 @@ const Registeration = () => {
         }
         const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
-        const list = await getRecommendedProducts();
+        // 위치 정보가 있을 때만 추천상품 API 호출
+        const list =
+          userLocation.lat && userLocation.lng
+            ? await getRecommendedProducts(userLocation.lat, userLocation.lng)
+            : await getRecommendedProducts();
         if (!mounted) return;
         const mapped = (Array.isArray(list) ? list : [])
           .filter((p) => p?.id !== Number(productId))
@@ -225,7 +251,7 @@ const Registeration = () => {
     return () => {
       mounted = false;
     };
-  }, [productId]);
+  }, [productId, userLocation.lat, userLocation.lng]);
 
   const handleReservationClick = () => {
     setReservationBottomSheetOpen(true);

@@ -97,7 +97,33 @@ const InventoryMapPage = () => {
           setUserLocation(newLocation);
         },
         (error) => {
-          // 위치 조회 실패 시 기본값 유지
+          // 위치 권한이 거부된 경우
+          if (error.code === error.PERMISSION_DENIED) {
+            // 권한이 거부된 경우 자동으로 다시 요청
+            setTimeout(() => {
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    const newLocation = {
+                      lat: position.coords.latitude,
+                      lng: position.coords.longitude,
+                      radius: 5,
+                    };
+                    setUserLocation(newLocation);
+                  },
+                  (retryError) => {
+                    // 두 번째 시도도 실패하면 아무것도 하지 않음
+                    console.log("위치 권한 재요청 실패");
+                  },
+                  {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000,
+                  }
+                );
+              }
+            }, 1000); // 1초 후 다시 시도
+          }
         },
         {
           enableHighAccuracy: true,
@@ -144,9 +170,8 @@ const InventoryMapPage = () => {
 
   // 위치가 변경되면 상품 데이터 다시 가져오기
   useEffect(() => {
-    if (userLocation.lat && userLocation.lng) {
-      fetchProductsData();
-    }
+    // userLocation이 설정되지 않았어도 fetchProductsData 호출
+    fetchProductsData();
   }, [userLocation]);
 
   // 상품 데이터 가져오기
@@ -245,16 +270,14 @@ const InventoryMapPage = () => {
           seenIds.add(product.id);
 
           // 사용자 위치와 상품 위치의 실제 거리 계산
-          if (
-            product.store &&
-            product.store.lat &&
-            product.store.lng &&
-            userLocation.lat &&
-            userLocation.lng
-          ) {
+          // userLocation이 없으면 기본 좌표 사용
+          const currentLat = userLocation.lat || 37.5665;
+          const currentLng = userLocation.lng || 126.978;
+
+          if (product.store && product.store.lat && product.store.lng) {
             const distance = Math.sqrt(
-              Math.pow(product.store.lat - userLocation.lat, 2) +
-                Math.pow(product.store.lng - userLocation.lng, 2)
+              Math.pow(product.store.lat - currentLat, 2) +
+                Math.pow(product.store.lng - currentLng, 2)
             );
 
             productsWithDistance.push({
@@ -371,11 +394,6 @@ const InventoryMapPage = () => {
 
   // 지도 클릭 핸들러
   const handleMapClick = async (event) => {
-    // 사용자 위치가 설정되지 않았으면 함수 실행하지 않음
-    if (!userLocation.lat || !userLocation.lng) {
-      return;
-    }
-
     try {
       const lat = event.latLng.lat();
       const lng = event.latLng.lng();
@@ -416,11 +434,6 @@ const InventoryMapPage = () => {
 
   // 마커 클릭 핸들러
   const handleMarkerClick = async (markerData) => {
-    // 사용자 위치가 설정되지 않았으면 함수 실행하지 않음
-    if (!userLocation.lat || !userLocation.lng) {
-      return;
-    }
-
     try {
       setSelectedLocationInfo({
         name: markerData.name,

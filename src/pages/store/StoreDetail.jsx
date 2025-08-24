@@ -54,9 +54,9 @@ const StoreDetail = () => {
     const load = async () => {
       try {
         if (!storeId) return;
-        console.log("[StoreDetail] storeId:", storeId);
+
         const info = await getStoreInfo(storeId);
-        console.log("[StoreDetail] getStoreInfo response:", info);
+
         if (!mounted) return;
         setStore({
           id: info?.id,
@@ -68,12 +68,7 @@ const StoreDetail = () => {
         });
 
         const products = await getStoreProducts(storeId);
-        console.log(
-          "[StoreDetail] getStoreProducts length:",
-          Array.isArray(products) ? products.length : "(not array)",
-          "sample:",
-          Array.isArray(products) && products.length > 0 ? products[0] : null
-        );
+
         if (!mounted) return;
 
         // 찜 목록 가져오기
@@ -107,7 +102,6 @@ const StoreDetail = () => {
         });
         setStoreProducts(mapped);
       } catch (e) {
-        console.log("[StoreDetail] load error:", e);
         if (!mounted) return;
         setStore(null);
         setStoreProducts([]);

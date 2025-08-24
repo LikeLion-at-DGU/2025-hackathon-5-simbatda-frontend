@@ -30,7 +30,35 @@ export const useOrderAcceptance = () => {
 export const OrderAcceptanceProvider = ({ children }) => {
   const [showAcceptanceModal, setShowAcceptanceModal] = useState(false);
   const [acceptedOrder, setAcceptedOrder] = useState(null);
-  const [modalType, setModalType] = useState("accepted"); 
+  const [modalType, setModalType] = useState("accepted");
+
+  // 위치 권한 확인 및 요청 함수
+  const checkAndRequestLocationPermission = () => {
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        if (result.state === "denied") {
+          // 위치 권한이 거부된 경우 자동으로 권한 요청
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                // 권한이 허용되면 성공
+                console.log("위치 권한이 허용되었습니다.");
+              },
+              (error) => {
+                // 권한이 여전히 거부된 경우
+                console.log("위치 권한이 거부되었습니다:", error.message);
+              },
+              {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000,
+              }
+            );
+          }
+        }
+      });
+    }
+  };
 
   // 주문 알림 체크 함수 (수락/거절 모두 처리)
   const checkOrderAcceptance = async () => {
@@ -62,11 +90,6 @@ export const OrderAcceptanceProvider = ({ children }) => {
             notification.status === "pickup") &&
           !notification.is_read
       );
-
-      // 디버깅을 위한 로그 추가
-      console.log("unreadConfirmNotification:", unreadConfirmNotification);
-      console.log("unreadCancelNotification:", unreadCancelNotification);
-      console.log("unreadCompletedNotification:", unreadCompletedNotification);
 
       // 주문 수락 알림이 있으면 우선 표시
       if (unreadConfirmNotification) {
@@ -117,17 +140,29 @@ export const OrderAcceptanceProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // 로그인 상태 확인
+    const checkLoginAndLocation = () => {
+      const accessToken = localStorage.getItem("accessToken");
+      if (accessToken) {
+        // 로그인된 상태에서 위치 권한 확인 및 요청
+        checkAndRequestLocationPermission();
+      }
+    };
+
     // 초기 체크
+    checkLoginAndLocation();
     checkOrderAcceptance();
 
     // 페이지가 활성화되거나 포커스될 때만 체크
     const handleVisibilityChange = () => {
       if (!document.hidden) {
+        checkLoginAndLocation();
         checkOrderAcceptance();
       }
     };
 
     const handleFocus = () => {
+      checkLoginAndLocation();
       checkOrderAcceptance();
     };
 

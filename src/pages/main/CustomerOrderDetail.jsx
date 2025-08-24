@@ -79,9 +79,6 @@ const CustomerOrderDetail = () => {
           cancelReason: orderData.cancel_reason,
         };
 
-        console.log("API 응답 데이터:", orderData);
-        console.log("변환된 주문 데이터:", transformedOrder);
-
         setOrder(transformedOrder);
         setOrderDetails(transformedOrder);
       } catch (error) {
@@ -241,10 +238,7 @@ const CustomerOrderDetail = () => {
           </OrderInfoItem>
           <OrderInfoItem>
             <OrderInfoLabel>주문시각</OrderInfoLabel>
-            <OrderInfoValue>
-              {console.log("주문시각 데이터:", order?.createdAt)}
-              {formatDate(order?.createdAt)}
-            </OrderInfoValue>
+            <OrderInfoValue>{formatDate(order?.createdAt)}</OrderInfoValue>
           </OrderInfoItem>
           <OrderInfoItem>
             <OrderInfoLabel>예약자명</OrderInfoLabel>
