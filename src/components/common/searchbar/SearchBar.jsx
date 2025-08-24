@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import searchIcon from "../../../assets/icons/search.png";
 import {
   SearchBarContainer,
@@ -10,10 +10,20 @@ const SearchBar = ({
   placeholder = "텍스트를 입력해 주세요.",
   onSearch,
   onChange,
+  value: externalValue,
   ...props
 }) => {
-  const [value, setValue] = useState("");
+  const [internalValue, setInternalValue] = useState(externalValue || "");
   const isComposingRef = useRef(false);
+
+  // 외부에서 value가 변경되면 내부 상태도 업데이트
+  useEffect(() => {
+    if (externalValue !== undefined) {
+      setInternalValue(externalValue);
+    }
+  }, [externalValue]);
+
+  const value = externalValue !== undefined ? externalValue : internalValue;
 
   const triggerSearch = () => {
     if (onSearch) onSearch(value.trim());
@@ -36,7 +46,7 @@ const SearchBar = ({
 
   const handleChange = (e) => {
     const next = e.target.value;
-    setValue(next);
+    setInternalValue(next);
     if (onChange) onChange(next);
   };
 

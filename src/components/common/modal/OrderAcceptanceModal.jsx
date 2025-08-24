@@ -30,6 +30,14 @@ const OrderAcceptanceModal = () => {
       };
     }
 
+    if (modalType === "completed") {
+      return {
+        title: "심봤다!",
+        message: `${store}에서 픽업이 완료되었습니다!`,
+        notice: "즐거운 식사 되세요!",
+      };
+    }
+
     // 기본값: 주문수락
     return {
       title: "주문수락",

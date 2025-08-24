@@ -30,7 +30,7 @@ export const useOrderAcceptance = () => {
 export const OrderAcceptanceProvider = ({ children }) => {
   const [showAcceptanceModal, setShowAcceptanceModal] = useState(false);
   const [acceptedOrder, setAcceptedOrder] = useState(null);
-  const [modalType, setModalType] = useState("accepted"); // "accepted" 또는 "rejected"
+  const [modalType, setModalType] = useState("accepted"); 
 
   // 주문 알림 체크 함수 (수락/거절 모두 처리)
   const checkOrderAcceptance = async () => {
@@ -54,6 +54,19 @@ export const OrderAcceptanceProvider = ({ children }) => {
         (notification) =>
           notification.status === "cancel" && !notification.is_read
       );
+
+      // 읽지 않은 completed 또는 pickup 상태 알림 찾기 (픽업완료)
+      const unreadCompletedNotification = notifications.find(
+        (notification) =>
+          (notification.status === "completed" ||
+            notification.status === "pickup") &&
+          !notification.is_read
+      );
+
+      // 디버깅을 위한 로그 추가
+      console.log("unreadConfirmNotification:", unreadConfirmNotification);
+      console.log("unreadCancelNotification:", unreadCancelNotification);
+      console.log("unreadCompletedNotification:", unreadCompletedNotification);
 
       // 주문 수락 알림이 있으면 우선 표시
       if (unreadConfirmNotification) {
@@ -81,6 +94,21 @@ export const OrderAcceptanceProvider = ({ children }) => {
 
         setAcceptedOrder(orderInfo);
         setModalType("rejected");
+        setShowAcceptanceModal(true);
+      }
+      // 픽업완료 알림이 있으면 표시
+      else if (unreadCompletedNotification) {
+        const orderInfo = {
+          id: unreadCompletedNotification.id,
+          reservationId: unreadCompletedNotification.reservation_id,
+          status: unreadCompletedNotification.status,
+          createdAt: unreadCompletedNotification.created_at,
+          storeName: "상점",
+        };
+
+        setAcceptedOrder(orderInfo);
+        // pickup 상태도 completed 모달로 표시
+        setModalType("completed");
         setShowAcceptanceModal(true);
       }
     } catch (error) {
