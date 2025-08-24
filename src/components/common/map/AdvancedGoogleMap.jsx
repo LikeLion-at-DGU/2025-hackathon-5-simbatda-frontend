@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import mapPinIcon from "../../../assets/icons/active-pin.svg";
 import currentLocationPinIcon from "../../../assets/icons/current-pin.svg";
-import locationIcon from "../../../assets/icons/Location.png";
+import locationIcon from "../../../assets/icons/Location.svg";
 import inventoryPinDefault from "../../../assets/icons/inactive-pin.svg";
 
 const MapContainer = styled.div`
@@ -311,28 +311,25 @@ const AdvancedGoogleMap = ({
     }
   }, []); // 의존성 제거
 
-  const addCurrentLocationMarker = useCallback(
-    (location, mapInstance) => {
-      if (currentLocationMarkerRef.current) {
-        currentLocationMarkerRef.current.setMap(null);
-      }
+  const addCurrentLocationMarker = useCallback((location, mapInstance) => {
+    if (currentLocationMarkerRef.current) {
+      currentLocationMarkerRef.current.setMap(null);
+    }
 
-      const marker = new window.google.maps.Marker({
-        position: location,
-        map: mapInstance,
-        title: "현재 위치",
-        icon: {
-          url: currentLocationPinIcon,
-          scaledSize: new window.google.maps.Size(30, 30),
-          anchor: new window.google.maps.Point(24, 48),
-        },
-        zIndex: 1000,
-      });
+    const marker = new window.google.maps.Marker({
+      position: location,
+      map: mapInstance,
+      title: "현재 위치",
+      icon: {
+        url: currentLocationPinIcon,
+        scaledSize: new window.google.maps.Size(30, 30),
+        anchor: new window.google.maps.Point(24, 48),
+      },
+      zIndex: 1000,
+    });
 
-      setCurrentLocationMarker(marker);
-    },
-    [] 
-  );
+    setCurrentLocationMarker(marker);
+  }, []);
 
   const moveToCurrentLocation = useCallback(() => {
     if (currentLocationRef.current && mapInstanceRef.current) {

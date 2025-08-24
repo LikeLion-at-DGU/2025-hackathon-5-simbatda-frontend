@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import menuIcon from "../../../assets/icons/menu.png";
+import menuIcon from "../../../assets/icons/menu.svg";
 import starsquirrelIcon from "../../../assets/icons/starsquirrel.svg";
-import LocationIcon from "../../../assets/icons/Location.png";
-import DiscountIcon from "../../../assets/icons/Discount.png";
-import GoodQualityIcon from "../../../assets/icons/GoodQuality.png";
-import BillIcon from "../../../assets/icons/Bill.png";
+import LocationIcon from "../../../assets/icons/Location.svg";
+import DiscountIcon from "../../../assets/icons/Discount.svg";
+import GoodQualityIcon from "../../../assets/icons/GoodQuality.svg";
+import BillIcon from "../../../assets/icons/Bill.svg";
 import FavoriteIcon from "../../../assets/icons/like/brown-like.svg";
 import textLogo from "../../../assets/images/text-logo.svg";
 import {
