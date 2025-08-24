@@ -106,7 +106,7 @@ const RecommendedPage = () => {
       getProducts={getProducts}
       showExpiry={true}
       showCategory={false}
-      description="회원님이 좋아하실 재고를 발견했어요!"
+      description="이런 상품은 어떠세요?"
     />
   );
 };

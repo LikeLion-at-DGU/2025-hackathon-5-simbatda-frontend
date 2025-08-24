@@ -195,7 +195,7 @@ const ProductListPage = ({
       case "price-low":
         return "가격 낮은순";
       case "expiry-close":
-        return "유통기한 임박순";
+        return "마감순";
       default:
         return "최신순";
     }
@@ -259,7 +259,7 @@ const ProductListPage = ({
                   가격 낮은순
                 </DropdownItem>
                 <DropdownItem onClick={() => handleSortChange("expiry-close")}>
-                  유통기한 임박순
+                  마감순
                 </DropdownItem>
               </DropdownContent>
             )}

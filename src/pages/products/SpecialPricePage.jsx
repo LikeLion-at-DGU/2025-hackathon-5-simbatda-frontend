@@ -100,7 +100,7 @@ const SpecialPricePage = () => {
       getProducts={getProducts}
       showExpiry={true}
       showCategory={false}
-      description="30% 이상 할인된 상품을 확인해보세요!"
+      description="30% 이상 할인 상품입니다!"
     />
   );
 };
