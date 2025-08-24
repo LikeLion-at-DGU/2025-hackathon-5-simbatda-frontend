@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const PageContainer = styled.div`
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: #f5f5f5;
 `;
 
 export const Content = styled.div`
