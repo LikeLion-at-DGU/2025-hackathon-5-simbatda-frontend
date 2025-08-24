@@ -16,11 +16,9 @@ import {
   StoreInfo,
   StoreName,
   StoreStatus,
-  StoreDetails,
   StoreDetailItem,
   StoreDetailLabel,
   StoreDetailValue,
-  StoreProducts,
   StoreProductsTitle,
   ProductGrid,
   EmptyState,
@@ -34,7 +32,6 @@ const StoreDetail = () => {
   const [storeProducts, setStoreProducts] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
 
-  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -71,19 +68,16 @@ const StoreDetail = () => {
 
         if (!mounted) return;
 
-        // 찜 목록 가져오기
         let wishlistProducts = [];
         try {
           wishlistProducts = await getWishlistProducts();
         } catch (error) {
-          // 찜 목록 조회 실패 시 기본값 사용
+          console.error("찜 목록 가져오기 실패:", error);
         }
 
-        // 찜 상품 ID Set 생성
         const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
         const mapped = (Array.isArray(products) ? products : []).map((p) => {
-          // 찜 상태 확인
           const isLiked = wishlistProductIds.has(p.id);
 
           return {
@@ -127,7 +121,6 @@ const StoreDetail = () => {
     try {
       await toggleWishlist(productId, isLiked);
 
-      // 로컬 상태 업데이트
       const updatedProducts = storeProducts.map((product) => {
         if (product.id === productId) {
           return { ...product, isLiked: !isLiked };

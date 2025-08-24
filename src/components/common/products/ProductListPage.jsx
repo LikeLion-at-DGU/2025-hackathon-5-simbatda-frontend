@@ -52,7 +52,6 @@ const ProductListPage = ({
     };
   }, []);
 
-  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -67,9 +66,7 @@ const ProductListPage = ({
     fetchUserInfo();
   }, []);
 
-  // 초기 데이터 로딩
   useEffect(() => {
-
     if (!getProducts || typeof getProducts !== "function") {
       setProducts([]);
       setFilteredProducts([]);
@@ -93,7 +90,6 @@ const ProductListPage = ({
 
     const maybe = getProducts();
     if (maybe && typeof maybe.then === "function") {
-      // 비동기 소스인 경우: 한 번만 호출되도록 load 사용
       load();
     } else {
       const normalized = Array.isArray(maybe) ? maybe : [];
@@ -106,7 +102,6 @@ const ProductListPage = ({
     };
   }, [getProducts]);
 
-  // 검색/카테고리/정렬
   useEffect(() => {
     if (!Array.isArray(products) || products.length === 0) {
       return;
@@ -159,10 +154,8 @@ const ProductListPage = ({
 
   const handleProductLikeToggle = async (productId, isLiked) => {
     try {
-      // 실제 찜 등록/해제 API 호출
       await toggleWishlist(productId, isLiked);
 
-      // 상품 목록에서 해당 상품의 찜 상태 업데이트
       const updatedProducts = products.map((product) => {
         if (product.id === productId) {
           return { ...product, isLiked: !isLiked };
@@ -195,7 +188,7 @@ const ProductListPage = ({
       case "price-low":
         return "가격 낮은순";
       case "expiry-close":
-        return "유통기한 임박순";
+        return "마감순";
       default:
         return "최신순";
     }
@@ -259,7 +252,7 @@ const ProductListPage = ({
                   가격 낮은순
                 </DropdownItem>
                 <DropdownItem onClick={() => handleSortChange("expiry-close")}>
-                  유통기한 임박순
+                  마감순
                 </DropdownItem>
               </DropdownContent>
             )}

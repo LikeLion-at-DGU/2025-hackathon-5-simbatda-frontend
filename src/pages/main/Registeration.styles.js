@@ -2,9 +2,8 @@ import styled from "styled-components";
 
 const Container = styled.div`
   padding: 0;
-  margin: 0 auto;
+  margin: 0;
   background-color: #f5f5f5;
-  max-width: 100vw;
   overflow-x: hidden;
   display: flex;
   justify-content: center;
@@ -22,7 +21,7 @@ const ProductImageContainer = styled.div`
 
 const ProductImageSection = styled.div`
   text-align: center;
-  margin: 20px;
+  margin: 0 0 20px 0;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -45,7 +44,7 @@ const StoreName = styled.h2`
   font-size: 16px;
   font-weight: 600;
   color: #775c4a;
-  margin: 0 0 8px 20px;
+  margin: 0 0 8px 0;
   cursor: pointer;
   transition: color 0.2s;
 
@@ -59,14 +58,14 @@ const ProductName = styled.h1`
   font-size: 20px;
   font-weight: 600;
   color: #1f2937;
-  margin: 0 0 12px 20px;
+  margin: 0 0 10px 0;
   line-height: 1.3;
 `;
 
 const ProductDescription = styled.p`
   font-size: 14px;
   color: #6b7280;
-  margin: 0 0 20px 20px;
+  margin: 0 0 15px 0;
   line-height: 1.5;
 `;
 
@@ -74,7 +73,7 @@ const PriceSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 5px;
-  margin: 0 20px 20px 20px;
+  margin: 0 0 20px 0;
 `;
 
 const OriginalPrice = styled.span`
@@ -105,7 +104,7 @@ const RemainingTimeSection = styled.div`
   background-color: #fef3c7;
   padding: 12px 16px;
   border-radius: 8px;
-  margin: 0 20px 30px 20px;
+  margin: 0 0 30px 0;
   text-align: center;
 `;
 
@@ -136,7 +135,7 @@ const LikeButton = styled.button`
 `;
 
 const RecommendedSection = styled.div`
-  margin: 0 20px 100px 20px;
+  margin: 0 0 100px 0;
 `;
 
 const SectionTitle = styled.h3`

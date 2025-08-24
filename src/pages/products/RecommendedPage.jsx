@@ -25,21 +25,18 @@ const RecommendedPage = () => {
     }
   }, []);
 
-  // 사용자 위치 요청
   useEffect(() => {
     requestUserLocation();
   }, [requestUserLocation]);
 
   const getProducts = async () => {
-    // 찜 목록 가져오기
     let wishlistProducts = [];
     try {
       wishlistProducts = await getWishlistProducts();
     } catch (error) {
-      // 찜 목록 조회 실패 시 기본값 사용
+      console.error("찜 목록 가져오기 실패:", error);
     }
 
-    // 찜 상품 ID Set 생성
     const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
     const apiProducts =
@@ -54,7 +51,6 @@ const RecommendedPage = () => {
             ? await getStoreInfo(product.store_id)
             : null;
 
-          // 찜 상태 확인
           const isLiked = wishlistProductIds.has(product.id);
 
           return {
@@ -76,7 +72,6 @@ const RecommendedPage = () => {
             categoryName: product.category_name || product.category?.name,
           };
         } catch (_) {
-          // 찜 상태 확인
           const isLiked = wishlistProductIds.has(product.id);
 
           return {
@@ -106,7 +101,7 @@ const RecommendedPage = () => {
       getProducts={getProducts}
       showExpiry={true}
       showCategory={false}
-      description="회원님이 좋아하실 재고를 발견했어요!"
+      description="이런 상품은 어떠세요?"
     />
   );
 };

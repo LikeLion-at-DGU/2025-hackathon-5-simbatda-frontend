@@ -52,12 +52,10 @@ function OrderHistory() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 주문내역 API 호출
     const fetchOrders = async () => {
       try {
         const reservations = await getReservations();
 
-        // API 응답을 기존 형식에 맞게 변환
         const mappedOrders = reservations.map((reservation) => ({
           id: reservation.id,
           reservationCode: reservation.reservation_code,
@@ -77,7 +75,6 @@ function OrderHistory() {
           expireDate: reservation.product.expire_date,
         }));
 
-        // 주문 상태별 우선순위 정렬 (진행중인 주문이 맨 위에 오도록)
         const sortedOrders = mappedOrders.sort((a, b) => {
           const statusPriority = {
             pending: 1, // 주문확인 대기 (가장 높음)
@@ -95,7 +92,6 @@ function OrderHistory() {
 
         setOrders(sortedOrders);
 
-        // 첫 번째 주문에서 사용자 정보 가져오기 (fallback)
         if (sortedOrders.length > 0 && sortedOrders[0].consumer) {
           setUserInfo({ name: sortedOrders[0].consumer.name });
         }
@@ -105,25 +101,21 @@ function OrderHistory() {
       }
     };
 
-    // 사용자 정보 가져오기 (우선)
     const fetchUserInfo = async () => {
       try {
         const userData = await getConsumerMe();
         setUserInfo({ name: userData.name });
       } catch (error) {
         console.error("사용자 정보 조회 오류:", error);
-        // 주문 내역에서 사용자 정보 가져오기 시도
         fetchOrders();
       }
     };
 
-    // 주문내역과 사용자 정보 모두 가져오기
     fetchOrders();
     fetchUserInfo();
   }, []);
 
   const getStatusText = (status) => {
-    // 상태값을 대문자로 정규화
     const normalizedStatus = status?.toLowerCase();
 
     switch (normalizedStatus) {
@@ -143,7 +135,6 @@ function OrderHistory() {
   };
 
   const getStatusColor = (status) => {
-    // 상태값을 소문자로 정규화
     const normalizedStatus = status?.toLowerCase();
 
     switch (normalizedStatus) {
@@ -162,7 +153,6 @@ function OrderHistory() {
     }
   };
 
-  // 날짜 포맷팅 함수
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -175,7 +165,6 @@ function OrderHistory() {
   };
 
   const getProgressSteps = (status) => {
-    // 상태값을 소문자로 정규화
     const normalizedStatus = status?.toLowerCase();
 
     const steps = [
@@ -186,7 +175,6 @@ function OrderHistory() {
 
     return steps.map((step) => {
       if (step.status === "pending") {
-        // 주문 확인 단계
         if (normalizedStatus === "pending") {
           return {
             ...step,
@@ -210,7 +198,6 @@ function OrderHistory() {
           };
         }
       } else if (step.status === "ready") {
-        // 상품 준비 단계
         if (normalizedStatus === "ready") {
           return { ...step, isCurrent: true, isCompleted: false };
         } else if (normalizedStatus === "pickup") {
@@ -221,7 +208,6 @@ function OrderHistory() {
           return { ...step, isPending: true, isCurrent: false };
         }
       } else if (step.status === "pickup") {
-        // 픽업 완료 단계
         if (normalizedStatus === "pickup") {
           return { ...step, isCurrent: true, isCompleted: false };
         } else if (["pending", "confirm", "ready"].includes(normalizedStatus)) {

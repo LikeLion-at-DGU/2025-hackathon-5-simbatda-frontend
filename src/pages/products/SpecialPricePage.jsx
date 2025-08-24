@@ -24,19 +24,17 @@ const SpecialPricePage = () => {
         lat = position.coords.latitude;
         lng = position.coords.longitude;
       } catch (_) {
-        // 권한 거부/실패 시 기본값 유지
+        console.error("위치 정보 가져오기 실패:", error);
       }
     }
 
-    // 찜 목록 가져오기
     let wishlistProducts = [];
     try {
       wishlistProducts = await getWishlistProducts();
     } catch (error) {
-      // 찜 목록 조회 실패 시 기본값 사용
+      console.error("찜 목록 가져오기 실패:", error);
     }
 
-    // 찜 상품 ID Set 생성
     const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
     const apiProducts = await getSpecialPriceProducts(lat, lng, radius);
@@ -48,7 +46,6 @@ const SpecialPricePage = () => {
             ? await getStoreInfo(product.store_id)
             : null;
 
-          // 찜 상태 확인
           const isLiked = wishlistProductIds.has(product.id);
 
           return {
@@ -70,7 +67,6 @@ const SpecialPricePage = () => {
             categoryName: product.category_name || product.category?.name,
           };
         } catch (_) {
-          // 찜 상태 확인
           const isLiked = wishlistProductIds.has(product.id);
 
           return {
@@ -100,7 +96,7 @@ const SpecialPricePage = () => {
       getProducts={getProducts}
       showExpiry={true}
       showCategory={false}
-      description="30% 이상 할인된 상품을 확인해보세요!"
+      description="30% 이상 할인 상품입니다!"
     />
   );
 };
