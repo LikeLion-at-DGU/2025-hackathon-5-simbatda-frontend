@@ -117,7 +117,9 @@ const OrderCard = ({
       <OrderInfo>
         <InfoRow>
           <InfoLabel>예약 번호</InfoLabel>
-          <InfoValue>{order.reservationCode || order.id}</InfoValue>
+          <InfoValue>
+            {order.reservation_code || order.reservationCode || order.id}
+          </InfoValue>
         </InfoRow>
 
         {order.status !== "cancel" && (

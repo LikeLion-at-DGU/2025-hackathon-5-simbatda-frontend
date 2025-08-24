@@ -99,6 +99,7 @@ function MainPageSeller() {
 
       const transformedOrders = orders.map((order) => ({
         id: order.id,
+        reservation_code: order.reservation_code,
         reservationCode: `B${order.id.toString().padStart(5, "0")}`,
         productName: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,

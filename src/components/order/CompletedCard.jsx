@@ -44,7 +44,9 @@ export default function CompletedCard({ children, stockInfo, ...props }) {
       <OrderInfo>
         <InfoRow>
           <InfoLabel>예약 번호</InfoLabel>
-          <InfoValue>{children.orderNumber}</InfoValue>
+          <InfoValue>
+            {children.reservation_code || children.orderNumber}
+          </InfoValue>
         </InfoRow>
         <InfoRow>
           <InfoLabel>픽업 시간</InfoLabel>

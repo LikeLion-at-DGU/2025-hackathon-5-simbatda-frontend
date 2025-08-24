@@ -54,6 +54,7 @@ export default function OrderCompleted() {
 
       const transformedOrders = completedOrders.map((order) => ({
         id: order.id,
+        reservation_code: order.reservation_code,
         reservation_number: `B${order.id.toString().padStart(5, "0")}`,
         product_name: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
@@ -121,6 +122,7 @@ export default function OrderCompleted() {
 
     acc[date].push({
       id: order.id,
+      reservation_code: order.reservation_code,
       createdAt: (() => {
         const date = new Date(order.created_at);
         const hour = date.getHours();
@@ -148,6 +150,9 @@ export default function OrderCompleted() {
           })()
         : "픽업 시간 미정",
       currentStock: currentStock,
+      // product와 quantity 정보 추가
+      product: order.product,
+      quantity: order.quantity,
     });
 
     return acc;
@@ -209,10 +214,17 @@ export default function OrderCompleted() {
                     })
                     .map((order, index) => (
                       <CompletedCard
-                        key={`${date}-${index}`}
-                        stockInfo={order.currentStock}
+                        key={order.id}
+                        stockInfo={productStocks[order.product?.id]}
                       >
-                        {order}
+                        {{
+                          id: order.id,
+                          reservation_code: order.reservation_code,
+                          createdAt: order.createdAt,
+                          orderNumber: order.orderNumber,
+                          itemSummary: order.itemSummary,
+                          pickupTime: order.pickupTime,
+                        }}
                       </CompletedCard>
                     ))}
                 </DateSection>
