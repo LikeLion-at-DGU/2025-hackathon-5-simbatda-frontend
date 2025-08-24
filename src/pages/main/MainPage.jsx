@@ -157,8 +157,8 @@ function MainPage() {
       // 찜 상품 ID Set 생성 (빠른 검색용)
       const wishlistProductIds = new Set(wishlistProducts.map(p => p.id));
       
-      // 추천상품 데이터: 소비자 추천 API 사용
-      const rec = await getRecommendedProducts();
+      // 추천상품 데이터: 소비자 추천 API 사용 (위치 기반)
+      const rec = await getRecommendedProducts(userLocation.lat, userLocation.lng);
       const mappedRec = await Promise.all(
         (rec || []).map(async (product) => {
           try {
@@ -329,10 +329,7 @@ function MainPage() {
       const allProductsForMap = [...mappedAllProducts];
       
       // 디버깅: userLocation 정보 확인
-      console.log("=== fetchProductsData 디버깅 ===");
-      console.log("userLocation:", userLocation);
-      console.log("currentLocation:", currentLocation);
-      console.log("mappedAllProducts 개수:", mappedAllProducts.length);
+
       
       // 중복 제거하면서 정확한 source 정보 설정
       const uniqueProducts = [];
@@ -372,7 +369,7 @@ function MainPage() {
         // 실제 거리가 0.05 이하인 상품만 nearby로 설정
         const isNearby = product.distance <= 0.05;
         
-        console.log(`상품 ${product.id}: 거리=${product.distance.toFixed(6)}, nearby=${isNearby}`);
+
         
         uniqueProducts.push({
           ...product,
@@ -380,8 +377,7 @@ function MainPage() {
         });
       });
       
-      console.log("최종 uniqueProducts:", uniqueProducts.map(p => ({ id: p.id, source: p.source })));
-      console.log("=== 디버깅 끝 ===");
+
       
       // 주변 상품과 전체 상품 분리
       const nearbyProducts = uniqueProducts.filter(p => p.source === "nearby");

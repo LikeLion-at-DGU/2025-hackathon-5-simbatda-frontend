@@ -30,7 +30,7 @@ export const useOrderAcceptance = () => {
 export const OrderAcceptanceProvider = ({ children }) => {
   const [showAcceptanceModal, setShowAcceptanceModal] = useState(false);
   const [acceptedOrder, setAcceptedOrder] = useState(null);
-  const [modalType, setModalType] = useState("accepted"); 
+  const [modalType, setModalType] = useState("accepted");
 
   // 주문 알림 체크 함수 (수락/거절 모두 처리)
   const checkOrderAcceptance = async () => {
@@ -62,11 +62,6 @@ export const OrderAcceptanceProvider = ({ children }) => {
             notification.status === "pickup") &&
           !notification.is_read
       );
-
-      // 디버깅을 위한 로그 추가
-      console.log("unreadConfirmNotification:", unreadConfirmNotification);
-      console.log("unreadCancelNotification:", unreadCancelNotification);
-      console.log("unreadCompletedNotification:", unreadCompletedNotification);
 
       // 주문 수락 알림이 있으면 우선 표시
       if (unreadConfirmNotification) {

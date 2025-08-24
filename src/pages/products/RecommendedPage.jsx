@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ProductListPage from "../../components/common/products/ProductListPage";
 import {
   getRecommendedProducts,
@@ -7,6 +7,29 @@ import {
 } from "../../api/products";
 
 const RecommendedPage = () => {
+  const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
+
+  const requestUserLocation = useCallback(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("위치 정보를 가져올 수 없습니다:", error);
+        }
+      );
+    }
+  }, []);
+
+  // 사용자 위치 요청
+  useEffect(() => {
+    requestUserLocation();
+  }, [requestUserLocation]);
+
   const getProducts = async () => {
     // 찜 목록 가져오기
     let wishlistProducts = [];
@@ -19,7 +42,10 @@ const RecommendedPage = () => {
     // 찜 상품 ID Set 생성
     const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
-    const apiProducts = await getRecommendedProducts();
+    const apiProducts =
+      userLocation.lat && userLocation.lng
+        ? await getRecommendedProducts(userLocation.lat, userLocation.lng)
+        : await getRecommendedProducts();
 
     const mapped = await Promise.all(
       (apiProducts || []).map(async (product) => {
