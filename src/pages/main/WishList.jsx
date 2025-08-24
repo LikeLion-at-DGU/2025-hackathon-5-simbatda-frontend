@@ -86,14 +86,9 @@ const WishList = () => {
     navigate(`/registeration/${productId}`);
   };
 
-  const handleLogout = () => {
-    console.log("로그아웃");
-    navigate("/signin");
-  };
-
   return (
     <Container>
-      <Header userInfo={userInfo} onLogout={handleLogout} title="찜 목록" />
+      <Header userInfo={userInfo} title="찜 목록" />
 
       {loading ? (
         <EmptyState>

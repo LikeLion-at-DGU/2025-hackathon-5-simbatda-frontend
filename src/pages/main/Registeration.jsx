@@ -83,6 +83,7 @@ import {
   NoRecommendationContainer,
   NoRecommendationImageContainer,
 } from "./Registeration.styles";
+import { Content } from "./MainPage.styles";
 
 const Registeration = () => {
   const { productId } = useParams();
@@ -340,91 +341,92 @@ const Registeration = () => {
     <Container>
       <BackHeader title="상품 상세" />
 
-      <ProductImageContainer>
-        <ProductImageSection>
-          <ProductImage
-            src={product.imageUrl || "/src/assets/images/defaultImage.svg"}
-            alt={product.name}
-          />
-          <LikeButton onClick={handleLikeToggle}>
-            <img src={isLiked ? like : unlike} alt="좋아요" />
-          </LikeButton>
-        </ProductImageSection>
-      </ProductImageContainer>
+      <Content>
+        <ProductImageContainer>
+          <ProductImageSection>
+            <ProductImage
+              src={product.imageUrl || "/src/assets/images/defaultImage.svg"}
+              alt={product.name}
+            />
+            <LikeButton onClick={handleLikeToggle}>
+              <img src={isLiked ? like : unlike} alt="좋아요" />
+            </LikeButton>
+          </ProductImageSection>
+        </ProductImageContainer>
 
-      <StoreName onClick={handleStoreClick}>
-        {store.name} {" >"}
-      </StoreName>
+        <StoreName onClick={handleStoreClick}>
+          {store.name} {" >"}
+        </StoreName>
 
-      <ProductName>{product.name}</ProductName>
+        <ProductName>{product.name}</ProductName>
 
-      <ProductDescription>{product.description}</ProductDescription>
+        <ProductDescription>{product.description}</ProductDescription>
 
-      <PriceSection>
-        <OriginalPrice>
-          {Number(product.originalPrice || 0).toLocaleString()}원
-        </OriginalPrice>
-        <DiscountInfo>
-          <DiscountRate>{Number(product.discountRate || 0)}%</DiscountRate>
-          <DiscountPrice>
-            {Number(product.discountPrice || 0).toLocaleString()}원
-          </DiscountPrice>
-        </DiscountInfo>
-      </PriceSection>
+        <PriceSection>
+          <OriginalPrice>
+            {Number(product.originalPrice || 0).toLocaleString()}원
+          </OriginalPrice>
+          <DiscountInfo>
+            <DiscountRate>{Number(product.discountRate || 0)}%</DiscountRate>
+            <DiscountPrice>
+              {Number(product.discountPrice || 0).toLocaleString()}원
+            </DiscountPrice>
+          </DiscountInfo>
+        </PriceSection>
 
-      <RemainingTimeSection>
-        <RemainingTimeTitle>
-          D-{product.remainingTime.days},{" "}
-          {String(product.remainingTime.hours).padStart(2, "0")}:
-          {String(product.remainingTime.minutes).padStart(2, "0")}:
-          {String(product.remainingTime.seconds).padStart(2, "0")} 남음
-        </RemainingTimeTitle>
-      </RemainingTimeSection>
+        <RemainingTimeSection>
+          <RemainingTimeTitle>
+            D-{product.remainingTime.days},{" "}
+            {String(product.remainingTime.hours).padStart(2, "0")}:
+            {String(product.remainingTime.minutes).padStart(2, "0")}:
+            {String(product.remainingTime.seconds).padStart(2, "0")} 남음
+          </RemainingTimeTitle>
+        </RemainingTimeSection>
 
-      {recommended.length > 0 ? (
-        <RecommendedSection>
-          <SectionTitle>
-            {userInfo?.name || "사용자"}님 취향과 비슷한 상품이에요!
-          </SectionTitle>
-          <ProductsContainer>
-            {recommended.map((recommendedProduct) => (
-              <ProductCard
-                key={recommendedProduct.id}
-                variant="compact"
-                storeName={recommendedProduct.storeName}
-                productName={recommendedProduct.productName}
-                originalPrice={recommendedProduct.originalPrice}
-                discountPrice={recommendedProduct.discountPrice}
-                imageUrl={recommendedProduct.imageUrl}
-                isLiked={recommendedProduct.isLiked}
-                onLikeToggle={(isLiked) =>
-                  handleRecommendedProductLikeToggle(
-                    recommendedProduct.id,
-                    isLiked
-                  )
-                }
-                onClick={() =>
-                  navigate(`/registeration/${recommendedProduct.id}`)
-                }
-              />
-            ))}
-          </ProductsContainer>
-        </RecommendedSection>
-      ) : (
-        <NoRecommendationContainer>
-          <NoRecommendationText>
-            원하는 상품 찜하시면 재고를 추천해드려요!
-          </NoRecommendationText>
-          <NoRecommendationImageContainer>
-            <NoRecommendationImage src={character} alt="character" />
-          </NoRecommendationImageContainer>
-        </NoRecommendationContainer>
-      )}
+        {recommended.length > 0 ? (
+          <RecommendedSection>
+            <SectionTitle>
+              {userInfo?.name || "사용자"}님 취향과 비슷한 상품이에요!
+            </SectionTitle>
+            <ProductsContainer>
+              {recommended.map((recommendedProduct) => (
+                <ProductCard
+                  key={recommendedProduct.id}
+                  variant="compact"
+                  storeName={recommendedProduct.storeName}
+                  productName={recommendedProduct.productName}
+                  originalPrice={recommendedProduct.originalPrice}
+                  discountPrice={recommendedProduct.discountPrice}
+                  imageUrl={recommendedProduct.imageUrl}
+                  isLiked={recommendedProduct.isLiked}
+                  onLikeToggle={(isLiked) =>
+                    handleRecommendedProductLikeToggle(
+                      recommendedProduct.id,
+                      isLiked
+                    )
+                  }
+                  onClick={() =>
+                    navigate(`/registeration/${recommendedProduct.id}`)
+                  }
+                />
+              ))}
+            </ProductsContainer>
+          </RecommendedSection>
+        ) : (
+          <NoRecommendationContainer>
+            <NoRecommendationText>
+              원하는 상품 찜하시면 재고를 추천해드려요!
+            </NoRecommendationText>
+            <NoRecommendationImageContainer>
+              <NoRecommendationImage src={character} alt="character" />
+            </NoRecommendationImageContainer>
+          </NoRecommendationContainer>
+        )}
 
-      <ReservationButton onClick={handleReservationClick}>
-        예약하기
-      </ReservationButton>
-
+        <ReservationButton onClick={handleReservationClick}>
+          예약하기
+        </ReservationButton>
+      </Content>
       {reservationBottomSheetOpen && (
         <>
           <BottomSheetOverlay

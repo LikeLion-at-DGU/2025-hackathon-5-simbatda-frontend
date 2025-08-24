@@ -2,10 +2,18 @@ import styled from "styled-components";
 
 const Container = styled.div`
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #f5f5f5;
   padding: 0 25px;
-  margin-top: 100px;
   margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+`;
+
+const Content = styled.div`
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0;
+  width: 100%;
 `;
 
 const OrderList = styled.div`
@@ -324,4 +332,5 @@ export {
   ProgressStepBar,
   PickupMessage,
   ExpireDate,
+  Content,
 };

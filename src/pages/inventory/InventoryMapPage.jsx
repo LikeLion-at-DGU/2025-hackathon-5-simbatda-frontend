@@ -547,11 +547,7 @@ const InventoryMapPage = () => {
   if (loading) {
     return (
       <PageContainer>
-        <Header
-          userInfo={userInfo || { name: "사용자" }}
-          title={"재고 지도"}
-          onLogout={() => {}}
-        />
+        <Header userInfo={userInfo || { name: "사용자" }} title={"재고 지도"} />
         <Content>
           <div
             style={{
@@ -572,11 +568,7 @@ const InventoryMapPage = () => {
 
   return (
     <PageContainer>
-      <Header
-        userInfo={userInfo || { name: "사용자" }}
-        title={"재고 지도"}
-        onLogout={() => {}}
-      />
+      <Header userInfo={userInfo || { name: "사용자" }} title={"재고 지도"} />
 
       <Content>
         <PageTitle>재고 지도</PageTitle>
