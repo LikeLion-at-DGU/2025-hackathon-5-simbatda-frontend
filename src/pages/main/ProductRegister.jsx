@@ -12,8 +12,6 @@ import Button from "../../components/common/button/Button";
 import {
   PageContainer,
   Content,
-  OpenStatusSection,
-  OpenStatusText,
   SectionTitle,
   SectionTitleWrapper,
   EmptyMessage,
@@ -47,13 +45,13 @@ import {
 
 import HeaderSeller from "../../components/common/header/HeaderSeller";
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
-import { useStoreStatus } from "../../hooks/useStoreStatus";
+
 import closeIcon from "../../assets/icons/x.svg";
 import ProductCard from "../../components/product/ProductCard";
 
 function ProductRegister() {
   const navigate = useNavigate();
-  const { isOpen, setIsOpen, handleToggleOpenStatus } = useStoreStatus();
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -193,8 +191,6 @@ function ProductRegister() {
     fetchCategories();
   }, []);
 
-  // localStorage에서 저장된 가게 상태 복원 (제거 - 서버에서만 상태를 가져옴)
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -219,13 +215,6 @@ function ProductRegister() {
     Math.max(0, Number(discountPercent) || 0)
   );
   const [finalPrice, setFinalPrice] = useState("");
-
-  useEffect(() => {
-    if (parsedBase && parsedPercent >= 0 && !finalPrice) {
-      const calculated = Math.round(parsedBase * (1 - parsedPercent / 100));
-      setFinalPrice(calculated);
-    }
-  }, [parsedBase, parsedPercent, finalPrice]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -287,7 +276,6 @@ function ProductRegister() {
         return;
       }
 
-      // 디버깅을 위한 로그 추가
       console.log("=== 상품 생성 요청 데이터 ===");
       console.log("메뉴 이름:", menuName);
       console.log("원 가격:", Number(basePrice || 0));
@@ -304,7 +292,6 @@ function ProductRegister() {
       console.log("유통기한:", expiryDate.toISOString());
       console.log("이미지 파일:", selectedImageFile);
 
-      // FormData 내용 확인
       console.log("=== FormData 내용 ===");
       for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
@@ -380,17 +367,6 @@ function ProductRegister() {
     <PageContainer>
       <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
       <Content>
-        <OpenStatusSection>
-          <Button
-            variant={isOpen === null ? "loading" : isOpen ? "open" : "close"}
-            onClick={handleToggleOpenStatus}
-            disabled={isOpen === null}
-          >
-            {isOpen === null ? "로딩 중..." : isOpen ? "open" : "close"}
-          </Button>
-          <OpenStatusText>영업상태 변경</OpenStatusText>
-        </OpenStatusSection>
-
         <SectionTitleWrapper>
           <SectionTitle onClick={() => navigate("/mainpage-seller")}>
             주문 현황

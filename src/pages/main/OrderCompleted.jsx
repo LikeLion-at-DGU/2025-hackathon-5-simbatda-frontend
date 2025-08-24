@@ -8,12 +8,10 @@ import {
 import { logout } from "../../api/auth";
 import CompletedCard from "../../components/order/CompletedCard";
 import Button from "../../components/common/button/Button";
-import { useStoreStatus } from "../../hooks/useStoreStatus";
+
 import {
   PageContainer,
   Content,
-  OpenStatusSection,
-  OpenStatusText,
   SectionTitleWrapper,
   SectionTitle,
   StatusButtons,
@@ -26,7 +24,7 @@ import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 export default function OrderCompleted() {
   const navigate = useNavigate();
-  const { isOpen, handleToggleOpenStatus } = useStoreStatus();
+
   const [userInfo, setUserInfo] = useState(null);
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +58,8 @@ export default function OrderCompleted() {
         product_name: order.product?.name || "상품명 없음",
         quantity: order.quantity || 1,
         price: order.product?.total_price || order.total_price || 0,
+        discount_price: order.product?.discount_price || null,
+        discount_rate: order.product?.discount_rate || null,
         created_at: order.created_at,
         pickup_time: order.pickup_time || order.reserved_at || order.created_at,
         status: order.status,
@@ -133,6 +133,10 @@ export default function OrderCompleted() {
       orderNumber:
         order.reservation_number || `B${order.id.toString().padStart(5, "0")}`,
       itemSummary: `${order.product_name || "상품명 없음"} ${order.quantity}개`,
+      // 가격 정보 추가
+      totalPrice: order.price,
+      discount_price: order.discount_price,
+      discount_rate: order.discount_rate,
       pickupTime: order.pickup_time
         ? (() => {
             const date = new Date(order.pickup_time);
@@ -164,16 +168,6 @@ export default function OrderCompleted() {
       <HeaderSeller userInfo={userInfo} onLogout={handleLogout} />
 
       <Content>
-        <OpenStatusSection>
-          <Button
-            variant={isOpen ? "open" : "close"}
-            onClick={handleToggleOpenStatus}
-          >
-            {isOpen ? "open" : "close"}
-          </Button>
-          <OpenStatusText>영업상태 변경</OpenStatusText>
-        </OpenStatusSection>
-
         <SectionTitleWrapper>
           <SectionTitle className="active">주문 현황</SectionTitle>
           <SectionTitle onClick={() => navigate("/product-register")}>

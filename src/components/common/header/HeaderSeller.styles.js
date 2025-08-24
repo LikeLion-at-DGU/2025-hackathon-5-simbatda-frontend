@@ -24,6 +24,13 @@ const BrandLogo = styled.img`
   height: 50px;
 `;
 
+const RightSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-right: 10px;
+`;
+
 const HamburgerButton = styled.button`
   width: 30px;
   height: 30px;
@@ -104,19 +111,34 @@ const Nickname = styled.span`
 `;
 
 const LogoutButton = styled.button`
-  color: #775c4a;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  text-decoration-line: underline;
-  border: none;
   background: none;
-  padding: 0;
+  border: none;
+  color: #666;
+  font-size: 14px;
   cursor: pointer;
-  &:focus {
-    outline: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
   }
+`;
+
+const OpenStatusSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0 20px;
+
+  margin-top: 10px;
+`;
+
+const OpenStatusText = styled.span`
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
 `;
 const DrawerList = styled.nav`
   display: flex;
@@ -145,6 +167,7 @@ export {
   HeaderContainer,
   Brand,
   BrandLogo,
+  RightSection,
   HamburgerButton,
   Backdrop,
   Drawer,
@@ -153,6 +176,8 @@ export {
   ProfileInfo,
   Nickname,
   LogoutButton,
+  OpenStatusSection,
+  OpenStatusText,
   DrawerList,
   DrawerItem,
 };
