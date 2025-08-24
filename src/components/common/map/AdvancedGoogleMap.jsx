@@ -7,10 +7,10 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import mapPinIcon from "../../../assets/icons/map-pin.svg";
-import currentLocationPinIcon from "../../../assets/icons/pin.svg";
+import mapPinIcon from "../../../assets/icons/active-pin.svg";
+import currentLocationPinIcon from "../../../assets/icons/current-pin.svg";
 import locationIcon from "../../../assets/icons/Location.png";
-import inventoryPinDefault from "../../../assets/icons/inventory-pin.svg";
+import inventoryPinDefault from "../../../assets/icons/inactive-pin.svg";
 
 const MapContainer = styled.div`
   width: 100%;
@@ -323,7 +323,7 @@ const AdvancedGoogleMap = ({
         title: "현재 위치",
         icon: {
           url: currentLocationPinIcon,
-          scaledSize: new window.google.maps.Size(48, 48),
+          scaledSize: new window.google.maps.Size(30, 30),
           anchor: new window.google.maps.Point(24, 48),
         },
         zIndex: 1000,
@@ -331,7 +331,7 @@ const AdvancedGoogleMap = ({
 
       setCurrentLocationMarker(marker);
     },
-    [] // 의존성 제거
+    [] 
   );
 
   const moveToCurrentLocation = useCallback(() => {
@@ -493,41 +493,23 @@ const AdvancedGoogleMap = ({
         lng: markerData.position.lng + offset,
       };
 
-      // 상점별로 그룹화된 마커인 경우 상품 개수 표시
       let markerIcon;
       if (markerData.storeGroup) {
-        // 상품 개수를 표시하는 커스텀 아이콘 생성
-        const productCount = markerData.storeGroup.products.length;
-        const iconSize = 40; // 아이콘 크기 증가
-
-        // 핀 색상 결정:
-        // - markerData.type === "nearby": 주변 상품 (주황색 #FF6B35)
-        // - markerData.type === "other": 먼 거리 상품 (초록색 #37CA79)
-        // 이는 API 호출 시 위도/경도 포함 여부에 따라 결정됨
-
-        markerIcon = {
-          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-            <svg width="${iconSize}" height="${iconSize}" viewBox="0 0 ${iconSize} ${iconSize}" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- 핀 모양 -->
-              <!-- 주변 상품: 주황색(#FF6B35), 먼 거리 상품: 초록색(#37CA79) -->
-              <path d="M20 0C12.5 0 6 6.5 6 14.5C6 25 20 40 20 40S34 25 34 14.5C34 6.5 27.5 0 20 0Z" 
-                    fill="${
-                      markerData.type === "nearby" ? "#FF6B35" : "#37CA79"
-                    }"
-                    stroke="#FFFFFF" stroke-width="2"/>
-              
-              <!-- 상품 개수 원 -->
-              <circle cx="28" cy="12" r="10" fill="#FFFFFF" stroke="#333" stroke-width="1"/>
-              <text x="28" y="16" text-anchor="middle" fill="#333" font-size="12" font-weight="bold" font-family="Arial, sans-serif">
-                ${productCount > 99 ? "99+" : productCount}
-              </text>
-            </svg>
-          `)}`,
-          scaledSize: new window.google.maps.Size(iconSize, iconSize),
-          anchor: new window.google.maps.Point(20, 40),
-        };
+        const iconSize = 30; // 아이콘 크기 증가
+        if (markerData.type === "nearby") {
+          markerIcon = {
+            url: mapPinIcon,
+            scaledSize: new window.google.maps.Size(iconSize, iconSize),
+            anchor: new window.google.maps.Point(20, 40),
+          };
+        } else {
+          markerIcon = {
+            url: inventoryPinDefault,
+            scaledSize: new window.google.maps.Size(iconSize, iconSize),
+            anchor: new window.google.maps.Point(20, 40),
+          };
+        }
       } else {
-        // 기존 아이콘 사용
         markerIcon = {
           url: chosenIconUrl,
           scaledSize: new window.google.maps.Size(32, 32),
