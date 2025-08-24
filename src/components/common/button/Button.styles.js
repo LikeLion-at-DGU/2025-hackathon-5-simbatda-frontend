@@ -1,6 +1,5 @@
 import styled, { keyframes } from "styled-components";
 
-// 애니메이션
 const spin = keyframes`
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -27,7 +26,6 @@ export const StyledButton = styled.button`
   justify-content: center;
   gap: ${(props) => (props.$size === "small" ? "4px" : "8px")};
 
-  /* 기본 스타일 (큰 버튼) */
   background-color: var(--color-primary-brown);
   color: white;
 
@@ -47,7 +45,6 @@ export const StyledButton = styled.button`
     box-shadow: 0 0 0 3px var(--color-shadow-brown);
   }
 
-  /* 작은 버튼 variant별 스타일 */
   ${(props) =>
     props.$size === "small" &&
     props.$variant === "primary" &&
@@ -133,8 +130,7 @@ export const StyledButton = styled.button`
     }
   `}
 
-  /* 판매자 페이지  */
- ${(props) =>
+  ${(props) =>
     props.$variant === "status" &&
     `
   display: flex;
@@ -246,7 +242,6 @@ export const StyledButton = styled.button`
     }
   `}
 
-  /* 큰 버튼 variant 스타일 */
   ${(props) =>
     props.$size !== "small" &&
     props.$variant === "outline" &&
@@ -263,7 +258,6 @@ export const StyledButton = styled.button`
     }
   `}
 
-  /* 상태별 스타일 */
   ${(props) =>
     props.disabled &&
     `
@@ -281,7 +275,6 @@ export const StyledButton = styled.button`
     }
   `}
 
-  /* 로딩 상태 */
   ${(props) =>
     props.$loading &&
     `

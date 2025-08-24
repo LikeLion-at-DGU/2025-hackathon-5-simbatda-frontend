@@ -24,6 +24,7 @@ import {
 const ProductListPage = ({
   title,
   getProducts,
+  products: initialProducts,
   showExpiry = true,
   showCategory = true,
   description,
@@ -52,7 +53,6 @@ const ProductListPage = ({
     };
   }, []);
 
-  // 사용자 정보 가져오기
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -67,9 +67,15 @@ const ProductListPage = ({
     fetchUserInfo();
   }, []);
 
-  // 초기 데이터 로딩
   useEffect(() => {
+    // initialProducts가 있으면 그것을 사용
+    if (initialProducts && Array.isArray(initialProducts)) {
+      setProducts(initialProducts);
+      setFilteredProducts(initialProducts);
+      return;
+    }
 
+    // initialProducts가 없고 getProducts가 함수인 경우에만 호출
     if (!getProducts || typeof getProducts !== "function") {
       setProducts([]);
       setFilteredProducts([]);
@@ -93,7 +99,6 @@ const ProductListPage = ({
 
     const maybe = getProducts();
     if (maybe && typeof maybe.then === "function") {
-      // 비동기 소스인 경우: 한 번만 호출되도록 load 사용
       load();
     } else {
       const normalized = Array.isArray(maybe) ? maybe : [];
@@ -104,9 +109,8 @@ const ProductListPage = ({
     return () => {
       isMounted = false;
     };
-  }, [getProducts]);
+  }, [getProducts, initialProducts]);
 
-  // 검색/카테고리/정렬
   useEffect(() => {
     if (!Array.isArray(products) || products.length === 0) {
       return;
@@ -159,10 +163,8 @@ const ProductListPage = ({
 
   const handleProductLikeToggle = async (productId, isLiked) => {
     try {
-      // 실제 찜 등록/해제 API 호출
       await toggleWishlist(productId, isLiked);
 
-      // 상품 목록에서 해당 상품의 찜 상태 업데이트
       const updatedProducts = products.map((product) => {
         if (product.id === productId) {
           return { ...product, isLiked: !isLiked };
@@ -175,11 +177,6 @@ const ProductListPage = ({
     } catch (error) {
       console.error("ProductListPage 찜 토글 실패:", error);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    navigate("/signin");
   };
 
   const handleSearch = (searchTerm) => {
@@ -195,7 +192,7 @@ const ProductListPage = ({
       case "price-low":
         return "가격 낮은순";
       case "expiry-close":
-        return "유통기한 임박순";
+        return "마감순";
       default:
         return "최신순";
     }
@@ -213,7 +210,7 @@ const ProductListPage = ({
   if (!Array.isArray(products) || products.length === 0) {
     return (
       <PageContainer>
-        <Header userInfo={userInfo} onLogout={handleLogout} title={title} />
+        <Header userInfo={userInfo} title={title} />
         <EmptyState>
           <img src={empty} alt="empty" />
           {title === "추천 상품" ? (
@@ -223,8 +220,13 @@ const ProductListPage = ({
                 원하는 상품 찜을 하시면 재고를 추천해드려요!
               </EmptyText>
             </>
+          ) : title === "특가 상품" ? (
+            <>
+              <EmptyText>주변 특가 상품이 없습니다.</EmptyText>
+              <EmptyText>할인 상품이 준비되면 알려드릴게요!</EmptyText>
+            </>
           ) : (
-            <EmptyText>주변 특가 상품이 없습니다.</EmptyText>
+            <EmptyText>상품이 없습니다.</EmptyText>
           )}
         </EmptyState>
       </PageContainer>
@@ -233,7 +235,7 @@ const ProductListPage = ({
 
   return (
     <PageContainer>
-      <Header userInfo={userInfo} onLogout={handleLogout} title={title} />
+      <Header userInfo={userInfo} title={title} />
 
       <Content>
         <SearchBar onSearch={handleSearch} onChange={handleSearch} />
@@ -259,7 +261,7 @@ const ProductListPage = ({
                   가격 낮은순
                 </DropdownItem>
                 <DropdownItem onClick={() => handleSortChange("expiry-close")}>
-                  유통기한 임박순
+                  마감순
                 </DropdownItem>
               </DropdownContent>
             )}

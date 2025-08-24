@@ -118,7 +118,6 @@ const Registeration = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isReserving, setIsReserving] = useState(false);
 
-  // 찜 토글 함수
   const handleLikeToggle = async () => {
     try {
       const newLikedState = !isLiked;
@@ -131,7 +130,6 @@ const Registeration = () => {
     }
   };
 
-  // 사용자 위치 요청
   useEffect(() => {
     requestUserLocation();
   }, [requestUserLocation]);
@@ -148,13 +146,12 @@ const Registeration = () => {
           typeof detail.store === "number" ? detail.store : detail.store?.id;
         const storeInfo = storeId ? await getStoreInfo(storeId) : null;
 
-        // 찜 상태 확인
         let productIsLiked = false;
         try {
           const wishlistProducts = await getWishlistProducts();
           productIsLiked = wishlistProducts.some((p) => p.id === detail.id);
         } catch (error) {
-          // 찜 목록 조회 실패 시 기본값 사용
+          console.error("찜 목록 가져오기 실패:", error);
         }
 
         const expiry = detail.expiration_date
@@ -214,7 +211,6 @@ const Registeration = () => {
     let mounted = true;
     const loadRecommended = async () => {
       try {
-        // 찜 목록 가져오기
         let wishlistProducts = [];
         try {
           wishlistProducts = await getWishlistProducts();
@@ -223,7 +219,6 @@ const Registeration = () => {
         }
         const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
-        // 위치 정보가 있을 때만 추천상품 API 호출
         const list =
           userLocation.lat && userLocation.lng
             ? await getRecommendedProducts(userLocation.lat, userLocation.lng)
@@ -282,7 +277,6 @@ const Registeration = () => {
       setReservationBottomSheetOpen(false);
       document.body.style.overflow = "unset";
 
-      // 예약 완료 후 페이지 새로고침하여 재고 상태 업데이트
       window.location.reload();
     } catch (e) {
       alert("예약에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -305,12 +299,10 @@ const Registeration = () => {
     if (store?.id) navigate(`/store/${store.id}`);
   };
 
-  // 추천상품 찜 토글 처리
   const handleRecommendedProductLikeToggle = async (productId, isLiked) => {
     try {
       await toggleWishlist(productId, isLiked);
 
-      // 찜 목록 다시 가져오기
       let wishlistProducts = [];
       try {
         wishlistProducts = await getWishlistProducts();
@@ -319,7 +311,6 @@ const Registeration = () => {
       }
       const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
-      // 추천상품 목록 업데이트
       const updatedRecommended = recommended.map((product) => {
         if (product.id === productId) {
           return { ...product, isLiked: wishlistProductIds.has(product.id) };

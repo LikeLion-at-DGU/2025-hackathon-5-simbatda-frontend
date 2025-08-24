@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import ProductListPage from "../../components/common/products/ProductListPage";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import {
   getRecommendedProducts,
   getStoreInfo,
@@ -8,6 +9,8 @@ import {
 
 const RecommendedPage = () => {
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
 
   const requestUserLocation = useCallback(() => {
     if (navigator.geolocation) {
@@ -25,21 +28,40 @@ const RecommendedPage = () => {
     }
   }, []);
 
-  // 사용자 위치 요청
   useEffect(() => {
     requestUserLocation();
   }, [requestUserLocation]);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const fetchedProducts = await getProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error("추천 상품 조회 오류:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userLocation.lat && userLocation.lng) {
+      fetchProducts();
+    } else {
+      // 위치 정보가 없어도 기본 추천 상품 조회
+      fetchProducts();
+    }
+  }, [userLocation]);
+
   const getProducts = async () => {
-    // 찜 목록 가져오기
     let wishlistProducts = [];
     try {
       wishlistProducts = await getWishlistProducts();
     } catch (error) {
-      // 찜 목록 조회 실패 시 기본값 사용
+      console.error("찜 목록 가져오기 실패:", error);
     }
 
-    // 찜 상품 ID Set 생성
     const wishlistProductIds = new Set(wishlistProducts.map((p) => p.id));
 
     const apiProducts =
@@ -54,7 +76,6 @@ const RecommendedPage = () => {
             ? await getStoreInfo(product.store_id)
             : null;
 
-          // 찜 상태 확인
           const isLiked = wishlistProductIds.has(product.id);
 
           return {
@@ -76,7 +97,6 @@ const RecommendedPage = () => {
             categoryName: product.category_name || product.category?.name,
           };
         } catch (_) {
-          // 찜 상태 확인
           const isLiked = wishlistProductIds.has(product.id);
 
           return {
@@ -100,13 +120,17 @@ const RecommendedPage = () => {
     return mapped;
   };
 
+  if (loading) {
+    return <LoadingSpinner text="추천 상품을 불러오는 중..." />;
+  }
+
   return (
     <ProductListPage
       title="추천 상품"
-      getProducts={getProducts}
+      products={products}
       showExpiry={true}
       showCategory={false}
-      description="회원님이 좋아하실 재고를 발견했어요!"
+      description="이런 상품은 어떠세요?"
     />
   );
 };

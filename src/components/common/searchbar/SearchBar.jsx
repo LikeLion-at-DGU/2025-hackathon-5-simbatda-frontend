@@ -16,7 +16,6 @@ const SearchBar = ({
   const [internalValue, setInternalValue] = useState(externalValue || "");
   const isComposingRef = useRef(false);
 
-  // 외부에서 value가 변경되면 내부 상태도 업데이트
   useEffect(() => {
     if (externalValue !== undefined) {
       setInternalValue(externalValue);
