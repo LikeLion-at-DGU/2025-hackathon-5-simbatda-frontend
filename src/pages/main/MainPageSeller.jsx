@@ -36,7 +36,7 @@ import {
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
 import { useStoreStatus } from "../../hooks/useStoreStatus";
 
-import ImportantIcon from "../../assets/icons/Important.png";
+import ImportantIcon from "../../assets/icons/Important.svg";
 import HeaderSeller from "../../components/common/header/HeaderSeller";
 
 function MainPageSeller() {

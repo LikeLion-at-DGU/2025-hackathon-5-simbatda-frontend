@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import forward from "../../../assets/icons/forward.png";
+import forward from "../../../assets/icons/forward.svg";
 import { Header, BackButton, Title } from "./BackHeader.styles";
 
 const BackHeader = ({ title, onBackClick }) => {

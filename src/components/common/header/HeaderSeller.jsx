@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import menuIcon from "../../../assets/icons/menu.png";
-import starsquirrelIcon from "../../../assets/icons/starsquirrel.png";
+import menuIcon from "../../../assets/icons/menu.svg";
+import starsquirrelIcon from "../../../assets/icons/starsquirrel.svg";
 import textLogo from "../../../assets/images/text-logo.svg";
 import { useNavigate } from "react-router-dom";
 import {

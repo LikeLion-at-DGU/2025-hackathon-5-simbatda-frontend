@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import searchIcon from "../../../assets/icons/search.png";
+import searchIcon from "../../../assets/icons/search.svg";
 import {
   SearchBarContainer,
   SearchIcon,

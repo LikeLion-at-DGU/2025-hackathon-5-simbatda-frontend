@@ -48,7 +48,7 @@ import {
 import HeaderSeller from "../../components/common/header/HeaderSeller";
 import { Backdrop } from "../../components/common/header/HeaderSeller.styles";
 import { useStoreStatus } from "../../hooks/useStoreStatus";
-import closeIcon from "../../assets/icons/x.png";
+import closeIcon from "../../assets/icons/x.svg";
 import ProductCard from "../../components/product/ProductCard";
 
 function ProductRegister() {
