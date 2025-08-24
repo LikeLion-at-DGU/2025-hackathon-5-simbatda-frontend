@@ -226,7 +226,6 @@ const Registeration = () => {
         if (!mounted) return;
         const mapped = (Array.isArray(list) ? list : [])
           .filter((p) => p?.id !== Number(productId))
-          .slice(0, 5)
           .map((p) => ({
             id: p.id,
             storeName: p.store_name || p.store?.name || "상점",
