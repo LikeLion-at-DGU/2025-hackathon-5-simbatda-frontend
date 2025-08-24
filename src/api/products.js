@@ -158,12 +158,16 @@ export const getAllProducts = async () => {
 };
 
 // 추천 상품 조회 API (소비자 추천 엔드포인트 사용)
-export const getRecommendedProducts = async () => {
+export const getRecommendedProducts = async (lat, lng) => {
   try {
-    const response = await apiRequest(`/accounts/consumer/recommends/`, {
-      method: "GET",
-      auth: true,
-    });
+    const queryParams = lat && lng ? `?lat=${lat}&lng=${lng}` : "";
+    const response = await apiRequest(
+      `/accounts/consumer/recommends/${queryParams}`,
+      {
+        method: "GET",
+        auth: true,
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
