@@ -112,7 +112,6 @@ export default function OrderDetail() {
   const formatPickupTime = (pickupTime) => {
     if (!pickupTime) return "";
 
-    // 이미 포맷된 문자열인 경우 그대로 반환
     if (typeof pickupTime === "string" && pickupTime.includes("시")) {
       return pickupTime;
     }

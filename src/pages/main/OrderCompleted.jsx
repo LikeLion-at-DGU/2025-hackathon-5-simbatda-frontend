@@ -61,7 +61,7 @@ export default function OrderCompleted() {
         quantity: order.quantity || 1,
         price: order.product?.total_price || order.total_price || 0,
         created_at: order.created_at,
-        pickup_time: order.reserved_at || order.created_at,
+        pickup_time: order.pickup_time || order.reserved_at || order.created_at,
         status: order.status,
         consumer: order.consumer,
         product: order.product,
