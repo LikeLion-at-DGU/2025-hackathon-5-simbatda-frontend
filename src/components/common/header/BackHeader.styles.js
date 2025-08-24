@@ -13,6 +13,7 @@ const Header = styled.header`
   right: 0;
   z-index: 100;
   margin: 0 -25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const BackButton = styled.button`

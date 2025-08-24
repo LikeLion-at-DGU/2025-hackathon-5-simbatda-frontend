@@ -89,16 +89,26 @@ export default function OrderProgressCard({
       return pickupTime;
     }
 
-    const date = new Date(pickupTime);
-    if (isNaN(date.getTime())) {
-      return pickupTime;
+    if (!pickupTime) {
+      return "픽업 시간 미정";
     }
 
-    const hour = date.getHours();
-    const ampm = hour >= 12 ? "오후" : "오전";
-    const displayHour = hour >= 12 ? hour - 12 : hour;
+    try {
+      const date = new Date(pickupTime);
+      if (isNaN(date.getTime())) {
+        return pickupTime;
+      }
 
-    return `${ampm} ${displayHour}시`;
+      const hour = date.getHours();
+      const ampm = hour >= 12 ? "오후" : "오전";
+      const displayHour = hour >= 12 ? hour - 12 : hour;
+      const minute = String(date.getMinutes()).padStart(2, "0");
+
+      return `${ampm} ${displayHour}시 ${minute}분 픽업`;
+    } catch (error) {
+      console.error("Error formatting pickup time:", error);
+      return pickupTime || "픽업 시간 미정";
+    }
   };
 
   const isStatusClickable =

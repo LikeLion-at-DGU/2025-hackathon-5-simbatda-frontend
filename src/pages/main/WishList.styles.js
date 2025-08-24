@@ -4,34 +4,34 @@ export const Container = styled.div`
   min-height: 100vh;
   background: #f5f5f5;
   padding-bottom: 20px;
-  margin-top: 100px;
-  max-width: 100%;
+  padding-top: 100px;
+  max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
 `;
 
 export const CardsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   padding: 0 16px;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 24px;
     padding: 0 24px;
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 32px;
     padding: 0 32px;
   }
 
   @media (min-width: 1400px) {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 40px;
     padding: 0 40px;
   }
