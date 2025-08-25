@@ -91,7 +91,7 @@ const AdvancedGoogleMap = ({
         return;
       }
 
-      const storeKey = `${productLat.toFixed(4)}_${productLng.toFixed(4)}`;
+      const storeKey = `${productLat.toFixed(6)}_${productLng.toFixed(6)}`;
 
       if (!storeGroups[storeKey]) {
         storeGroups[storeKey] = {
