@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
 export const PageContainer = styled.div`
   min-height: 1080px;
@@ -25,12 +25,12 @@ export const Header = styled.header`
 `;
 
 export const Content = styled.main`
-  padding: 16px;
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 120px);
   max-width: 1200px;
   width: 100%;
+  margin-top: 20px;
 `;
 
 export const OpenStatusSection = styled.div`

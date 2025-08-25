@@ -84,7 +84,7 @@ const DrawerHeader = styled.div`
 const ProfileAvatar = styled.div`
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 10px;
   overflow: hidden;
 `;
 
