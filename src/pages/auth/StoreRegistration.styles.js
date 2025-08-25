@@ -6,7 +6,7 @@ export const LoginPageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 106px 24px 188px;
+  padding: 100px 24px 0 24px;
   margin: 0 auto;
   font-family: "Pretendard", sans-serif;
   width: 100%;
@@ -26,6 +26,8 @@ export const PictureSection = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  margin-bottom: 30px;
+  margin-top: 10px;
 `;
 
 export const SquirrelContainer = styled.div`

@@ -15,7 +15,6 @@ import {
   FormSection,
   SignupSection,
   SignupText,
-  SectionGuide,
 } from "./SignupSeller.styles";
 
 function SignupSeller() {
@@ -156,10 +155,7 @@ function SignupSeller() {
         </PictureSection>
 
         <FormSection onSubmit={handleSubmit}>
-          <SectionGuide>
-            사장님의 <strong>로그인</strong> 정보를
-            <br /> 입력해주세요.
-          </SectionGuide>
+          
           <Input
             label="이름"
             name="name"
