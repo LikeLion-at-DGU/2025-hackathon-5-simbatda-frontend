@@ -6,7 +6,6 @@ export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(true);
   const initialized = useRef(false);
 
-  // 초기 인증 상태 확인 (한 번만 실행)
   useEffect(() => {
     if (initialized.current) return;
 
@@ -20,7 +19,6 @@ export const useAuth = () => {
     checkAuth();
   }, []);
 
-  // logout 함수를 useCallback으로 메모이제이션
   const logout = useCallback(() => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -28,7 +26,6 @@ export const useAuth = () => {
     setIsAuthenticated(false);
   }, []);
 
-  // 직접 객체 반환
   return {
     isAuthenticated,
     isLoading,

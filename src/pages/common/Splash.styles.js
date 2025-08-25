@@ -63,12 +63,12 @@ export const PageContainer = styled.section`
 
   @media (max-width: 480px) {
     align-items: flex-start;
-    padding-top: 80px;
+    padding-top: 60px;
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 375px) {
     align-items: flex-start;
-    padding-top: 60px;
+    padding-top: 50px;
   }
 
   header {
