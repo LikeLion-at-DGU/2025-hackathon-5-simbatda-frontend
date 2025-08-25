@@ -8,7 +8,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import mapPinIcon from "../../../assets/icons/active-pin.png";
 import currentLocationPinIcon from "../../../assets/icons/current-pin.png";
-import locationIcon from "../../../assets/icons/Location.svg";
+import locationIcon from "../../../assets/icons/Location.png";
 import inventoryPinDefault from "../../../assets/icons/inactive-pin.png";
 import {
   MapContainer,

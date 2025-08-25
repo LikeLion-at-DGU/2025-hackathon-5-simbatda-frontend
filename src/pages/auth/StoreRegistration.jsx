@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/common/input/Input";
 import Button from "../../components/common/button/Button";
-import greenSquirrelIcon from "../../assets/images/greensquirrel.svg";
+import greenSquirrelIcon from "../../assets/images/greensquirrel.png";
 
 import {
   LoginPageContainer,
@@ -135,7 +135,7 @@ function StoreRegistration() {
 
         <PictureSection>
           <SquirrelContainer>
-            <img src={greenSquirrelIcon} alt="다람쥐" />
+            <img src={greenSquirrelIcon} alt="다람쥐" width={136} height={88} />
           </SquirrelContainer>
         </PictureSection>
 
