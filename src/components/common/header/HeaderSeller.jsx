@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import menuIcon from "../../../assets/icons/menu.svg";
-import starsquirrelIcon from "../../../assets/icons/starsquirrel.svg";
+import starsquirrelIcon from "../../../assets/icons/starsquirrel.png";
 import textLogo from "../../../assets/images/text-logo.svg";
 import { useNavigate } from "react-router-dom";
 import { useStoreStatus } from "../../../hooks/useStoreStatus";
@@ -66,9 +66,7 @@ const HeaderSeller = ({ userInfo, onLogout }) => {
         <RightSection>
           <OpenStatusSection>
             <Button
-              variant={
-                isOpen === null ? "secondary" : isOpen ? "open" : "close"
-              }
+              variant={isOpen === null ? "close" : isOpen ? "open" : "close"}
               onClick={handleToggleOpenStatus}
               disabled={isOpen === null}
             >
@@ -90,7 +88,7 @@ const HeaderSeller = ({ userInfo, onLogout }) => {
       <Drawer $open={drawerOpen} ref={drawerRef} aria-hidden={!drawerOpen}>
         <DrawerHeader>
           <ProfileAvatar>
-            <img src={starsquirrelIcon} alt="프로필" width={28} height={28} />
+            <img src={starsquirrelIcon} alt="프로필" width={40} height={40} />
           </ProfileAvatar>
           <ProfileInfo>
             <Nickname>

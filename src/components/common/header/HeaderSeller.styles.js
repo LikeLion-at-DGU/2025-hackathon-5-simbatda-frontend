@@ -85,10 +85,9 @@ const DrawerHeader = styled.div`
 `;
 
 const ProfileAvatar = styled.div`
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #ddcfc5;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,6 +98,7 @@ const ProfileInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
+  align-items: flex-start;
 `;
 
 const Nickname = styled.span`
@@ -116,7 +116,7 @@ const LogoutButton = styled.button`
   color: #666;
   font-size: 14px;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 0;
   border-radius: 4px;
   transition: background-color 0.2s;
 
