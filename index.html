@@ -1,10 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/greensquirrel.svg" />
+    <link rel="apple-touch-icon" href="/greensquirrel.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <meta
+      name="description"
+      content="동네 남는 재고, 도토리를 콕! 우리 동네 숨은 도토리를 찾는 재미"
+    />
+    <meta property="og:title" content="심봤다" />
+    <meta
+      property="og:description"
+      content="동네 남는 재고, 도토리를 콕! 우리 동네 숨은 도토리를 찾는 재미"
+    />
+    <meta property="og:image" content="/greensquirrel.svg" />
+    <meta property="og:type" content="website" />
+    <title>심봤다</title>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script
+      type="text/javascript"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1cd5b573ad17f0d64f44ccf0dade951c&libraries=services"
+    ></script>
+    <script
+      async
+      src="https://maps.googleapis.com/maps/api/js?key=%VITE_GOOGLE_MAPS_API_KEY%&callback=console.debug&libraries=maps,marker&v=beta&loading=async"
+    ></script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,5 +1,17 @@
+import { Outlet } from "react-router-dom";
+import "./styles/global.css";
+import { OrderAcceptanceProvider } from "./contexts/OrderAcceptanceContext";
+import OrderAcceptanceModal from "./components/common/modal/OrderAcceptanceModal";
+
 function App() {
-  return <>환경셋팅 완료</>;
+  return (
+    <OrderAcceptanceProvider>
+      <div className="app">
+        <Outlet />
+        <OrderAcceptanceModal />
+      </div>
+    </OrderAcceptanceProvider>
+  );
 }
 
 export default App;
