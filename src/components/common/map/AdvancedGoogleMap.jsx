@@ -206,7 +206,7 @@ const AdvancedGoogleMap = ({
         scaledSize: new window.google.maps.Size(30, 30),
         anchor: new window.google.maps.Point(24, 48),
       },
-      zIndex: 1000,
+      zIndex: 9999,
     });
 
     setCurrentLocationMarker(marker);
