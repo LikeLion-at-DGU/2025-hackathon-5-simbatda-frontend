@@ -10,7 +10,6 @@ import {
   PictureSection,
   SquirrelContainer,
   FormSection,
-  SectionGuide,
   UploadGroup,
   UploadRow,
   UploadText,
@@ -19,6 +18,7 @@ import {
   SignupSection,
   SignupText,
 } from "./StoreDocumentUpload.styles";
+import { Title } from "./Signin.styles";
 
 function StoreDocumentUpload() {
   const navigate = useNavigate();
@@ -138,6 +138,7 @@ function StoreDocumentUpload() {
   return (
     <LoginPageContainer>
       <MainContent>
+      <Title>판매자 회원가입</Title>
         <PictureSection>
           <SquirrelContainer>
             <img src={greenSquirrelIcon} alt="다람쥐" />
@@ -145,12 +146,6 @@ function StoreDocumentUpload() {
         </PictureSection>
 
         <FormSection onSubmit={handleSubmit}>
-          <SectionGuide>
-            <strong>매장 등록</strong>에 필요한 정보를
-            <br />
-            입력해 주세요.
-          </SectionGuide>
-
           <UploadGroup>
             <label>사업자 등록증</label>
             <UploadRow

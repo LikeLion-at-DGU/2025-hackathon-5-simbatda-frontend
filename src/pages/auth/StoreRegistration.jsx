@@ -10,15 +10,14 @@ import {
   PictureSection,
   SquirrelContainer,
   FormSection,
-  SectionGuide,
   SignupSection,
   SignupText,
 } from "./StoreRegistration.styles";
+import { Title } from "./Signin.styles";
 
 function StoreRegistration() {
   const navigate = useNavigate();
 
-  // 1단계 정보 확인
   useEffect(() => {
     const step1Data = localStorage.getItem("sellerSignupData");
     if (!step1Data) {
@@ -132,6 +131,8 @@ function StoreRegistration() {
   return (
     <LoginPageContainer>
       <MainContent>
+      <Title>판매자 회원가입</Title>
+
         <PictureSection>
           <SquirrelContainer>
             <img src={greenSquirrelIcon} alt="다람쥐" />
@@ -139,12 +140,6 @@ function StoreRegistration() {
         </PictureSection>
 
         <FormSection onSubmit={handleSubmit}>
-          <SectionGuide>
-            <strong>매장 등록</strong>에 필요한 정보를
-            <br />
-            입력해 주세요.
-          </SectionGuide>
-
           <Input
             label="가게명"
             name="storeName"

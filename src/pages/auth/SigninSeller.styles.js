@@ -6,7 +6,7 @@ export const LoginPageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 106px 24px 188px;
+  padding: 80px 24px 0 24px;
   margin: 0 auto;
   width: 100%;
   max-width: 100%;
@@ -50,6 +50,7 @@ export const ManagerLink = styled.div`
   color: #6b7280;
   text-align: center;
   margin-bottom: 50px;
+  margin-top: 10px;
 
   a {
     color: #8b4513;
