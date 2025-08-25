@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import dots from "../../assets/icons/dots.svg";
+import React, { useEffect, useState } from "react";
+import dots from "../../assets/icons/dots.png";
 import {
   CardContainer,
   StockNotice,
@@ -69,6 +69,18 @@ export default function ProductCard({ product, categories, onDelete }) {
         <span>
           현재 재고 {String(productStock).padStart(2, "")}개 남았습니다
         </span>
+        <div style={{ position: "relative" }}>
+          <div onClick={() => setMenuOpen((v) => !v)} $menu>
+            <img src={dots} alt="더보기" width={13} height={18} />
+          </div>
+          {menuOpen && (
+            <MoreMenu onMouseLeave={() => setMenuOpen(false)}>
+              <MoreMenuItem onClick={() => onDelete?.(product.id)}>
+                메뉴 삭제
+              </MoreMenuItem>
+            </MoreMenu>
+          )}
+        </div>
       </StockNotice>
 
       <CardBody>
@@ -95,18 +107,6 @@ export default function ProductCard({ product, categories, onDelete }) {
             <StatusPill>
               <span>판매 중</span>
             </StatusPill>
-            <div style={{ position: "relative" }}>
-              <StatusPill onClick={() => setMenuOpen((v) => !v)} $menu>
-                <img src={dots} alt="더보기" width={13} height={13} />
-              </StatusPill>
-              {menuOpen && (
-                <MoreMenu onMouseLeave={() => setMenuOpen(false)}>
-                  <MoreMenuItem onClick={() => onDelete?.(product.id)}>
-                    메뉴 삭제
-                  </MoreMenuItem>
-                </MoreMenu>
-              )}
-            </div>
           </div>
 
           <FooterRow>

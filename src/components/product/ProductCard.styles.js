@@ -13,6 +13,7 @@ export const StockNotice = styled.div`
   padding: 10px 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   &::before {
     content: "";
@@ -34,10 +35,10 @@ export const StockNotice = styled.div`
   }
 `;
 
+
 export const CardBody = styled.div`
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 12px;
   padding: 16px 0;
 `;
 
@@ -83,7 +84,7 @@ export const Category = styled.div`
 export const Title = styled.div`
   color: #000;
   font-family: Pretendard;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
 `;
 
@@ -101,10 +102,11 @@ export const RightColumn = styled.div`
   gap: 12px;
   align-items: flex-end;
   padding-right: 16px;
+  justify-content: space-between;
 `;
 
 export const StatusPill = styled.button`
-  padding: 6px 10px;
+  padding: 5px 8px;
   border-radius: 6px;
   border: 1px solid #ddd;
   background: ${(p) => (p.$active ? "#eaf9f1" : "#f8f9fa")};
@@ -158,7 +160,7 @@ export const ExpireLabel = styled.div`
   color: #37ca79;
 
   font-family: Pretendard;
-  font-size: 14px;
+  font-size: 12px;
 
   font-weight: 500;
   padding-left: 3px;
@@ -167,5 +169,5 @@ export const ExpireLabel = styled.div`
 export const Price = styled.div`
   color: #000;
   font-weight: 700;
-  font-size: 22px;
+  font-size: 18px;
 `;

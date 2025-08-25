@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PageContainer, SectionTitle, Content } from "./Splash.styles";
-import acorn1 from "../../assets/images/acorn1.svg";
-import textLogoWhite from "../../assets/images/text-logo-white.svg";
-import acorns from "../../assets/images/acorns.svg";
-import splashSquirrel from "../../assets/images/splashsquirrel.svg";
+import acorn1 from "../../assets/images/acorn1.png";
+import textLogoWhite from "../../assets/images/text-logo-white.png";
+import acorns from "../../assets/images/acorns.png";
+import splashSquirrel from "../../assets/images/splashsquirrel.png";
 import { getStoredTokens } from "../../api/client";
 
 const SHOW_MS = 4000;
